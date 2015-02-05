@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Import color
+source $DSS_ROOT/config/color
+
+# Check for a help flag
+if [ "$1" == "-h" ]; then
+
+	## Put your documentation here, a single line is best
+
+	echo "opens sublime to edit the commands folder"
+
+	## End help line
+
+	exit
+fi
+
+
+# Import system path
+export PATH=$PATH:$OLD_SYSTEM_PATH
+
+
+#### Put system commands here
+
+sublime $DSS_ROOT/bin
+
+#### End commands

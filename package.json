@@ -1,0 +1,27 @@
+{
+  "name": "av",
+  "version": "1.0.0",
+  "description": "make your own domain specific shell",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "av": "./av"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sio2boss/av.git"
+  },
+  "keywords": [
+    "domain specific shell",
+    "dss"
+  ],
+  "preferGlobal": true,
+  "author": "sio2boss",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sio2boss/av/issues"
+  },
+  "homepage": "https://github.com/sio2boss/av"
+}

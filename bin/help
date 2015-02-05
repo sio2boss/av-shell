@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Import color
+source $DSS_ROOT/config/color
+
+# Import system path
+export PATH=$PATH:$OLD_SYSTEM_PATH
+
+#### Put system commands here
+echo
+echo
+echo -e "${txtgrn}$PROMPT${txtrst} domain specific shell"
+echo
+echo
+
+printf "%-20s - %s\n" "help" "what you see here"
+for command in `ls -1 $DSS_ROOT/bin/ | grep -v help`; do
+	printf "%-20s - %s\n" "$command" "`$DSS_ROOT/bin/$command -h`"
+done
+echo
+
+#### End commands

@@ -1,0 +1,49 @@
+export OLD_SYSTEM_PATH=$PATH
+export PATH=$DSS_ROOT/bin
+
+source $DSS_ROOT/config/color
+
+# don't put duplicate lines in the history. See bash(1) for more options
+# ... or force ignoredups and ignorespace
+HISTCONTROL=ignoredups:ignorespace
+TERM=xterm-color
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+ 
+shopt -s cdspell
+shopt -s nocaseglob
+ 
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+ 
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color) color_prompt=yes;;
+esac
+ 
+# leave some commands out of history log
+export HISTIGNORE="&:bg:fg:ll:h:??:[ ]*:clear:exit:logout"
+export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
+export HISTTIMEFORMAT="%H:%M > "
+ 
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    . /etc/bash_completion
+fi
+
+# Make an alias so that help can run
+alias help='$DSS_ROOT/bin/help'
+
+
+# Set prompt to something short and different
+export PROMPT=`/bin/cat $DSS_ROOT/config/prompt`
+export PS1="${txtgrn}${PROMPT}${txtrst}> "
+
