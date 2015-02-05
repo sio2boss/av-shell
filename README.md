@@ -1,5 +1,7 @@
 # av
 
+[![Build Status](https://travis-ci.org/sio2boss/av.svg)](https://travis-ci.org/sio2boss/av)
+
 Make your own domain specific shell (DSS).  The power of bash customized for your project.
 
 ## Using
