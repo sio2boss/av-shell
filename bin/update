@@ -1,14 +1,14 @@
-#! /bin/bash
+#!/bin/bash
 
 # Import color
 source $DSS_ROOT/config/color
 
 # Check for a help flag
-if [ "$1" == "-h" ]; then
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
 
 	## Put your documentation here, a single line is best
 
-	echo "updates your local av environment with the latest [builtin]"
+	echo "[builtin] updates your local av environment with the latest"
 
 	## End help line
 
