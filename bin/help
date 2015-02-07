@@ -13,7 +13,7 @@ echo -e "${txtgrn}$PROMPT${txtrst} domain specific shell"
 echo
 echo
 
-printf "%-20s - %s\n" "help" "what you see here"
+printf "%-20s - %s\n" "help" "[builtin] what you see here"
 for command in `ls -1 $DSS_ROOT/bin/ | grep -v help`; do
 	printf "%-20s - %s\n" "$command" "`$DSS_ROOT/bin/$command -h`"
 done

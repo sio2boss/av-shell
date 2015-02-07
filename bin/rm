@@ -8,7 +8,7 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
 
 	## Put your documentation here, a single line is best
 
-	echo "[builtin] creates a new av environment"
+	echo "[builtin] delete a script"
 
 	## End help line
 
@@ -21,8 +21,13 @@ fi
 
 
 # Import system path
-export PATH=$PATH:$OLD_SYSTEM_PATH
+export PATH=$OLD_SYSTEM_PATH
 
 ## Put system commands here
+if [[ "$#" -eq 1 ]]; then
+	/bin/rm -f $DSS_ROOT/bin/$1
+else
+	echo "Please give me an argument, a script to nuke"
+fi
 
 ## End commands

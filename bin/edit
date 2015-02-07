@@ -4,11 +4,11 @@
 source $DSS_ROOT/config/color
 
 # Check for a help flag
-if [ "$1" == "-h" ]; then
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
 
 	## Put your documentation here, a single line is best
 
-	echo "opens sublime to edit the commands folder"
+	echo "[builtin] opens sublime to edit the commands folder"
 
 	## End help line
 
@@ -21,7 +21,26 @@ export PATH=$PATH:$OLD_SYSTEM_PATH
 
 
 #### Put system commands here
+if [ -z "$EDITOR" ]; then
 
-sublime $DSS_ROOT/bin
+	echo "set your EDITOR to something you like, I'm picking vi"
+	echo
+	echo "    something like: export EDITOR=sublime"
+	echo
+	echo -n "1..."
+	sleep 1
+	echo -n "2..."
+	sleep 1
+	echo -n "3..."
+	sleep 1
+	echo
+
+	vi $DSS_ROOT/bin/$1
+
+else
+
+	$EDITOR $DSS_ROOT/bin/$1
+
+fi
 
 #### End commands
