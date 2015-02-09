@@ -1,6 +1,6 @@
 # av
 
-[![Build Status](https://travis-ci.org/sio2boss/av.svg)](https://travis-ci.org/sio2boss/av)
+[![Build Status](https://travis-ci.org/sio2boss/av.svg)](https://travis-ci.org/sio2boss/av) [![Hack sio2boss/a on Nitrous](https://d3o0mnbgv6k92a.cloudfront.net/assets/hack-s-v1-0616054bfad452919522f1d08ad1fddf.png)](https://www.nitrous.io/hack_button?source=embed&runtime=go&repo=sio2boss%2Fa) 
 
 Make your own domain specific shell (DSS).  The power of bash customized for your project.
 

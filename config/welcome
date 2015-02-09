@@ -1,0 +1,19 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/color
+
+echo -e -n "${bldgrn}"
+echo '
+    _____ ___  __   
+    \__  \\  \/ /
+     / __ \\   /
+    (____  /\_/ 
+         \/ 
+'
+
+echo -e -n "${txtblu}"
+echo -e "Welcome to the av domain specific shell, your context has been set. Make"
+echo -e "sure to visit https://github.com/sio2boss/av for updates."
+echo -e -n "${txtrst}"
+echo

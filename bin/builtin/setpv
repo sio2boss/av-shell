@@ -9,9 +9,11 @@ avCheckHelpFlags "$1" "builtin" "template script" "\n \
     Template to help you out.\\n \
 \n"
 
-# Import system path
-avRestoreSystemPath
-
 #### Put system commands here
+if [[ $# -eq 2 ]]; then
+	echo "$2" > $AV_CONFIG_DIR/vars/$1
+else
+	echo "usage: setpv <var> <value>"
+fi
 
 #### End commands

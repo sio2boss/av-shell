@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Variables
-INSTALLED_PATH=/usr/local/lib/node_modules/av
+AV_INSTALLED_PATH=/usr/local/lib/node_modules/av
 
 # Figure out where the .av directory is starting with pwd
 upsearch () {
@@ -9,14 +9,14 @@ upsearch () {
   directory="$PWD"
   for (( n=${#slashes}; n>0; --n ))
   do
-    test -e "$directory/$1" && export DSS_ROOT="$directory/$1" && return
+    test -e "$directory/$1" && export AV_ROOT="$directory/$1" && return
     directory="$directory/.."
   done
 }
 upsearch ".av"
 
 # Built-in commands
-if [[ "$1" == "init" && -z "$DSS_ROOT" ]]; then
+if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
 	echo "This utility creates a new domain specific shell in your current path"
 	echo
 
@@ -26,8 +26,8 @@ if [[ "$1" == "init" && -z "$DSS_ROOT" ]]; then
 	echo
 	echo "copying files..."
 	mkdir .av
-	cp -r $INSTALLED_PATH/bin .av/
-	cp -r $INSTALLED_PATH/config .av/
+	cp -r $AV_INSTALLED_PATH/bin .av/
+	cp -r $AV_INSTALLED_PATH/config .av/
 	echo "$prompt" > .av/config/prompt
 
 	echo
@@ -36,7 +36,7 @@ if [[ "$1" == "init" && -z "$DSS_ROOT" ]]; then
 	exit
 fi
 
-if [ -z "$DSS_ROOT" ]; then
+if [ -z "$AV_ROOT" ]; then
 	echo "Unable to find av environment, have you run 'av init'?"
 	exit
 fi
@@ -44,26 +44,25 @@ fi
 
 # Handle update command
 if [ "$1" == "update" ]; then
-	cp -v $INSTALLED_PATH/bin/* $DSS_ROOT/bin/
-	cp -v $INSTALLED_PATH/config/color $DSS_ROOT/config/
-	cp -v $INSTALLED_PATH/config/template $DSS_ROOT/config/ 
+	cp -vr $AV_INSTALLED_PATH/bin/* $AV_ROOT/bin/
+	cp -rv $AV_INSTALLED_PATH/config/* $AV_ROOT/config/
 	exit
 fi
 
 
 # Change dir to script root
-cd $DSS_ROOT > /dev/null
+cd $AV_ROOT > /dev/null
 
 # If there are arguments, just run them rather than opening a shell
 if [ $# -eq 0 ]; then
 
 	# Open shell
-	DSS_ROOT=$DSS_ROOT bash --rcfile $DSS_ROOT/config/rc
+	AV_ROOT=$AV_ROOT bash --rcfile $AV_ROOT/config/rc
 
 else
 
 	# Run command in shell
-	DSS_ROOT=$DSS_ROOT PATH=$DSS_ROOT/bin:$PATH bash --rcfile $DSS_ROOT/config/rc -i -c "$*"
+	AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_ROOT/config/rc -i -c "$*"
 
 fi
 

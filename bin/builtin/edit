@@ -1,17 +1,18 @@
-#! /bin/bash
-
+#!/bin/bash
 
 # Import color
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "template script" "\n \
-    Template to help you out.\\n \
+avCheckHelpFlags "$1" "builtin" "Create a new command based on argument" "\n \
+    Open a script to edit \n \
 \n"
 
 # Import system path
 avRestoreSystemPath
 
 #### Put system commands here
+
+avLaunchEditor "$AV_BIN_DIR/$1"
 
 #### End commands

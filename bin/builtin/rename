@@ -14,4 +14,13 @@ avRestoreSystemPath
 
 #### Put system commands here
 
+if [ $# -ne 2 ]; then
+  echo "usage: rename <current> <new>"
+  echo "example: rename foo bar"
+  echo "example: rename builtin/foo builtin/magic"
+  exit
+fi
+
+mv $1 $2
+
 #### End commands
