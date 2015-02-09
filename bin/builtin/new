@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags $1 "builtin" "Create a new command based on argument" " \
+	\
+	creates a new script
+"
+
+# Restore system path
+avRestoreSystemPath
+
+#### Put system commands here
+
+# Check command line args
+if [ "$#" -eq 0 ]; then
+	echo -e "Need at least one argument, the name of the script to create."
+	exit
+fi
+
+
+# Requested file
+filename=$AV_BIN_DIR/$1
+
+if [ -e $filename ]; then
+	echo -e "File already exists, updating permissions only"
+	chmod +x $filename
+	exit
+fi
+
+# Start with template
+cp $AV_CONFIG_DIR/template $filename
+chmod +x $filename
+avLaunchEditor $filename
+
+#### Put system commands here
+
+

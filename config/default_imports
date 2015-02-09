@@ -1,0 +1,96 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/color
+
+# Check for a help flag
+# $1: args as in $1 from command line
+# $2: script category, i.e. builtin plugin_XYZ 
+# $3: single help line
+# $4: full help
+function avCheckHelpFlags
+{ 
+	if [[ $# -ne 4 ]]; then
+		echo -e "Error in calling avCheckHelpFlags!"
+		exit
+	fi
+
+	if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+
+		if [[ $AV_SINGLE_LINE_HELP == true ]]; then
+			echo -e "$3"
+		else
+			echo -e "$4"
+		fi
+
+		exit
+	fi
+}
+
+# Restore system path
+function avRestoreSystemPath
+{
+	export PATH=$AV_OLD_SYSTEM_PATH
+}
+
+# Restore system path
+function avAppendSystemPath
+{
+	export PATH=$PATH:$AV_OLD_SYSTEM_PATH
+}
+
+# Restore system path
+function avPrependSystemPath
+{
+	export PATH=$AV_OLD_SYSTEM_PATH:$PATH
+}
+
+# Figure out default editor and run it with provided filename (full path)
+function avLaunchEditor
+{
+	if [ -z "$EDITOR" ]; then
+
+		echo -e "set your EDITOR to something you like, I'm picking vi"
+		echo
+		echo -e "    something like: export EDITOR=sublime"
+		echo
+		echo -e -n "1..."
+		sleep 1
+		echo -e -n "2..."
+		sleep 1
+		echo -e -n "3..."
+		sleep 1
+		echo
+
+		vi $1
+
+	else
+
+		$EDITOR $1
+
+	fi
+}
+
+
+
+# Same as avCheckHelpFlags but instead of outputing full help, run command
+function avCheckHelpFlagsPassThrough
+{ 
+	if [[ $# -ne 4 ]]; then
+		echo -e "Error in calling avCheckHelpFlags!"
+		exit
+	fi
+
+	if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+
+		if [[ $AV_SINGLE_LINE_HELP == true ]]; then
+			echo -e "$3"
+		else
+			avRestoreSystemPath
+			$($4)
+		fi
+
+		exit
+	fi
+}
+

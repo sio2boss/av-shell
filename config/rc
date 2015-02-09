@@ -1,7 +1,10 @@
-export OLD_SYSTEM_PATH=$PATH
-export PATH=$DSS_ROOT/bin
+export AV_OLD_SYSTEM_PATH=$PATH
+export AV_CONFIG_DIR=$AV_ROOT/config
+export AV_BIN_DIR=$AV_ROOT/bin
 
-source $DSS_ROOT/config/color
+export PATH=$AV_BIN_DIR:$AV_BIN_DIR/builtin:$AV_BIN_DIR/docker:$AV_BIN_DIR/boot2docker
+
+source $AV_CONFIG_DIR/color
 
 # don't put duplicate lines in the history. See bash(1) for more options
 # ... or force ignoredups and ignorespace
@@ -40,10 +43,14 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 fi
 
 # Make an alias so that help can run
-alias help='$DSS_ROOT/bin/help'
-
+alias help='$AV_BIN_DIR/builtin/help'
 
 # Set prompt to something short and different
-export PROMPT=`/bin/cat $DSS_ROOT/config/prompt`
+export PROMPT=`/bin/cat $AV_CONFIG_DIR/prompt`
 export PS1="${txtgrn}${PROMPT}${txtrst}> "
+
+# Welcome
+if [ ! -z $AV_NON_INTERACTIVE ]; then
+  $AV_CONFIG_DIR/welcome
+fi
 

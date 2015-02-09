@@ -1,0 +1,22 @@
+#!/bin/bash
+#!/bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "builtin" "create a new command based on argument" "\n \
+    Open a script to edit \n \
+\n"
+
+# Import system path
+avRestoreSystemPath
+
+#### Put system commands here
+if [[ "$#" -eq 1 ]]; then
+	/bin/rm -f $AV_BIN_DIR/$1
+else
+	echo "Please give me an argument, a script to nuke"
+fi
+
+#### End commands

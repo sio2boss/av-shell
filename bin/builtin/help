@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+avCheckHelpFlags "$1" "builtin" "What you see here" "\n \
+    Open a script to edit \n \
+\n"
+
+$AV_CONFIG_DIR/welcome
+
+# Import system path
+avRestoreSystemPath
+
+#### Put system commands here
+
+export AV_SINGLE_LINE_HELP=true  
+
+echo
+
+for plugin in `cd $AV_BIN_DIR && ls -1 -d */`; do
+
+	plugin=${plugin%?}
+
+	echo -e "Category ${txtred}$plugin${txtrst}:\n"
+
+	for command in `ls -1 $AV_BIN_DIR/$plugin`; do
+		printf "    %-20s - %s\n" "$command" "`$AV_BIN_DIR/$plugin/$command -h`"
+	done
+
+	echo
+
+done
+
+echo -e "Category ${txtred}yours${txtrst}:\n"
+
+for command in ` ls -F $AV_BIN_DIR/ | grep -v '/'`; do
+	command=${command%?}
+	printf "    %-20s - %s\n" "$command" "`$AV_BIN_DIR/$command -h`"
+done
+
+echo
+
+export AV_SINGLE_LINE_HELP=false 
+
+#### End commands

@@ -5,7 +5,7 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "template script" "\n \
+avCheckHelpFlags "$1" "docker" "List all containers running and not." "\n \
     Template to help you out.\\n \
 \n"
 
@@ -13,5 +13,7 @@ avCheckHelpFlags "$1" "builtin" "template script" "\n \
 avRestoreSystemPath
 
 #### Put system commands here
+
+docker ps -a
 
 #### End commands

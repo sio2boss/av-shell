@@ -14,4 +14,6 @@ avRestoreSystemPath
 
 #### Put system commands here
 
+boot2docker up
+
 #### End commands
