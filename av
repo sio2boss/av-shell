@@ -1,7 +1,21 @@
-#!/bin/sh
+#!/bin/bash
 
-# Variables
-AV_INSTALLED_PATH=/usr/local/lib/node_modules/av
+#AV_INSTALLED_PATH=/usr/local/lib/node_modules/av
+
+# get the absolute path of the executable
+function realpath {
+    local r=$1; local t=$(readlink $r)
+    while [ $t ]; do
+        r=$(cd $(dirname $r) && cd $(dirname $t) && pwd -P)/$(basename $t)
+        t=$(readlink $r)
+    done
+    echo $r
+}
+
+#example usage
+AV_INSTALLED_PATH=$(dirname $(realpath "$0"))
+
+echo "$AV_INSTALLED_PATH"
 
 # Figure out where the .av directory is starting with pwd
 upsearch () {
