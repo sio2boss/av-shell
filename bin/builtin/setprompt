@@ -1,0 +1,21 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "builtin" "Change the prompt text." "\n \
+Change the prompt to whatever you want, you can use colors too.\n \
+\n"
+
+# Import system path
+avRestoreSystemPath
+
+#### Put system commands here
+
+echo "$1" > $AV_CONFIG_DIR/prompt
+
+echo "You will need to restart the shell for the changes to take effect."
+
+#### End commands

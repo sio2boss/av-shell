@@ -45,7 +45,14 @@ fi
 # Handle update command
 if [ "$1" == "update" ]; then
 	cp -vr $AV_INSTALLED_PATH/bin/* $AV_ROOT/bin/
-	cp -rv $AV_INSTALLED_PATH/config/* $AV_ROOT/config/
+	cp -v $AV_INSTALLED_PATH/config/default_imports $AV_ROOT/config/
+	cp -v $AV_INSTALLED_PATH/config/passthrough_template $AV_ROOT/config/
+	cp -v $AV_INSTALLED_PATH/config/rc $AV_ROOT/config/
+	cp -v $AV_INSTALLED_PATH/config/template $AV_ROOT/config/
+	cp -v $AV_INSTALLED_PATH/config/welcome $AV_ROOT/config/
+	cp -v $AV_INSTALLED_PATH/config/color $AV_ROOT/config/
+	mkdir -p  $AV_ROOT/config/vars
+
 	exit
 fi
 
