@@ -31,6 +31,7 @@ if [ -e $filename ]; then
 fi
 
 # Start with template
+mkdir -p $(dirname $filename)
 cp $AV_CONFIG_DIR/template $filename
 chmod +x $filename
 avLaunchEditor $filename

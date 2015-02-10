@@ -2,9 +2,16 @@ export AV_OLD_SYSTEM_PATH=$PATH
 export AV_CONFIG_DIR=$AV_ROOT/config
 export AV_BIN_DIR=$AV_ROOT/bin
 
-export PATH=$AV_BIN_DIR:$AV_BIN_DIR/builtin:$AV_BIN_DIR/docker:$AV_BIN_DIR/boot2docker
+# Setup path
+av_path=""
+for plugin in `cd $AV_BIN_DIR && ls -1 -d */`; do
+  av_path=$AV_BIN_DIR/${plugin%?}:${av_path}
+done
+export PATH=$AV_BIN_DIR:${av_path}
 
+# Bring in color
 source $AV_CONFIG_DIR/color
+
 
 # don't put duplicate lines in the history. See bash(1) for more options
 # ... or force ignoredups and ignorespace
@@ -50,7 +57,6 @@ export PROMPT=`/bin/cat $AV_CONFIG_DIR/prompt`
 export PS1="${txtgrn}${PROMPT}${txtrst}> "
 
 # Welcome
-if [ ! -z $AV_NON_INTERACTIVE ]; then
+if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
   $AV_CONFIG_DIR/welcome
 fi
-

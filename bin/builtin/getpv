@@ -5,8 +5,9 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "Get persistent variable" "\n \
-    Template to help you out.\\n \
+avCheckHelpFlags "$1" "builtin" "Read a value from persistent storage" "\n \
+    This reads the contents of a file under .av/config/vars with variable name\n \
+    usage: setpv <var> <value> \n \
 \n"
 
 

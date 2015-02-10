@@ -5,8 +5,8 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "template script" "\n \
-    Template to help you out.\\n \
+avCheckHelpFlags "$1" "boot2docker" "Shutdown the boot2docker virtual machine" "\n \
+Basically runs boot2docker down\n \
 \n"
 
 # Import system path
