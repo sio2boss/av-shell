@@ -30,6 +30,10 @@ Your project now has a domain specific shell, just run for interactive:
 
     av
 
+Looks like this:
+
+    ![Starting up with av](https://raw.githubusercontent.com/sio2boss/av/master/doc/start.png)
+
 Or for non-interactive, where help can be replaced with any command:
 
     av help
