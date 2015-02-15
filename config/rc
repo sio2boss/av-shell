@@ -2,16 +2,17 @@ export AV_OLD_SYSTEM_PATH=$PATH
 export AV_CONFIG_DIR=$AV_ROOT/config
 export AV_BIN_DIR=$AV_ROOT/bin
 
+# Figure out OS
+THIS_OS=`uname`
+
 # Setup path
 av_path=""
 for plugin in `cd $AV_BIN_DIR && ls -1 -d */`; do
   av_path=$AV_BIN_DIR/${plugin%?}:${av_path}
 done
-export PATH=$AV_BIN_DIR:${av_path}
 
 # Bring in color
 source $AV_CONFIG_DIR/color
-
 
 # don't put duplicate lines in the history. See bash(1) for more options
 # ... or force ignoredups and ignorespace
@@ -20,7 +21,6 @@ TERM=xterm-color
 
 # append to the history file, don't overwrite it
 shopt -s histappend
- 
 shopt -s cdspell
 shopt -s nocaseglob
  
@@ -45,14 +45,24 @@ export HISTTIMEFORMAT="%H:%M > "
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
-    . /etc/bash_completion
-fi
+#if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+#    . /etc/bash_completion
+#fi
 
 # Make an alias so that help can run
 alias help='$AV_BIN_DIR/builtin/help'
+alias sudo=`which sudo`
+alias gawk=`which gawk`
+alias awk=`which awk`
+alias cat=`which cat`
+alias less=`which less`
+alias more=`which more`
+alias more=`which sed`
+alias curl=`which curl`
+alias wget=`which wget`
 
 # Set prompt to something short and different
+export PATH=$AV_BIN_DIR:${av_path}
 export PROMPT=`/bin/cat $AV_CONFIG_DIR/prompt`
 export PS1="${txtgrn}${PROMPT}${txtrst}> "
 
