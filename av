@@ -66,7 +66,7 @@ fi
 
 
 # Change dir to script root
-cd $AV_ROOT > /dev/null
+cd $AV_ROOT/.. > /dev/null
 
 # If there are arguments, just run them rather than opening a shell
 if [ $# -eq 0 ]; then
