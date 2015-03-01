@@ -50,18 +50,44 @@ if [ -z "$AV_ROOT" ]; then
 fi
 
 
-# Handle update command
-if [ "$1" == "update" ]; then
-	cp -vr $AV_INSTALLED_PATH/bin/* $AV_ROOT/bin/
+# Update function
+update() {
 	cp -v $AV_INSTALLED_PATH/config/default_imports $AV_ROOT/config/
 	cp -v $AV_INSTALLED_PATH/config/passthrough_template $AV_ROOT/config/
 	cp -v $AV_INSTALLED_PATH/config/rc $AV_ROOT/config/
 	cp -v $AV_INSTALLED_PATH/config/template $AV_ROOT/config/
 	cp -v $AV_INSTALLED_PATH/config/welcome $AV_ROOT/config/
+	cp -v $AV_INSTALLED_PATH/config/version $AV_ROOT/config/
 	cp -v $AV_INSTALLED_PATH/config/color $AV_ROOT/config/
 	mkdir -p  $AV_ROOT/config/vars
+}
 
+# Handle update command
+LOCAL_VER=""
+if [ -e $AV_ROOT/config/version ]; then
+	LOCAL_VER=`cat $AV_ROOT/config/version`
+fi
+INSTALLED_VER=`cat $AV_INSTALLED_PATH/config/version`
+
+if [[ "$1" == "update" ]]; then
+	update ""
 	exit
+else
+	if [[ "$LOCAL_VER" != "$INSTALLED_VER" ]]; then
+
+		echo -n "We need to do an update, may I? [n/Y]: "
+		read line
+		if [[ "$line" == "Y" || "$line" == "y" || -z "$line" ]]; then
+			update ""
+			echo ""
+			echo "Updated local scripts to ${txtpur}v$INSTALLED_VER${txtrst}"
+			echo ""
+		else
+			echo ""
+			echo "Roger that, not touching a thing."
+			echo ""
+		fi
+	fi
 fi
 
 
@@ -72,12 +98,12 @@ cd $AV_ROOT/.. > /dev/null
 if [ $# -eq 0 ]; then
 
 	# Open shell
-	AV_ROOT=$AV_ROOT bash --rcfile $AV_ROOT/config/rc
+	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_ROOT=$AV_ROOT bash --rcfile $AV_ROOT/config/rc
 
 else
 
 	# Run command in shell
-	AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_ROOT/config/rc -i -c "$*"
+	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_ROOT/config/rc -i -c "$*"
 
 fi
 

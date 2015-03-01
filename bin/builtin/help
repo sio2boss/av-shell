@@ -21,14 +21,14 @@ export AV_SINGLE_LINE_HELP=true
 
 echo
 
-for plugin in `cd $AV_BIN_DIR && ls -1 -d */`; do
+for plugin in `cd $AV_INSTALLED_BIN/ && ls -1 -d */`; do
 
 	plugin=${plugin%?}
 
 	echo -e "Category ${txtred}$plugin${txtrst}:\n"
 
-	for command in `ls -1 $AV_BIN_DIR/$plugin`; do
-		printf "    %-20s - %s\n" "$command" "`$AV_BIN_DIR/$plugin/$command -h`"
+	for command in `ls -1 $AV_INSTALLED_BIN/$plugin`; do
+		printf "    %-20s - %s\n" "$command" "`$AV_INSTALLED_BIN/$plugin/$command -h`"
 	done
 
 	echo
