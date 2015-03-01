@@ -1,5 +1,6 @@
 export AV_OLD_SYSTEM_PATH=$PATH
 export AV_CONFIG_DIR=$AV_ROOT/config
+export AV_INSTALLED_BIN=$AV_INSTALLED_PATH/bin
 export AV_BIN_DIR=$AV_ROOT/bin
 
 # Figure out OS
@@ -7,8 +8,8 @@ THIS_OS=`uname`
 
 # Setup path
 av_path=""
-for plugin in `cd $AV_BIN_DIR && ls -1 -d */`; do
-  av_path=$AV_BIN_DIR/${plugin%?}:${av_path}
+for plugin in `cd $AV_INSTALLED_BIN && ls -1 -d */`; do
+  av_path=$AV_INSTALLED_BIN/${plugin%?}:${av_path}
 done
 
 # Bring in color
@@ -50,7 +51,7 @@ export HISTTIMEFORMAT="%H:%M > "
 #fi
 
 # Make an alias so that help can run
-alias help='$AV_BIN_DIR/builtin/help'
+alias help='$AV_INSTALLED_PATH/bin/builtin/help'
 alias sudo=`which sudo`
 alias gawk=`which gawk`
 alias awk=`which awk`
