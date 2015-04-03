@@ -4,11 +4,33 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlagsPassThrough "$1" "docker" "Tag an image into a repository" "docker tag --help"
+avCheckHelpFlagsPassThrough "$1" "docker" "Tag current container on a repository" "usage: tag <version>"
 
 # Import system path
-avRestoreSystemPath
+avAppendSystemPath
 
 #### Put system commands here
-cd $AV_ROOT/.. && docker tag $*
+
+if [ $# -ne 1 ]; then
+	echo "usage: tag <version>"
+	exit 1
+fi
+
+domain=$(cat $AV_CONFIG_DIR/prompt | sed "s/\ /\_/g")
+if [ -z $domain ]; then
+	echo -e "${txtred}Unable to understand prompt text as docker domain${txtrst}"
+fi
+
+container=$(getpv container)
+if [ -z $container ]; then
+	echo -e "${txtred}Set your container context via \'choose\'${txtrst}"
+fi
+
+repo=$(getpv repo)
+if [ -z $repo ]; then
+	echo -e "${txtred}Set your repo context setpv repo <server:5000>${txtrst}"
+fi
+
+cd $AV_ROOT/.. && docker tag $domain/$container $repo/$domain/$container:$*
+
 #### End commands

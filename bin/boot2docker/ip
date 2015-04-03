@@ -12,5 +12,6 @@ Basically runs boot2docker ip\n \
 avRestoreSystemPath
 
 #### Put system commands here
-boot2docker ip
+ip=$(boot2docker ip)
+echo -n "${ip}"
 #### End commands
