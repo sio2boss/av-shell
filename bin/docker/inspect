@@ -14,7 +14,7 @@ avRestoreSystemPath
 
 #### Put system commands here
 
-if [[ "$1" == "{}" ]]; then
+if [[ "$1" == "{}" || $# -lt 1 ]]; then
 	cd $AV_ROOT/.. && docker inspect ${lasthash}
 else
 	cd $AV_ROOT/.. && docker inspect $*

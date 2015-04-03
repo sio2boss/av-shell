@@ -13,10 +13,10 @@ avRestoreSystemPath
 
 #### Put system commands here
 
-if [[ "$1" == "{}" ]]; then
-	docker exec -t -i ${lasthash} bash
+if [[ "$1" == "{}" || $# -lt 1 ]]; then
+	docker exec -i -t ${lasthash} bash
 else
-	docker exec -t -t $1 bash
+	docker exec -i -t $1 bash
 fi
 
 #### End commands

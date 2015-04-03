@@ -28,6 +28,11 @@ if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
 	echo "This utility creates a new domain specific shell in your current path"
 	echo
 
+    if [[ -e .av ]]; then
+    	echo "It appears 'av' is already installed"
+    	exit
+    fi
+
 	echo "your prompt should be named?:"
 	read prompt
 
@@ -63,7 +68,38 @@ update() {
 }
 
 # Handle update command
-LOCAL_VER=""
+vercomp () {
+    if [[ $1 == $2 ]]
+    then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+    do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++))
+    do
+        if [[ -z ${ver2[i]} ]]
+        then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]}))
+        then
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]}))
+        then
+            return 2
+        fi
+    done
+    return 0
+}
+
+LOCAL_VER="0.0.0"
 if [ -e $AV_ROOT/config/version ]; then
 	LOCAL_VER=`cat $AV_ROOT/config/version`
 fi
@@ -72,10 +108,14 @@ INSTALLED_VER=`cat $AV_INSTALLED_PATH/config/version`
 if [[ "$1" == "update" ]]; then
 	update ""
 	exit
-else
-	if [[ "$LOCAL_VER" != "$INSTALLED_VER" ]]; then
+fi
 
-		echo -n "We need to do an update, may I? [n/Y]: "
+
+vercomp $INSTALLED_VER $LOCAL_VER
+case $? in
+    1) #op='>'
+
+		echo -n "We need to do an update of your project shell, may I? [n/Y]: "
 		read line
 		if [[ "$line" == "Y" || "$line" == "y" || -z "$line" ]]; then
 			update ""
@@ -87,8 +127,20 @@ else
 			echo "Roger that, not touching a thing."
 			echo ""
 		fi
-	fi
-fi
+	;;
+
+    2) #op='<'
+
+		echo "Your project is running a new version of av than you have installed..."
+		echo
+		echo "${txtbld}Please visit http://github.com/sio2boss/av${txtrst}"
+		echo
+		exit
+
+	;;
+
+esac
+
 
 
 # Change dir to script root

@@ -11,9 +11,22 @@ avAppendSystemPath
 
 #### Put system commands here
 
-cd $AV_ROOT/.. && echo $PWD &&  docker run $* 
+domain=$(cat $AV_CONFIG_DIR/prompt | sed "s/\ /\_/g")
+if [ -z $domain ]; then
+	echo -e "${txtred}Unable to understand prompt text as docker domain${txtrst}"
+fi
 
-holdhash=$(getpv "holdhash")
+container=$(getpv container)
+if [ -z $container ]; then
+	echo -e "${txtred}Set your container context via \'choose\'${txtrst}"
+fi
+
+container_path=$(container_path)
+line="docker run -d $(cat $container_path/Runfile) ${domain}/${container}"
+echo  -e "runnning: $line "
+cd ${container_path} && eval $line
+
+holdhash=$(getpv holdhash)
 if [[ "${holdhash}" == "true" ]]; then
 	setpv "lasthash" "`docker ps -l -q`"
 fi

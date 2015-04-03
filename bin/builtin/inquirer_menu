@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+
+/**
+ * List prompt example
+ */
+
+"use strict";
+var inquirer = require("inquirer");
+require('shelljs/global');
+
+
+// print process.argv
+var argv_choices = [];
+var args = process.argv.slice(2);
+var variableName=args[0];
+if ( variableName === '-h') {
+  console.log("Provides a chooser to user with provided inputs");
+  process.exit(0);
+}
+args = args.slice(1);
+args.forEach(function (val, index, array) {
+  argv_choices.push(val);
+});
+
+
+
+inquirer.prompt([
+  {
+    type: "list",
+    name: "theme",
+    message: "Which do you want?",
+    choices: argv_choices
+  }
+], function( answers ) {
+  exec('setpv ' + variableName + ' ' + answers.theme);
+});
