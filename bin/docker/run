@@ -14,14 +14,26 @@ avAppendSystemPath
 domain=$(cat $AV_CONFIG_DIR/prompt | sed "s/\ /\_/g")
 if [ -z $domain ]; then
 	echo -e "${txtred}Unable to understand prompt text as docker domain${txtrst}"
+	exit
 fi
 
 container=$(getpv container)
-if [ -z $container ]; then
-	echo -e "${txtred}Set your container context via \'choose\'${txtrst}"
+if [ -z $domain ]; then
+	echo -e "${txtred}Unable to understand prompt text as docker domain${txtrst}"
+	exit
 fi
 
 container_path=$(container_path)
+if [ -z $domain ]; then
+	echo -e "${txtred}Unable to understand prompt text as docker domain${txtrst}"
+	exit
+fi
+
+if [ ! -e "$container_path/Runfile" ]; then
+	echo -e "${txtred}Unable to find Runfile in $container_path${txtrst}"
+        exit
+fi
+
 line="docker run -d $(cat $container_path/Runfile) ${domain}/${container}"
 echo  -e "runnning: $line "
 cd ${container_path} && eval $line

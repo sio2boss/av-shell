@@ -13,12 +13,17 @@ avAppendSystemPath
 
 #### Put system commands here
 
+containerdir=$(getpv containerdir)
+if [ -z $containerdir ]; then
+        echo -e "${txtred}Set the directory container your containers via \'setpv containerdir\'${txtrst}"
+fi
+
 container=$(getpv container)
 if [ -z $container ]; then
 	echo -e "${txtred}Set your container context via \'choose\'${txtrst}"
 fi
 
-SELF_PATH=$(cd -P -- "$AV_ROOT/../$container" && pwd -P)
+SELF_PATH=$(cd -P -- "$AV_ROOT/../$containerdir/$container" && pwd -P)
 echo -n $SELF_PATH
 
 #### End commands
