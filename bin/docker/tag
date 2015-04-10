@@ -31,6 +31,6 @@ if [ -z $repo ]; then
 	echo -e "${txtred}Set your repo context setpv repo <server:5000>${txtrst}"
 fi
 
-cd $AV_ROOT/.. && docker tag $domain/$container $repo/$domain/$container:$*
+cd $AV_ROOT/.. && docker tag -f $domain/$container $repo/$domain/$container:$*
 
 #### End commands
