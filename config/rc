@@ -70,8 +70,17 @@ alias node=`which node`
 
 # Set prompt to something short and different
 export PATH=$AV_BIN_DIR:${av_path}
-export PROMPT=`/bin/cat $AV_CONFIG_DIR/prompt`
-export PS1="${txtgrn}${PROMPT}${txtrst}> "
+export PROMPT=`/bin/cat $AV_CONFIG_DIR/prompt` 
+
+function container_prompt() {
+    cur_container=`getpv container`
+    if [ ! -z ${cur_container} ]; then
+        echo -e -n " [${txtcyn}${cur_container}${txtrst}]"
+    else
+        echo -n ""
+    fi
+}
+export PS1="${txtgrn}${PROMPT}${txtrst}\$(container_prompt)> "
 
 # Welcome
 if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then

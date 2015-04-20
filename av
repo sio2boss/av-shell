@@ -24,6 +24,15 @@ upsearch () {
 upsearch ".av"
 
 # Built-in commands
+if [[ "$1" == "status" ]]; then
+	if [ -z $AV_ROOT ]; then
+		echo ""
+	else
+		echo "av"
+	fi
+	exit
+fi
+
 if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
 	echo "This utility creates a new domain specific shell in your current path"
 	echo
