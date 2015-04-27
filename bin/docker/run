@@ -34,7 +34,11 @@ if [ ! -e "$container_path/Runfile" ]; then
         exit
 fi
 
-line="docker run -d $(cat $container_path/Runfile) ${domain}/${container}"
+if [ ! -z "$*" ]; then
+	line="docker run $* ${domain}/${container}" 
+else
+	line="docker run $(cat $container_path/Runfile) ${domain}/${container}"
+fi
 echo  -e "runnning: $line "
 cd ${container_path} && eval $line
 
