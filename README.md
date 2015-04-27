@@ -10,8 +10,16 @@ Contracts:
  * Every script should handle a '-h' argument and output a single line of documentation.  This makes the 'help' look nice
  * Don't over write the builtins
  
+## Installing
 
-## Using
+Its now a package!
+   
+    npm install -g av-shell
+    # Depending on your npm or node installation, you may need to use `sudo` when performing an installation through npm
+    sudo npm install -g av-shell
+
+
+## Using this repo
 
 Pull down the code:
 
@@ -20,7 +28,11 @@ Pull down the code:
 Install to your system:
 
     npm install -g
-    sudo npm install -g  # if Linux
+    # Depending on your npm or node installation, you may need to use `sudo` when performing an installation through npm
+    sudo npm install -g
+
+
+## Using av with your project
 
 In your project run and answer the wizard question(s):
 
@@ -94,7 +106,11 @@ We are going to use a special av feature to show one way domain specific shells 
 
 This will hold the container hash produced by run so we don't have to copy and paste it all the time.  Now run the container
 
-    run -d -p 9200:9200 orchardup/elasticsearch
+    run -d -p 9200:9200 -t orchardup/elasticsearch
+
+For a custom container, create a Runfile next to your Dockerfile with your docker run arguments, like this:
+
+    -p 9200:9200
 
 The command should output some huge hash value.  The first 12 chars can always be found with a ps
 
@@ -105,20 +121,20 @@ The command should output some huge hash value.  The first 12 chars can always b
 
 But lets stop it with that 'holdhash' feature
 
-    stop {}
+    stop
 
 And start it back up again
 
-    start {}
+    start
 
 Handy right?  Well what if we what to shell into that container?  av will help you here (need docker 1.3+)
 
-    shell {}
+    shell
 
 Lets shut it down and remove it
 
-    stop {}
-    rmc {}
+    stop
+    rmc
 
 How many times did you not have to type docker?  Eight!  Make your life easy with av!
 
