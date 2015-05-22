@@ -32,7 +32,7 @@ if [ $# -eq 1 ]; then
 else
 
     list=""
-    list=`cd $AV_ROOT/.. && find ${cpath} -name Dockerfile | sed -e "s/\.\///g" -e "s/^\///" -e "s/\/Dockerfile//g"`
+    list=`cd $AV_ROOT/../${cpath} && find . -name Dockerfile | sed -e "s/\.\///g" -e "s/^\///" -e "s/\/Dockerfile//g"`
     inquirer_menu container $list
 
 fi
