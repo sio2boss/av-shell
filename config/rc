@@ -11,14 +11,17 @@ source $AV_CONFIG_DIR/color
 
 # Setup path
 av_path="$AV_INSTALLED_BIN"
-for plugin in `cat $AV_CONFIG_DIR/vars/plugins_enabled`; do
-  plugin_dir=$AV_INSTALLED_BIN/../../${plugin}/bin
-  if [ -d ${plugin_dir} ]; then
-    av_path=$AV_INSTALLED_BIN/../../${plugin}/bin:${av_path}
-  else
-    echo -e "${txtylw}WARN:${txtrst} Couldn't find ${plugin} please do a 'npm install -g ${plugin}'" 
-  fi
-done
+plugin_config=$AV_CONFIG_DIR/vars/plugins_enabled
+if [ -e ${plugin_config} ]; then
+  for plugin in `cat ${plugin_config}`; do
+    plugin_dir=$AV_INSTALLED_BIN/../../${plugin}/bin
+    if [ -d ${plugin_dir} ]; then
+      av_path=$AV_INSTALLED_BIN/../../${plugin}/bin:${av_path}
+    else
+      echo -e "${txtylw}WARN:${txtrst} Couldn't find ${plugin} please do a 'npm install -g ${plugin}'" 
+    fi
+  done
+fi
 
 # don't put duplicate lines in the history. See bash(1) for more options
 # ... or force ignoredups and ignorespace
