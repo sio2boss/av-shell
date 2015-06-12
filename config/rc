@@ -6,14 +6,19 @@ export AV_BIN_DIR=$AV_ROOT/bin
 # Figure out OS
 THIS_OS=`uname`
 
-# Setup path
-av_path=""
-for plugin in `cd $AV_INSTALLED_BIN && ls -1 -d */`; do
-  av_path=$AV_INSTALLED_BIN/${plugin%?}:${av_path}
-done
-
 # Bring in color
 source $AV_CONFIG_DIR/color
+
+# Setup path
+av_path="$AV_INSTALLED_BIN"
+for plugin in `cat $AV_CONFIG_DIR/vars/plugins_enabled`; do
+  plugin_dir=$AV_INSTALLED_BIN/../../${plugin}/bin
+  if [ -d ${plugin_dir} ]; then
+    av_path=$AV_INSTALLED_BIN/../../${plugin}/bin:${av_path}
+  else
+    echo -e "${txtylw}WARN:${txtrst} Couldn't find ${plugin} please do a 'npm install -g ${plugin}'" 
+  fi
+done
 
 # don't put duplicate lines in the history. See bash(1) for more options
 # ... or force ignoredups and ignorespace
@@ -63,6 +68,7 @@ alias curl=`which curl`
 alias wget=`which wget`
 alias head=`which head`
 alias tail=`which tail`
+alias uniq=`which uniq`
 alias grep=`which grep`
 alias ls=`whereis ls`
 alias git=`which git`

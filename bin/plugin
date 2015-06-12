@@ -1,0 +1,79 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "builtin" "template script" "\n \
+    Template to help you out.\n \
+\n"
+
+# Check usage
+if [ $# -lt 1 ]; then
+	echo "$0 <command> <options>"
+	exit
+fi
+
+# Utility function to display latest and exit
+function showAndExit()
+{
+	# Show new setting
+	echo -e "${txtgrn}Plugins Enabled:${txtrst}"
+	echo "    $(getpv plugins_enabled)"
+	exit
+}
+
+# Enabled uniq
+avAppendSystemPath
+
+# List
+if [[ $1 == "list" || $1 == "ls" ]]; then
+	showAndExit
+fi
+
+# Add
+if [[ $1 == "add" ]]; then
+	# Throw away other command line args
+	shift
+
+	# Read current value	
+	plugin_list=$(getpv plugins_enabled)
+
+	for plugin in $*; do
+		plugin_list="${plugin_list} ${plugin}"
+	done
+	setpv plugins_enabled "${plugin_list}"
+
+	showAndExit
+fi
+
+# Remove
+if [[ $1 == "rm" || $1 == "rem" || $1 == "remove" ]]; then
+	# Throw away other command line args
+	shift
+
+	# Read current value	
+	plugin_list=$(getpv plugins_enabled)
+	new_plugin_list=""
+
+	for plugin in $*; do
+		for i in ${plugin_list}; do
+			if [[ $plugin != $i ]]; then
+				new_plugin_list="${new_plugin_list} ${i}"
+			fi
+		done
+	done
+	setpv plugins_enabled "${new_plugin_list}"
+
+	showAndExit
+fi
+
+if [[ $1 == "clear" ]]; then
+	setpv plugins_enabled ""
+	showAndExit
+fi
+
+
+
+#### End commands
