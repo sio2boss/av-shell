@@ -17,24 +17,28 @@ avRestoreSystemPath
 
 #### Put system commands here
 
+# Plugins / global commands
 export AV_SINGLE_LINE_HELP=true  
-
 echo
+av_path="$AV_INSTALLED_BIN"
+plugin_config=$AV_CONFIG_DIR/vars/plugins_enabled
+if [ -e ${plugin_config} ]; then
+  for plugin in `cat ${plugin_config}`; do
+    plugin_dir=$AV_INSTALLED_BIN/../../${plugin}/bin
+    if [ -d ${plugin_dir} ]; then
+    	echo -e "Category ${txtred}$plugin${txtrst}:\n"
 
-for plugin in `cd $AV_INSTALLED_BIN/ && ls -1 -d */`; do
+		for command in `ls -1 ${plugin_dir}`; do
+			printf "    %-20s - %s\n" "$command" "$(${plugin_dir}/$command -h)"
+		done
 
-	plugin=${plugin%?}
+		echo
+   	fi
+  done
+fi
 
-	echo -e "Category ${txtred}$plugin${txtrst}:\n"
 
-	for command in `ls -1 $AV_INSTALLED_BIN/$plugin`; do
-		printf "    %-20s - %s\n" "$command" "`$AV_INSTALLED_BIN/$plugin/$command -h`"
-	done
-
-	echo
-
-done
-
+# Local commands
 echo -e "Category ${txtred}yours${txtrst}:\n"
 
 for command in ` ls -F $AV_BIN_DIR/ | grep -v '/'`; do
