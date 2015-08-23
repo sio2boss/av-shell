@@ -68,7 +68,6 @@ fi
 update() {
 	cp -v $AV_INSTALLED_PATH/config/default_imports $AV_ROOT/config/
 	cp -v $AV_INSTALLED_PATH/config/passthrough_template $AV_ROOT/config/
-	cp -v $AV_INSTALLED_PATH/config/rc $AV_ROOT/config/
 	cp -v $AV_INSTALLED_PATH/config/template $AV_ROOT/config/
 	cp -v $AV_INSTALLED_PATH/config/welcome $AV_ROOT/config/
 	cp -v $AV_INSTALLED_PATH/config/version $AV_ROOT/config/
@@ -140,9 +139,9 @@ case $? in
 
     2) #op='<'
 
-		echo "Your project is running a new version of av than you have installed..."
+		echo "Your project is running a newer version of av than you have installed..."
 		echo
-		echo "${txtbld}Please visit http://github.com/sio2boss/av${txtrst}"
+		echo "${txtbld}Please run `[sudo] npm upgrade av-shell`${txtrst}"
 		echo
 		exit
 
@@ -159,12 +158,12 @@ cd $AV_ROOT/.. > /dev/null
 if [ $# -eq 0 ]; then
 
 	# Open shell
-	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_ROOT=$AV_ROOT bash --rcfile $AV_ROOT/config/rc
+	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_ROOT=$AV_ROOT bash --rcfile $AV_INSTALLED_PATH/config/rc
 
 else
 
 	# Run command in shell
-	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_ROOT/config/rc -i -c "$*"
+	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_INSTALLED_PATH/config/rc -i -c "$*"
   exit $?
 
 fi
