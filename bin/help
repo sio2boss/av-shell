@@ -29,7 +29,7 @@ if [ -e ${plugin_config} ]; then
     	echo -e "Category ${txtred}$plugin${txtrst}:\n"
 
 		for command in `ls -1 ${plugin_dir}`; do
-			printf "    %-20s - %s\n" "$command" "$(${plugin_dir}/$command -h)"
+			printf "    %-30s - %s\n" "$command" "$(${plugin_dir}/$command -h)"
 		done
 
 		echo
@@ -43,7 +43,7 @@ echo -e "Category ${txtred}yours${txtrst}:\n"
 
 for command in ` ls -F $AV_BIN_DIR/ | grep -v '/'`; do
 	command=${command%?}
-	printf "    %-20s - %s\n" "$command" "`$AV_BIN_DIR/$command -h`"
+	printf "    %-30s - %s\n" "$command" "`$AV_BIN_DIR/$command -h`"
 done
 
 echo
