@@ -48,7 +48,7 @@ if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
 	echo
 	echo "copying files..."
 	mkdir .av
-	cp -r $AV_INSTALLED_PATH/bin .av/
+	mkdir .av/bin
 	cp -r $AV_INSTALLED_PATH/config .av/
 	echo "$prompt" > .av/config/prompt
 
@@ -72,6 +72,17 @@ update() {
 	cp -v $AV_INSTALLED_PATH/config/welcome $AV_ROOT/config/
 	cp -v $AV_INSTALLED_PATH/config/version $AV_ROOT/config/
 	cp -v $AV_INSTALLED_PATH/config/color $AV_ROOT/config/
+	cp -v $AV_INSTALLED_PATH/config/findjar $AV_ROOT/config/
+	rm -f $AV_ROOT/bin/inquirer_menu
+	rm -f $AV_ROOT/bin/edit
+	rm -f $AV_ROOT/bin/getpv
+	rm -f $AV_ROOT/bin/setpv
+	rm -f $AV_ROOT/bin/help
+	rm -f $AV_ROOT/bin/new
+	rm -f $AV_ROOT/bin/plugin
+	rm -f $AV_ROOT/bin/rename
+	rm -f $AV_ROOT/bin/rm
+	rm -f $AV_ROOT/bin/setprompt
 	mkdir -p  $AV_ROOT/config/vars
 }
 
