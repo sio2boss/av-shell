@@ -1,0 +1,26 @@
+#! /bin/bash
+
+
+# Check for a help flag
+# $1: directory
+# $2: grep filters
+function avFindJar
+{
+	if [[ $# -ne 2 ]]; then
+		echo -e "Error in calling avFindJar"
+		exit
+	fi
+
+	echo -e "Getting the current jarball"                                                                     
+
+	jarball=`cd $1 && ls -1rt *.jar | grep $2 | tail -1`
+	if [ -z "${jarball}" ]; then                                                      
+		echo -e "  ${txtred}Could not find a jarball, please run 'make'${txtrst}"     
+	else                                                                            
+	 	echo -e "  ${txtgrn}${jarball}${txtrst}"                                      
+	fi
+
+	export AV_JARBALL=$jarball   
+}
+
+   
