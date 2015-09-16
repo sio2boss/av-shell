@@ -1,6 +1,6 @@
 {
   "name": "av-shell",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "make your own domain specific shell",
   "main": "index.js",
   "scripts": {
