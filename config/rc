@@ -77,7 +77,7 @@ alias jq=`which jq`
 alias ls=`whereis ls`
 alias git=`which git`
 alias node=`which node`
-alias boot2docker=`which boot2docker`
+alias sublime=`which sublime`
 
 # Set prompt to something short and different
 export PATH=$AV_BIN_DIR:${av_path}
