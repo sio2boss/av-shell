@@ -75,7 +75,6 @@ alias uniq=`which uniq`
 alias grep=`which grep`
 alias jq=`which jq`
 alias ls=`whereis ls`
-alias git=`which git`
 alias node=`which node`
 alias sublime=`which sublime`
 
