@@ -21,48 +21,6 @@ upsearch () {
     directory="$directory/.."
   done
 }
-upsearch ".av"
-
-# Built-in commands
-if [[ "$1" == "status" ]]; then
-	if [ -z $AV_ROOT ]; then
-		echo ""
-	else
-		echo "av"
-	fi
-	exit
-fi
-
-if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
-	echo "This utility creates a new domain specific shell in your current path"
-	echo
-
-    if [[ -e .av ]]; then
-    	echo "It appears 'av' is already installed"
-    	exit
-    fi
-
-	echo "your prompt should be named?:"
-	read prompt
-
-	echo
-	echo "copying files..."
-	mkdir .av
-	mkdir .av/bin
-	cp -r $AV_INSTALLED_PATH/config .av/
-	echo "$prompt" > .av/config/prompt
-
-	echo
-	echo "done"
-
-	exit
-fi
-
-if [ -z "$AV_ROOT" ]; then
-	echo "Unable to find av environment, have you run 'av init'?"
-	exit
-fi
-
 
 # Update function
 update() {
@@ -118,13 +76,84 @@ vercomp () {
     return 0
 }
 
+# --------------------------------------------------------------------
+
+# See if there is an .av directory
+upsearch ".av"
+
+
+# Built-in commands
+if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]]; then
+	export AV_CONFIG_DIR=$AV_INSTALLED_PATH/config
+	cd $AV_INSTALLED_PATH/config && ./welcome
+	echo
+	echo "Global commands: "
+	echo "  help    - this helpful display"
+	echo "  install - installs the latest av-shell and plugins"
+	echo 
+	echo "Commands that work on the current directory: "
+	echo "  init    - creates a new domain specific shell in your current path"
+	echo "  status  - displays 'av' if a domain specific shell is in your current path"
+	echo "  update  - checks your domain specific shell's version and imposes the changes necessary"
+	echo "  upgrade - same as update"
+	echo
+	exit
+fi
+
+if [[ "$1" == "status" ]]; then
+	if [ -z $AV_ROOT ]; then
+		echo ""
+	else
+		echo "av"
+	fi
+	exit
+fi
+
+
+if [[ "$1" == "install" ]]; then
+	npm install -g av-shell av-docker
+	exit
+fi
+
+if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
+	echo "This utility creates a new domain specific shell in your current path"
+	echo
+
+    if [[ -e .av ]]; then
+    	echo "It appears 'av' is already installed"
+    	exit
+    fi
+
+	echo "your prompt should be named?:"
+	read prompt
+
+	echo
+	echo "copying files..."
+	mkdir .av
+	mkdir .av/bin
+	cp -r $AV_INSTALLED_PATH/config .av/
+	echo "$prompt" > .av/config/prompt
+
+	echo
+	echo "done"
+
+	exit
+fi
+
+if [ -z "$AV_ROOT" ]; then
+	echo "Unable to find av environment, have you run 'av init'?"
+	exit
+fi
+
+
+# Find local version
 LOCAL_VER="0.0.0"
 if [ -e $AV_ROOT/config/version ]; then
 	LOCAL_VER=`cat $AV_ROOT/config/version`
 fi
 INSTALLED_VER=`cat $AV_INSTALLED_PATH/config/version`
 
-if [[ "$1" == "update" ]]; then
+if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
 	update ""
 	exit
 fi
@@ -161,6 +190,7 @@ case $? in
 esac
 
 
+# --------------------------------------------------------------------
 
 # Change dir to script root
 cd $AV_ROOT/.. > /dev/null
