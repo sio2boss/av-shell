@@ -181,7 +181,7 @@ case $? in
 
 		echo "Your project is running a newer version of av than you have installed..."
 		echo
-		echo "${txtbld}Please run `[sudo] npm upgrade av-shell`${txtrst}"
+		echo "${txtbld}Please run 'npm upgrade av-shell'${txtrst}"
 		echo
 		exit
 
