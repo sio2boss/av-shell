@@ -42,7 +42,7 @@ fi
 echo -e "Category ${txtred}yours${txtrst}:\n"
 
 for command in ` ls -F $AV_BIN_DIR/ | grep -v '/'`; do
-	command=${command%?}
+	command=$(echo "${command}" | sed -e 's/\*$//')
 	printf "    %-30s - %s\n" "$command" "`$AV_BIN_DIR/$command -h`"
 done
 
