@@ -24,21 +24,12 @@ args.forEach(function (val, index, array) {
 
 var questions = [
   {
-    type: "checkbox",
-    name: "value",
-    message: "Which do you want?",
-    choices: argv_choices
-  }
-];
-
-
-var questions = [
-  {
     type: "multiselect",
     name: "value",
     message: "Which do you want?",
     choices: argv_choices,
-    hint: '- Space to select. Return to submit'
+    hint: '- Space to select. Return to submit',
+    limit: 10
   }
 ];
 
