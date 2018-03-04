@@ -24,10 +24,12 @@ args.forEach(function (val, index, array) {
 
 var questions = [
   {
-    type: "select",
+    type: "autocomplete",
     name: "value",
     message: "Which do you want?",
-    choices: argv_choices
+    choices: argv_choices,
+    hint: '- type to autocomplete. Return to submit',
+    limit: 10
   }
 ];
 

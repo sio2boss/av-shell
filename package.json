@@ -25,7 +25,9 @@
   },
   "homepage": "https://github.com/sio2boss/av",
   "dependencies": {
+    "awaits": "^1.0.2",
     "inquirer": "^0.8.2",
+    "prompts": "^0.1.4",
     "shelljs": "^0.4.0"
   }
 }

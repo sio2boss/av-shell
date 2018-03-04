@@ -5,7 +5,7 @@
  */
 
 "use strict";
-var inquirer = require("inquirer");
+var prompts = require("prompts");
 require('shelljs/global');
 
 
@@ -19,18 +19,32 @@ if ( variableName === '-h') {
 }
 args = args.slice(1);
 args.forEach(function (val, index, array) {
-  argv_choices.push(val);
+  argv_choices.push({title: val, value: val});
 });
 
-
-
-inquirer.prompt([
+var questions = [
   {
     type: "checkbox",
-    name: "theme",
+    name: "value",
     message: "Which do you want?",
     choices: argv_choices
   }
-], function( answers ) {
-  exec('setpv ' + variableName + ' ' + answers.theme);
-});
+];
+
+
+var questions = [
+  {
+    type: "multiselect",
+    name: "value",
+    message: "Which do you want?",
+    choices: argv_choices,
+    hint: '- Space to select. Return to submit'
+  }
+];
+
+(async function chooseFun() {
+  var answers = await prompts(questions);
+  return answers.value;
+})().then( (answer) => {
+  exec('setpv ' + variableName + ' ' + answer);
+})
