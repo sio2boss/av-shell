@@ -83,7 +83,7 @@ alias mc=`which mc`
 alias caffeinate=`which caffeinate`
 
 # Set prompt to something short and different
-export PATH=$AV_BIN_DIR:${av_path}
+export PATH=$AV_BIN_DIR:${av_path}:$AV_BIN_DIR/../../build
 export PROMPT=`/bin/cat $AV_CONFIG_DIR/prompt` 
 
 function container_prompt() {
