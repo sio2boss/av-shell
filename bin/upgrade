@@ -10,11 +10,9 @@ avCheckHelpFlags "$1" "builtin" "Write a value to persistent storage" "\n \
     usage: setpv <var> <value> \n \
 \n"
 
+avRestoreSystemPath
+
 #### Put system commands here
-if [[ $# -eq 2 ]]; then
-	echo "$2" > $AV_PROJECT_CONFIG_DIR/vars/$1
-else
-	echo "usage: setpv <var> <value>"
-fi
+cd $AV_INSTALLED_PLUGINS && git pull
 
 #### End commands

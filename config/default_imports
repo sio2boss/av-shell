@@ -54,12 +54,7 @@ function avLaunchEditor
 		echo
 		echo -e "    something like: export EDITOR=sublime"
 		echo
-		echo -e -n "1..."
-		sleep 1
-		echo -e -n "2..."
-		sleep 1
-		echo -e -n "3..."
-		sleep 1
+		sleep 2
 		echo
 
 		vi $1

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "docker" "Copy files/folders from a \
+container's filesystem to the host path" "docker cp --help"
+
+lasthash=$(getpv lasthash)
+
+# Import system path
+avRestoreSystemPath
+
+#### Put system commands here
+
+if [[ "$1" == "{}" || $# -lt 1 ]]; then
+	#cd $AV_ROOT/.. && docker cp ${1/\{\}/$lasthash}
+else
+	cd $AV_ROOT/.. && docker cp $*
+fi
+
+#### End commands

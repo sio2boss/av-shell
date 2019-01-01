@@ -1,0 +1,15 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlagsPassThrough "$1" "docker" "Pull an image or a \
+repository from a Docker registry server" "docker pull --help"
+
+# Import system path
+avRestoreSystemPath
+
+#### Put system commands here
+cd $AV_ROOT/.. && docker pull $*
+#### End commands
