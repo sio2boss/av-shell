@@ -22,28 +22,6 @@ upsearch () {
   done
 }
 
-# Update function
-update() {
-	cp -v $AV_INSTALLED_PATH/config/default_imports $AV_ROOT/config/
-	cp -v $AV_INSTALLED_PATH/config/passthrough_template $AV_ROOT/config/
-	cp -v $AV_INSTALLED_PATH/config/template $AV_ROOT/config/
-	cp -v $AV_INSTALLED_PATH/config/welcome $AV_ROOT/config/
-	cp -v $AV_INSTALLED_PATH/config/version $AV_ROOT/config/
-	cp -v $AV_INSTALLED_PATH/config/color $AV_ROOT/config/
-	cp -v $AV_INSTALLED_PATH/config/findjar $AV_ROOT/config/
-	rm -f $AV_ROOT/bin/inquirer_menu
-	rm -f $AV_ROOT/bin/edit
-	rm -f $AV_ROOT/bin/getpv
-	rm -f $AV_ROOT/bin/setpv
-	rm -f $AV_ROOT/bin/help
-	rm -f $AV_ROOT/bin/new
-	rm -f $AV_ROOT/bin/plugin
-	rm -f $AV_ROOT/bin/rename
-	rm -f $AV_ROOT/bin/rm
-	rm -f $AV_ROOT/bin/setprompt
-	mkdir -p  $AV_ROOT/config/vars
-}
-
 # Handle update command
 vercomp () {
     if [[ $1 == $2 ]]
@@ -89,13 +67,12 @@ if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]]; then
 	echo
 	echo "Global commands: "
 	echo "  help    - this helpful display"
-	echo "  install - installs the latest av-shell and plugins"
 	echo 
 	echo "Commands that work on the current directory: "
 	echo "  init    - creates a new domain specific shell in your current path"
 	echo "  status  - displays 'av' if a domain specific shell is in your current path"
 	echo "  update  - checks your domain specific shell's version and imposes the changes necessary"
-	echo "  upgrade - same as update"
+	echo "  upgrade - pull updates for av-shell and plugins, system wide"
 	echo
 	exit
 fi
@@ -110,8 +87,8 @@ if [[ "$1" == "status" ]]; then
 fi
 
 
-if [[ "$1" == "install" ]]; then
-	npm install -g av-shell av-docker
+if [[ "$1" == "update" ]]; then
+	update
 	exit
 fi
 
@@ -131,7 +108,6 @@ if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
 	echo "copying files..."
 	mkdir .av
 	mkdir .av/bin
-	cp -r $AV_INSTALLED_PATH/config .av/
 	echo "$prompt" > .av/config/prompt
 
 	echo
@@ -145,61 +121,43 @@ if [ -z "$AV_ROOT" ]; then
 	exit
 fi
 
-
-# Find local version
-LOCAL_VER="0.0.0"
-if [ -e $AV_ROOT/config/version ]; then
-	LOCAL_VER=`cat $AV_ROOT/config/version`
-fi
-INSTALLED_VER=`cat $AV_INSTALLED_PATH/config/version`
-
-if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
-	update ""
-	exit
-fi
-
-
-vercomp $INSTALLED_VER $LOCAL_VER
-case $? in
-    1) #op='>'
-
-		echo -n "We need to do an update of your project shell, may I? [n/Y]: "
-		read line
-		if [[ "$line" == "Y" || "$line" == "y" || -z "$line" ]]; then
-			update ""
-			echo ""
-			echo "Updated local scripts to ${txtpur}v$INSTALLED_VER${txtrst}"
-			echo ""
-		else
-			echo ""
-			echo "Roger that, not touching a thing."
-			echo ""
-		fi
-	;;
-
-    2) #op='<'
-
-		echo "Your project is running a newer version of av than you have installed..."
-		echo
-		echo "${txtbld}Please run 'npm upgrade av-shell'${txtrst}"
-		echo
-		exit
-
-	;;
-
-esac
-
-
 # --------------------------------------------------------------------
 
 # Change dir to script root
 cd $AV_ROOT/.. > /dev/null
 
+
 # If there are arguments, just run them rather than opening a shell
 if [ $# -eq 0 ]; then
 
+
+	FORCED_COMMAND=""
+	if [ -e $AV_ROOT/config/version ]; then
+		echo -en "${txtred}[AV-SHELL] Your local .av folder can be simplified...do so now? [Y/n]: ${txtrst}"
+		read prompt
+		if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then
+			AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_INSTALLED_PATH/config/rc -i -c update
+		fi
+
+	else
+		CURRENT_DATE=`date +%s`
+		if [[ ! -e $AV_INSTALLED_PATH/config/update_checked ]]; then
+			echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
+		else
+			LAST_CHECKED=`cat $AV_INSTALLED_PATH/config/update_checked`
+			if [[ `expr ${CURRENT_DATE} - ${LAST_CHECKED}` -gt 1728000 ]]; then
+				echo -en "${txtred}[AV-SHELL] Would you like to check for updates? [Y/n]: ${txtrst}"
+				read prompt
+				echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
+				if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then
+					AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_INSTALLED_PATH/config/rc -i -c upgrade
+				fi
+			fi
+		fi
+	fi
+
 	# Open shell
-	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_ROOT=$AV_ROOT bash --rcfile $AV_INSTALLED_PATH/config/rc
+	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_ROOT=$AV_ROOT bash --rcfile $AV_INSTALLED_PATH/config/rc ${FORCED_COMMAND}
 
 else
 

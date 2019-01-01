@@ -1,0 +1,7 @@
+#! /bin/bash
+
+if [[ ! -e ./av ]]; then
+    cd .av
+fi
+ln -s av /usr/local/bin
+cd plugins/av-prompts && make

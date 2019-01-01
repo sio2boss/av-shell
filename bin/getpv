@@ -14,8 +14,8 @@ avCheckHelpFlags "$1" "builtin" "Read a value from persistent storage" "\n \
 #### Put system commands here
 
 # Get variable stored on disks
-if [ -e $AV_CONFIG_DIR/vars/$1 ]; then
-        /bin/cat $AV_CONFIG_DIR/vars/$1
+if [ -e $AV_PROJECT_CONFIG_DIR/vars/$1 ]; then
+        /bin/cat $AV_PROJECT_CONFIG_DIR/vars/$1
 fi
 
 #### End commands

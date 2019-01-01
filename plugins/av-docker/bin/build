@@ -1,0 +1,35 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlagsPassThrough "$1" "docker" "Build an image from a Dockerfile" "docker build --help"
+
+# Import system path
+avAppendSystemPath
+
+#### Put system commands here
+
+domain=$(cat $AV_CONFIG_DIR/prompt | sed "s/\ /\_/g")
+if [ -z $domain ]; then
+	echo -e "${txtred}Unable to understand prompt text as docker domain${txtrst}"
+	exit 1
+fi
+container=$(getpv container)
+if [ -z $container ]; then
+	echo -e "${txtred}Unable to determine which container you are working on, use setpv container${txtrst}"
+	exit 1
+fi
+
+cpath=$(container_path)
+if [ ! -e "$cpath" ]; then
+        echo -e "${txtred}Unable to determing container_path, make sure you have set your containerdir and container with setpv${txtrst}"
+        exit 1
+fi
+
+cd $(container_path) && docker build -t $domain/$container .
+
+exit $?
+
+#### End commands

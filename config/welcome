@@ -14,8 +14,8 @@ echo -e "
          \/ 
 "
 
-echo -e -n "${txtblu}"
-echo -e "Welcome to the av domain specific shell, your context has been set. Make"
-echo -e "sure to visit https://github.com/sio2boss/av for updates."
+echo -e -n "${txtcyn}"
+echo -e "Welcome to the av domain specific shell, your context has been set."
+echo -e "Visit ${txtblu}https://github.com/sio2boss/av-shell${txtrst}${txtcyn} for updates."
 echo -e -n "${txtrst}"
 echo
