@@ -56,10 +56,6 @@ vercomp () {
 
 # --------------------------------------------------------------------
 
-# See if there is an .av directory
-upsearch ".av"
-
-
 # Built-in commands
 if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]]; then
 	export AV_CONFIG_DIR=$AV_INSTALLED_PATH/config
@@ -77,14 +73,6 @@ if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]]; then
 	exit
 fi
 
-if [[ "$1" == "status" ]]; then
-	if [ -z $AV_ROOT ]; then
-		echo ""
-	else
-		echo "av"
-	fi
-	exit
-fi
 
 if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
 	echo "This utility creates a new domain specific shell in your current path"
@@ -111,16 +99,24 @@ if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
 	exit
 fi
 
+
+# See if there is an .av directory
+upsearch ".av"
+
+
+if [[ "$1" == "status" ]]; then
+	if [ -z $AV_ROOT ]; then
+		echo ""
+	else
+		echo "av"
+	fi
+	exit
+fi
+
 if [ -z "$AV_ROOT" ]; then
 	echo "Unable to find av environment, have you run 'av init'?"
 	exit
 fi
-
-if [[ "$1" == "update" ]]; then
-	update
-	exit
-fi
-
 
 # --------------------------------------------------------------------
 
