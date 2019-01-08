@@ -1,0 +1,40 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "builtin" "Checks your domain specific shell's version and imposes the changes necessary" "\n \
+    Checks your domain specific shell's version and imposes the changes necessary \n
+\n"
+
+avRestoreSystemPath
+
+#### Put system commands here
+
+rm -f $AV_ROOT/config/vars/plugins_enabled
+rm -f $AV_ROOT/config/default_imports
+rm -f $AV_ROOT/config/passthrough_template
+rm -f $AV_ROOT/config/template
+rm -f $AV_ROOT/config/welcome
+rm -f $AV_ROOT/config/version
+rm -f $AV_ROOT/config/color
+rm -f $AV_ROOT/config/findjar
+rm -f $AV_ROOT/bin/inquirer_menu
+rm -f $AV_ROOT/bin/edit
+rm -f $AV_ROOT/bin/getpv
+rm -f $AV_ROOT/bin/setpv
+rm -f $AV_ROOT/bin/help
+rm -f $AV_ROOT/bin/new
+rm -f $AV_ROOT/bin/plugin
+rm -f $AV_ROOT/bin/rename
+rm -f $AV_ROOT/bin/rm
+rm -f $AV_ROOT/bin/setprompt
+mkdir -p  $AV_ROOT/config/vars
+
+echo
+echo "You will need to commit these changes"
+echo
+
+#### End commands

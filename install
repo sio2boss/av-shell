@@ -3,5 +3,10 @@
 if [[ ! -e ./av ]]; then
     cd .av
 fi
+
+if [[ -e /usr/local/bin/av ]]; then
+    rm /usr/local/bin/av
+fi
+
 ln -s av /usr/local/bin
 cd plugins/av-prompts && make

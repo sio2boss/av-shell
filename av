@@ -86,12 +86,6 @@ if [[ "$1" == "status" ]]; then
 	exit
 fi
 
-
-if [[ "$1" == "update" ]]; then
-	update
-	exit
-fi
-
 if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
 	echo "This utility creates a new domain specific shell in your current path"
 	echo
@@ -108,6 +102,7 @@ if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
 	echo "copying files..."
 	mkdir .av
 	mkdir .av/bin
+	mkdir .av/config
 	echo "$prompt" > .av/config/prompt
 
 	echo
@@ -120,6 +115,12 @@ if [ -z "$AV_ROOT" ]; then
 	echo "Unable to find av environment, have you run 'av init'?"
 	exit
 fi
+
+if [[ "$1" == "update" ]]; then
+	update
+	exit
+fi
+
 
 # --------------------------------------------------------------------
 

@@ -48,7 +48,7 @@ export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
 export HISTTIMEFORMAT="%H:%M > "
 
 # Make an alias so that help can run
-alias help='$AV_INSTALLED_PATH/bin/help'
+alias help='$AV_INSTALLED_PATH/plugins/av-shell/bin/help'
 alias sudo=`which sudo`
 alias gawk=`which gawk`
 alias awk=`which awk`
