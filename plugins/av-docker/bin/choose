@@ -27,10 +27,13 @@ else
 
     list=""
     list=`cd $AV_ROOT/../${cpath} && find . -name Dockerfile | sed -e "s/\.\///g" -e "s/^\///" -e "s/\/Dockerfile//g"`
+    list="$list None"
     inquirer_menu container $list
 
 fi
 
-echo -e "Using ${txtcyn}`getpv container`${txtrst} as container for docker commands"
+if [[ ! -z $(getpv container) ]]; then
+    echo -e "Using ${txtcyn}`getpv container`${txtrst} as container for docker commands"
+fi
 
 #### End commands
