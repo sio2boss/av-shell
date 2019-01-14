@@ -14,7 +14,7 @@ avRestoreSystemPath
 
 #### Put system commands here
 
-echo "$1" > $AV_CONFIG_DIR/prompt
+echo "$1" > $AV_PROJECT_CONFIG_DIR/prompt
 
 echo "You will need to restart the shell for the changes to take effect."
 
