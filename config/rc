@@ -51,6 +51,7 @@ export HISTTIMEFORMAT="%H:%M > "
 alias help='$AV_INSTALLED_PATH/plugins/av-shell/bin/help'
 alias team='$AV_INSTALLED_PATH/plugins/av-shell/bin/squad'
 alias update='$AV_INSTALLED_PATH/plugins/av-shell/bin/upgrade'
+alias get_tag_from_commit='$AV_INSTALLED_PATH/plugins/av-shell/bin/codehash'
 alias sudo=`which sudo`
 alias gawk=`which gawk`
 alias awk=`which awk`

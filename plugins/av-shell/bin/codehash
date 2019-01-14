@@ -1,0 +1,27 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "builtin" "Generate hash or tag in date-hash format" "\n \
+    Will generate a <date>-<githash> for use in containers and CI.\n \
+\n"
+
+# Import system path
+avRestoreSystemPath
+
+#### Put system commands here
+
+commit_id=$(git rev-parse --short HEAD | sed 's/\ //g')
+datestamp=$(git log -1 --pretty=tformat:%at ${commit_id})
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    today=$(date -r ${datestamp} +%y%m%dT%H)
+else
+    today=$(date --date=@${datestamp} +\"%y%m%dT%H\")
+fi
+echo -e "${today}-${commit_id}"
+
+#### End commands
