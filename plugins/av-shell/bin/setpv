@@ -11,8 +11,8 @@ avCheckHelpFlags "$1" "builtin" "Write a value to persistent storage" "\n \
 \n"
 
 #### Put system commands here
-if [[ $# -eq 2 ]]; then
-	echo "$2" > $AV_PROJECT_CONFIG_DIR/vars/$1
+if [[ $# -gt 1 ]]; then
+	echo -n "$2" > $AV_PROJECT_CONFIG_DIR/vars/$1
 else
 	echo "usage: setpv <var> <value>"
 fi

@@ -5,14 +5,17 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "Write a value to persistent storage" "\n \
-    This creates a file under .av/config/vars with the contents of the variable\n \
-    usage: setpv <var> <value> \n \
+avCheckHelpFlags "$1" "builtin" "Upgrade av and plugins" "\n \
+    Runs git pull on av and all all plugins\n \
 \n"
 
 avRestoreSystemPath
 
 #### Put system commands here
-cd $AV_INSTALLED_PLUGINS && git pull
+cd $AV_INSTALLED_PLUGINS
+for plugin in `ls -1`; do
+    echo -en "Updating: ${txtpur}$plugin${txtrst}..." && cd $AV_INSTALLED_PLUGINS/${plugin} && git pull
+done
+
 
 #### End commands

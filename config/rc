@@ -49,6 +49,8 @@ export HISTTIMEFORMAT="%H:%M > "
 
 # Make an alias so that help can run
 alias help='$AV_INSTALLED_PATH/plugins/av-shell/bin/help'
+alias team='$AV_INSTALLED_PATH/plugins/av-shell/bin/squad'
+alias update='$AV_INSTALLED_PATH/plugins/av-shell/bin/upgrade'
 alias sudo=`which sudo`
 alias gawk=`which gawk`
 alias awk=`which awk`
@@ -73,15 +75,27 @@ alias which=`which which`
 alias mc=`which mc`
 alias caffeinate=`which caffeinate`
 alias tree=`which tree`
+alias pip=`which pip`
+alias pip=`which pip3`
+alias pip=`which python`
+alias pip=`which python3`
 
 # Set prompt to something short and different
 export PATH=$AV_BIN_DIR:${av_path}
-export PROMPT=`/bin/cat $AV_PROJECT_CONFIG_DIR/prompt` 
 
 function container_prompt() {
     cur_container=`getpv container`
     if [ ! -z ${cur_container} ]; then
         echo -e -n " [${cur_container}]"
+    else
+        echo -n ""
+    fi
+}
+
+function cluster_prompt() {
+    cur_cluster=`getpv cluster`
+    if [ ! -z ${cur_cluster} ]; then
+        echo -e -n " [${cur_cluster}]"
     else
         echo -n ""
     fi
@@ -95,9 +109,10 @@ function role_prompt() {
         echo -n ""
     fi
 }
-export PS1="\[${txtgrn}\]${PROMPT}\[${txtrst}\]\[${txtcyn}\]\$(container_prompt)\[${txtrst}\]\[${txtpur}\]\$(role_prompt)\[${txtrst}\]> "
 
 # Welcome
 if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
+  export PROMPT=`/bin/cat $AV_PROJECT_CONFIG_DIR/prompt` 
+  export PS1="\[${txtgrn}\]${PROMPT}\[${txtrst}\]\[${txtred}\$(cluster_prompt)${txtrst}\]\[${txtcyn}\]\$(container_prompt)\[${txtrst}\]\[${txtpur}\]\$(role_prompt)\[${txtrst}\]> "
   $AV_CONFIG_DIR/welcome
 fi

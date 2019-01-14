@@ -15,43 +15,15 @@ AV_INSTALLED_PATH=$(dirname $(realpath "$0"))
 upsearch () {
   slashes=${PWD//[^\/]/}
   directory="$PWD"
+  topdir="`cd ~/;pwd`"
   for (( n=${#slashes}; n>0; --n ))
   do
+	if [[ $directory == $topdir ]]; then
+		return
+	fi
     test -e "$directory/$1" && export AV_ROOT="$directory/$1" && return
-    directory="$directory/.."
+	directory="`cd "$directory/..";pwd`"
   done
-}
-
-# Handle update command
-vercomp () {
-    if [[ $1 == $2 ]]
-    then
-        return 0
-    fi
-    local IFS=.
-    local i ver1=($1) ver2=($2)
-    # fill empty fields in ver1 with zeros
-    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
-    do
-        ver1[i]=0
-    done
-    for ((i=0; i<${#ver1[@]}; i++))
-    do
-        if [[ -z ${ver2[i]} ]]
-        then
-            # fill empty fields in ver2 with zeros
-            ver2[i]=0
-        fi
-        if ((10#${ver1[i]} > 10#${ver2[i]}))
-        then
-            return 1
-        fi
-        if ((10#${ver1[i]} < 10#${ver2[i]}))
-        then
-            return 2
-        fi
-    done
-    return 0
 }
 
 # --------------------------------------------------------------------
@@ -65,10 +37,12 @@ if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]]; then
 	echo "  help    - this helpful display"
 	echo 
 	echo "Commands that work on the current directory: "
-	echo "  init    - creates a new domain specific shell in your current path"
-	echo "  status  - displays 'av' if a domain specific shell is in your current path"
-	echo "  update  - checks your domain specific shell's version and imposes the changes necessary"
-	echo "  upgrade - pull updates for av-shell and plugins, system wide"
+	echo "  init        - creates a new domain specific shell in your current path"
+	echo "  status      - displays 'av' if a domain specific shell is in your current path"
+	echo "  get         - install plugin from repository"
+	echo "  invigorate  - checks your domain specific shell's version and imposes the changes necessary"
+	echo "  upgrade     - pull updates for av-shell and plugins, system wide"
+	echo "  update      - same as upgrade"
 	echo
 	exit
 fi
@@ -99,21 +73,30 @@ if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
 	exit
 fi
 
+if [[ "$1" == "get" && -z "$AV_ROOT" ]]; then
+
+	if [[ $# -ne 2 ]]; then
+		echo "Usage: av get <repository>"
+		exit 1
+	fi
+
+	cd ~/.av/plugins && git clone $2
+
+	exit
+fi
 
 # See if there is an .av directory
 upsearch ".av"
 
 
 if [[ "$1" == "status" ]]; then
-	if [ -z $AV_ROOT ]; then
-		echo ""
-	else
-		echo "av"
+	if [[ ! -z $AV_ROOT ]]; then
+		echo -n "av"
 	fi
 	exit
 fi
 
-if [ -z "$AV_ROOT" ]; then
+if [[ -z "$AV_ROOT" && $# -eq 0 ]]; then
 	echo "Unable to find av environment, have you run 'av init'?"
 	exit
 fi
@@ -133,9 +116,8 @@ if [ $# -eq 0 ]; then
 		echo -en "${txtred}[AV-SHELL] Your local .av folder can be simplified...do so now? [Y/n]: ${txtrst}"
 		read prompt
 		if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then
-			AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_INSTALLED_PATH/config/rc -i -c update
+			AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_INSTALLED_PATH/config/rc -i -c invigorate
 		fi
-
 	else
 		CURRENT_DATE=`date +%s`
 		if [[ ! -e $AV_INSTALLED_PATH/config/update_checked ]]; then
