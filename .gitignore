@@ -1,3 +1,5 @@
 node_modules
 plugins/av-prompts/bin/*
 .DS_Store
+.idea
+.vscode
