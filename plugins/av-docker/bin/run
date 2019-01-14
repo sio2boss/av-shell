@@ -11,7 +11,7 @@ avAppendSystemPath
 
 #### Put system commands here
 
-domain=$(cat $AV_CONFIG_DIR/prompt | sed "s/\ /\_/g")
+domain=$(cat $AV_PROJECT_CONFIG_DIR/prompt | sed "s/\ /\_/g")
 if [ -z $domain ]; then
 	echo -e "${txtred}Unable to understand prompt text as docker domain${txtrst}"
 	exit 1
