@@ -114,6 +114,6 @@ function role_prompt() {
 # Welcome
 if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
   export PROMPT=`/bin/cat $AV_PROJECT_CONFIG_DIR/prompt` 
-  export PS1="\[${txtgrn}\]${PROMPT}\[${txtrst}\]\[${txtred}\$(cluster_prompt)${txtrst}\]\[${txtcyn}\]\$(container_prompt)\[${txtrst}\]\[${txtpur}\]\$(role_prompt)\[${txtrst}\]> "
+  export PS1="\[${txtgrn}\]${PROMPT}\[${txtrst}\]\[${txtred}\]\$(cluster_prompt)\[${txtrst}\]\[${txtcyn}\]\$(container_prompt)\[${txtrst}\]\[${txtpur}\]\$(role_prompt)\[${txtrst}\]> "
   $AV_CONFIG_DIR/welcome
 fi
