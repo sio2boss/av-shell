@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+
 	"github.com/manifoldco/promptui"
 )
 
@@ -12,7 +13,6 @@ var usage = `
 Usage:
 	inquirer_multiselect [-h] <variable> <option1> [<option2> ...]
 `
-
 
 func main() {
 
@@ -34,8 +34,8 @@ func main() {
 
 	for index < 0 {
 		prompt := promptui.SelectWithAdd{
-			Label:    "Select the ones you want",
-			Items:    items,
+			Label: "Select the ones you want",
+			Items: items,
 		}
 
 		index, result, err = prompt.Run()
@@ -48,6 +48,10 @@ func main() {
 	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return
+	}
+
+	if result == "None" {
+		result = ""
 	}
 
 	cmd := exec.Command("setpv", variable, result)
