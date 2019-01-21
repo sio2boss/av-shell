@@ -17,6 +17,6 @@ for plugin in `ls -1`; do
     echo -en "Updating: ${txtpur}$plugin${txtrst}..." && cd $AV_INSTALLED_PLUGINS/${plugin} && git pull
 done
 
-bash $AV_BIN_DIR/../install
+cd $AV_CONFIG_DIR/../ && bash ./install
 
 #### End commands
