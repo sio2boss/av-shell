@@ -15,7 +15,6 @@ Usage:
 	inquirer_menu [-h] <variable> <option1> [<option2> ...]
 `
 
-
 func main() {
 
 	if os.Args[1] == "-h" {
@@ -62,6 +61,10 @@ func main() {
 	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return
+	}
+
+	if result == "None" {
+		result = ""
 	}
 
 	cmd := exec.Command("setpv", variable, result)

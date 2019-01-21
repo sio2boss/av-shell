@@ -1,4 +1,5 @@
 node_modules
+config/update_checked
 plugins/av-prompts/bin/*
 .DS_Store
 .idea
