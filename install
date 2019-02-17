@@ -1,9 +1,24 @@
 #! /bin/bash
 
-if [[ ! -e ./av ]]; then
-    cd .av
+# Get to the root of av-shell install
+cd $(dirname "$0")
+
+# Import color
+source config/color
+
+# Verify osx
+if [[ "$OSTYPE" != "darwin"* && `whoami` != "root" ]]; then
+    echo -e "${txtgrn}[AV-SHELL]${txtrst} install must be run as ${txtred}root${txtrst} on your system, re-running..."
+    sudo bash ./install
+    exit $?
 fi
 
+echo -e "${txtgrn}[AV-SHELL]${txtrst} Creating symlink in ${txtpur}/usr/local/bin${txtrst}"
 rm -f /usr/local/bin/av > /dev/null
 ln -s `pwd`/av /usr/local/bin/av
-cd plugins/av-prompts && make
+
+echo -e "${txtgrn}[AV-SHELL]${txtrst} Building ${txtpur}prompts/menu${txtrst} system"
+cd plugins/av-prompts && make; cd ../..
+
+echo -e "${txtgrn}[AV-SHELL]${txtrst} Installing ${txtpur}python${txtrst} dependencies"
+pip install -r ./requirements.txt
