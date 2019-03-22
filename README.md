@@ -124,3 +124,10 @@ And perminantly remove it
     rmc
 
 How many times did you not have to type docker?  Make your life easy with av-docker!
+
+example flow to push container:
+
+    tag latest
+    push latest
+
+
