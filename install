@@ -7,7 +7,7 @@ cd $(dirname "$0")
 source config/color
 
 # Verify osx
-if [[ "$OSTYPE" != "darwin"* && `whoami` != "root" ]]; then
+if [[ "$OSTYPE" != "darwin"* && `whoami` != "root" && $1 != "--user" ]]; then
     echo -e "${txtgrn}[AV-SHELL]${txtrst} install must be run as ${txtred}root${txtrst} on your system, re-running..."
     sudo bash ./install
     exit $?
