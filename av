@@ -1,5 +1,9 @@
 #!/bin/bash
 
+txtred="\033[0;31m"       # red
+txtgrn="\033[0;32m"       # green
+txtrst="\033[0m"          # Text reset
+
 # Get the absolute path of the executable
 function realpath {
     local r=$1; local t=$(readlink $r)
@@ -80,7 +84,13 @@ if [[ "$1" == "get" && -z "$AV_ROOT" ]]; then
 		exit 1
 	fi
 
-	cd ~/.av/plugins && git clone $2
+  reponame="$(basename "${2%.*}")"
+  if [[ -e ~/.av/plugins/${reponame} ]]; then
+		echo -e "${txtgrn}[AV-SHELL]${txtrst} Plugin already installed, pulling latest"
+		cd ~/.av/plugins/${reponame} && git pull
+	else
+		cd ~/.av/plugins && git clone $2
+	fi
 
 	exit
 fi
@@ -110,10 +120,10 @@ cd $AV_ROOT/.. > /dev/null
 # If there are arguments, just run them rather than opening a shell
 if [ $# -eq 0 ]; then
 
-
 	FORCED_COMMAND=""
 	if [ -e $AV_ROOT/config/version ]; then
-		echo -en "${txtred}[AV-SHELL] Your local .av folder can be simplified...do so now? [Y/n]: ${txtrst}"
+
+		echo -en "${txtgrn}[AV-SHELL]${txtred} Your local .av folder can be simplified...do so now? [Y/n]: ${txtrst}"
 		read prompt
 		if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then
 			AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_INSTALLED_PATH/config/rc -i -c invigorate
@@ -125,7 +135,7 @@ if [ $# -eq 0 ]; then
 		else
 			LAST_CHECKED=`cat $AV_INSTALLED_PATH/config/update_checked`
 			if [[ `expr ${CURRENT_DATE} - ${LAST_CHECKED}` -gt 1728000 ]]; then
-				echo -en "${txtred}[AV-SHELL] Would you like to check for updates? [Y/n]: ${txtrst}"
+				echo -en "${txtred}[AV-SHELL]${txtgrn} Would you like to check for updates? [Y/n]: ${txtrst}"
 				read prompt
 				echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
 				if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then

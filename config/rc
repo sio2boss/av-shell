@@ -69,17 +69,22 @@ alias jq=`which jq`
 alias ls=`whereis ls`
 alias rm=`whereis rm`
 alias node=`which node`
-alias sublime=`which sublime`
 alias clear=`which clear`
 alias git=`which git`
 alias which=`which which`
 alias mc=`which mc`
-alias caffeinate=`which caffeinate`
 alias tree=`which tree`
 alias pip=`which pip`
 alias pip=`which pip3`
 alias pip=`which python`
 alias pip=`which python3`
+
+# OSX specific
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    alias sublime=`which sublime`
+    alias subl=`which sublime`
+    alias caffeinate=`which caffeinate`
+fi
 
 # Set prompt to something short and different
 export PATH=$AV_BIN_DIR:${av_path}
