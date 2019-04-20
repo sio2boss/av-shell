@@ -37,8 +37,10 @@ done
 # Local commands
 echo -e "Category ${txtred}yours${txtrst}:\n"
 for command in ` ls -F $AV_BIN_DIR/ | grep -v '/'`; do
-	command=$(echo "${command}" | sed -e 's/\*$//')
-	printf "    %-30s - %s\n" "$command" "`$AV_BIN_DIR/$command -h`"
+		command=$(echo "${command}" | sed -e 's/\*$//')
+    	if [[ -e $AV_BIN_DIR/$command ]]; then
+			printf "    %-30s - %s\n" "$command" "`$AV_BIN_DIR/$command -h`"
+		fi
 done
 
 echo
