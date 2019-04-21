@@ -1,0 +1,41 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "builtin" "Download necessary bundle for kafka things" "\n \
+    Template to help you out.\n \
+\n"
+
+# Import system path
+
+#### Put system commands here
+
+version=kafka_2.11-1.1.1
+if [[ ! -e $AV_ROOT/../support/${version} ]]; then
+
+	setpv kafka-partitions 3
+	setpv kafka-replication 1
+	setpv kakfa-offset earliest
+	setpv kafka-version ${version}
+	setpv kafka-group testing-from-av-shell
+	setpv kafka-brokers localhost:9092
+	setpv kafka-zookeepers localhost:2181
+
+	avAppendSystemPath
+	cd $AV_ROOT/.. && mkdir -p support && cd support && \
+		curl -o ${version}.tgz -# https://archive.apache.org/dist/kafka/1.1.1/${version}.tgz && \
+		tar xfz ${version}.tgz && \
+		rm ${version}.tgz
+
+	if [[ $(cat $AV_ROOT/../.gitignore) == "" ]]; then
+		echo "support/" >> $AV_ROOT/../.gitignore
+	fi
+
+fi
+
+
+#### End commands

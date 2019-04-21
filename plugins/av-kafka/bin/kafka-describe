@@ -1,0 +1,25 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "builtin" "Describe topic" "\n \
+    Template to help you out.\n \
+\n"
+
+# Import system path
+avAppendSystemPath
+
+#### Put system commands here
+
+kafka_root=$AV_ROOT/../support/$(getpv kafka-version)/bin
+
+echo "Kafka Command: ./kafka-topics.sh --describe --zookeeper $(getpv kafka-zookeepers) --topic $(getpv kafka-topic) $*"
+
+cd ${kafka_root} && ./kafka-topics.sh --describe --zookeeper $(getpv kafka-zookeepers) --topic $(getpv kafka-topic) $*
+
+
+#### End commands
