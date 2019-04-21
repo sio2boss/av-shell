@@ -116,9 +116,18 @@ function role_prompt() {
     fi
 }
 
+function topic_prompt() {
+    cur_role=`getpv kafka-topic`
+    if [ ! -z ${cur_role} ]; then
+        echo -e -n " [${cur_role}]"
+    else
+        echo -n ""
+    fi
+}
+
 # Welcome
 if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
   export PROMPT=`/bin/cat $AV_PROJECT_CONFIG_DIR/prompt` 
-  export PS1="\[${txtgrn}\]${PROMPT}\[${txtrst}\]\[${txtred}\]\$(cluster_prompt)\[${txtrst}\]\[${txtcyn}\]\$(container_prompt)\[${txtrst}\]\[${txtpur}\]\$(role_prompt)\[${txtrst}\]> "
+  export PS1="\[${txtgrn}\]${PROMPT}\[${txtrst}\]\[${txtred}\]\$(cluster_prompt)\[${txtrst}\]\[${txtcyn}\]\$(container_prompt)\[${txtrst}\]\[${txtpur}\]\$(role_prompt)\[${txtrst}\]\[${txtpur}\]\$(topic_prompt)\[${txtrst}\]> "
   $AV_CONFIG_DIR/welcome
 fi

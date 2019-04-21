@@ -28,7 +28,23 @@ func main() {
 	}
 
 	variable := os.Args[1]
-	items := os.Args[2:]
+	rawitems := os.Args[2:]
+
+	items := []string{}
+	temp := ""
+	for _, a := range rawitems {
+		if a[len(a)-1] == '"' && (len(temp) > 0) {
+			temp += " " + a
+			items = append(items, strings.Replace(temp, "\"", "", -1))
+			temp = ""
+		} else if ((a[0] == '"') && (a[len(a)-1] != '"')) {
+			temp += a
+		} else if len(temp) > 0 {
+			temp += " " + a
+		} else {
+			items = append(items, strings.Replace(a, "\"", "", -1))
+		}
+	}
 
 	// The Active and Selected templates set a small pepper icon next to the name colored and the heat unit for the
 	// active template. The details template is show at the bottom of the select's list and displays the full info
@@ -53,7 +69,7 @@ func main() {
 		Label:     "Which do you want",
 		Items:     items,
 		Templates: templates,
-		Size:      6,
+		Size:      12,
 		Searcher:  searcher,
 	}
 
