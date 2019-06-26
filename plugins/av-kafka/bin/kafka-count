@@ -18,11 +18,11 @@ avAppendSystemPath
 kafka_root=$AV_ROOT/../support/$(getpv kafka-version)/bin
 
 echo -e "Kafka Command: ./kafka-run-class.sh kafka.tools.GetOffsetShell \n \
-        --broker-list $(getpv kafka-brokers) --topic $(getpv kafka-topic) --time -1 --offsets"
+        --broker-list $(getpv kafka-brokers) --topic $(getpv kafka-topic) --time -1"
 
 cd ${kafka_root} && ./kafka-run-class.sh kafka.tools.GetOffsetShell \
                 --broker-list $(getpv kafka-brokers) \
                 --topic $(getpv kafka-topic) \
-                --time -1 --offsets | awk -F ":" '{sum += $3} END{print sum}'
+                --time -1 | awk -F ":" '{sum += $3} END{print sum}'
 
 #### End commands
