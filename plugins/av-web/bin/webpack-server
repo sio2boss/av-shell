@@ -15,7 +15,7 @@ webpack_folders=`cd $AV_ROOT/.. && find . -name webpack.config.js | grep -v node
 count=`echo -e ${webpack_folders} | wc -l`
 
 if [[ ${count} -eq 1 ]]; then
-	echo -e "Running webpack-dev-server --progress --color in ${webpack_folders}"
+	echo -e "Running webpack-dev-server --progress --color $* in ${webpack_folders}"
 	avRestoreSystemPath
 	cd $AV_ROOT/../${webpack_folders} && ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --color $*
 else
@@ -24,7 +24,7 @@ else
 	sleep 1
 	webdir=`getpv webdir`
 	if [[ ! -z ${webdir} ]]; then
-		echo -e "Running webpack-dev-server --progress --color in ${webdir}"
+		echo -e "Running webpack-dev-server --progress --color $* in ${webdir}"
 		avRestoreSystemPath
 		cd $AV_ROOT/../${webdir} && ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --color $*
 	fi
