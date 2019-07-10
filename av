@@ -75,6 +75,7 @@ if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
     echo ".av/config/vars/branch" >> .av/config/.gitignore
     echo ".av/config/vars/cluster_type" >> .av/config/.gitignore
     echo ".av/config/vars/profile" >> .av/config/.gitignore
+	echo ".av/config/vars/lasthash" >> .av/config/.gitignore
 	echo "$prompt" > .av/config/prompt
 
 	echo
