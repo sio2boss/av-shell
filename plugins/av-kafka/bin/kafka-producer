@@ -20,11 +20,11 @@ kafka_root=$AV_ROOT/../support/$(getpv kafka-version)/bin
 echo -e "Kafka Command: ./kafka-console-producer.sh \n\
         --broker-list $(getpv kafka-brokers) \n\
         --property parse.key=false \n\
-        --topic $(getpv kafka-topic) \n"
+        --topic $(getpv kafka-topic) $*\n"
 
 cd ${kafka_root} && ./kafka-console-producer.sh \
                 --broker-list $(getpv kafka-brokers) \
                 --property parse.key=false \
-                --topic $(getpv kafka-topic)
+                --topic $(getpv kafka-topic) $*
 
 #### End commands
