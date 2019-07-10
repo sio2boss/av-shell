@@ -24,6 +24,6 @@ if [[ -z ${topics} ]]; then
     exit 1
 fi
 
-inquirer_menu kafka-topic ${topics}
+inquirer_menu kafka-topic ${topics} None
 
 #### End commands
