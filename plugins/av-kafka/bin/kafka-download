@@ -7,7 +7,7 @@ source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
 avCheckHelpFlags "$1" "builtin" "Download necessary bundle for kafka things" "\n \
-    Template to help you out.\n \
+    Download necessary bundle for kafka things.\n \
 \n"
 
 # Import system path

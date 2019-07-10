@@ -6,8 +6,8 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "template script" "\n \
-    Template to help you out.\n \
+avCheckHelpFlags "$1" "builtin" "Count offsets" "\n \
+    Count offsets.\n \
 \n"
 
 # Import system path
@@ -18,11 +18,11 @@ avAppendSystemPath
 kafka_root=$AV_ROOT/../support/$(getpv kafka-version)/bin
 
 echo -e "Kafka Command: ./kafka-run-class.sh kafka.tools.GetOffsetShell \n \
-        --broker-list $(getpv kafka-brokers) --topic $(getpv kafka-topic) --time -1"
+        --broker-list $(getpv kafka-brokers) --topic $(getpv kafka-topic) --time -1 $*"
 
 cd ${kafka_root} && ./kafka-run-class.sh kafka.tools.GetOffsetShell \
                 --broker-list $(getpv kafka-brokers) \
                 --topic $(getpv kafka-topic) \
-                --time -1 | awk -F ":" '{sum += $3} END{print sum}'
+                --time -1  $* | awk -F ":" '{sum += $3} END{print sum}'
 
 #### End commands

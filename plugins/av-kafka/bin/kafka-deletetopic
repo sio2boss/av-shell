@@ -6,8 +6,8 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "Delete topic" "\n \
-    Template to help you out.\n \
+avCheckHelpFlags "$1" "builtin" "Delete kafka topic" "\n \
+    Usage: kafka-deletetopic <topic name>\n \
 \n"
 
 # Import system path

@@ -6,8 +6,8 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "template script" "\n \
-    Template to help you out.\n \
+avCheckHelpFlags "$1" "builtin" "List kafka topics and select one to use" "\n \
+    Usage: $0 [topic].\n \
 \n"
 
 # Import system path
@@ -16,6 +16,12 @@ avAppendSystemPath
 #### Put system commands here
 
 kafka_root=$AV_ROOT/../support/$(getpv kafka-version)/bin
+
+if [[ ! -z $1 ]]; then
+    setpv kafka-topic "$1"
+    exit 0
+fi
+
 setpv kafka-topic ""
 echo "Kafka Command: ./kafka-topics.sh --list --zookeeper $(getpv kafka-zookeepers)"
 topics=$(cd ${kafka_root} && ./kafka-topics.sh --list --zookeeper $(getpv kafka-zookeepers) | awk '{ print "\""$0"\""}' | tr '\n' ' ')
