@@ -6,8 +6,8 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "template script" "\n \
-    Template to help you out.\n \
+avCheckHelpFlags "$1" "builtin" "Cat selected kafka topic" "\n \
+    Cat selected kafka topic.\n \
 \n"
 
 #### Put system commands here
