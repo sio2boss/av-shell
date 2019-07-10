@@ -1,0 +1,30 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "builtin" "template script" "\n \
+    Template to help you out.\n \
+\n"
+
+#### Put system commands here
+brokers=$(getpv kafka-brokers)
+topic=$(getpv kafka-topic)
+
+avRestoreSystemPath
+
+if [[ -z $(which kafkacat) ]]; then
+    echo -e "Please install kafkacat via https://github.com/edenhill/kafkacat"
+    exit 1
+fi
+
+echo -e "Kafka Command: kafkacat -C \n \
+                -b ${brokers} \n \
+                -t ${topic} $* \n"
+
+kafkacat -C -b ${brokers} -t ${topic} $*
+                
+#### End commands
