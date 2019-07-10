@@ -20,13 +20,11 @@ kafka_root=$AV_ROOT/../support/$(getpv kafka-version)/bin
 echo -e "Kafka Command: ./kafka-console-consumer.sh \n \
                 --bootstrap-server $(getpv kafka-brokers) \n \
                 --property print.key=false \n \
-                --from-beginning \n \
-                --topic $(getpv kafka-topic)"
+                --topic $(getpv kafka-topic) $*\n" 
 
 cd ${kafka_root} && ./kafka-console-consumer.sh \
                 --bootstrap-server $(getpv kafka-brokers) \
                 --property print.key=false \
-                --from-beginning \
-                --topic $(getpv kafka-topic)
+                --topic $(getpv kafka-topic) $*
                 
 #### End commands
