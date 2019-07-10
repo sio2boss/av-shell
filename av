@@ -33,12 +33,12 @@ upsearch () {
 # --------------------------------------------------------------------
 
 # Built-in commands
-if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]]; then
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
 	export AV_CONFIG_DIR=$AV_INSTALLED_PATH/config
 	cd $AV_INSTALLED_PATH/config && ./welcome
 	echo
-	echo "Global commands: "
-	echo "  help    - this helpful display"
+	echo "Flags: "
+	echo "  --help      - this helpful display"
 	echo 
 	echo "Commands that work on the current directory: "
 	echo "  init        - creates a new domain specific shell in your current path"
