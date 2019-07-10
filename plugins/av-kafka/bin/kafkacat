@@ -21,10 +21,6 @@ if [[ -z $(which kafkacat) ]]; then
     exit 1
 fi
 
-echo -e "Kafka Command: kafkacat -C \n \
-                -b ${brokers} \n \
-                -t ${topic} $* \n"
-
 kafkacat -C -b ${brokers} -t ${topic} $*
                 
 #### End commands
