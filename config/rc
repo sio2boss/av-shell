@@ -34,6 +34,10 @@ shopt -s nocaseglob
 HISTSIZE=1000
 HISTFILESIZE=2000
  
+# Zsh style history search
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
@@ -75,10 +79,9 @@ alias git=`which git`
 alias which=`which which`
 alias mc=`which mc`
 alias tree=`which tree`
-alias pip=`which pip`
 alias pip=`which pip3`
-alias pip=`which python`
-alias pip=`which python3`
+alias vault=`which vault`
+
 
 # OSX specific
 if [[ "$OSTYPE" == "darwin"* ]]; then
