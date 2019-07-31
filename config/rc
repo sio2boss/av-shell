@@ -80,6 +80,7 @@ alias which=`which which`
 alias mc=`which mc`
 alias tree=`which tree`
 alias pip=`which pip3`
+alias python=`which python3`
 alias vault=`which vault`
 
 

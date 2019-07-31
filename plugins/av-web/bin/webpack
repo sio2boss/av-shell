@@ -11,7 +11,7 @@ avCheckHelpFlags "$1" "av-web" "Run webpack" "\n \
 avAppendSystemPath
 
 #### Put system commands here
-webpack_folders=`cd $AV_ROOT/.. && find . -name webpack.config.js | grep -v node_modules | sed -e 's/\/webpack.config.js//g' -e 's/^.\///g'`
+webpack_folders=`cd $AV_ROOT/.. && find . -name webpack.*.js | grep -v node_modules | sed -e 's/\/webpack..*.js//g' -e 's/^.\///g' | uniq`
 count=`echo -e ${webpack_folders} | wc -l`
 
 if [[ ${count} -eq 1 ]]; then
