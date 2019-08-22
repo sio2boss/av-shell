@@ -5,10 +5,21 @@ if [[ $1 == "" ]]; then
     exit
 fi
 
+excludes='--exclude .git --exclude .idea'
 cd ..
-make linux  -C .av/plugins/av-prompts
-tar -c --exclude .git --exclude .idea -z -f av-shell-$1-linux64.tar.gz .av
+
+# Linux
+make linux -C .av/plugins/av-prompts
+make linux -C .av/plugins/configgen
+tar -c ${excludes} -z -f av-shell-$1-linux64.tar.gz .av
+echo -e "Produced: av-shell-$1-linux64.tar.gz"
+
+# OSX
 make -C .av/plugins/av-prompts
-tar -c --exclude .git --exclude .idea -z -f av-shell-$1-mac.tar.gz .av
+make -C .av/plugins/configgen
+tar -c ${excludes} -z -f av-shell-$1-mac.tar.gz .av
+echo -e "Produced: av-shell-$1-linux64.tar.gz"
+
+# Move into .av folder
 mv av-shell-$1-* .av
 cd -
