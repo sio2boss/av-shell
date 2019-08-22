@@ -1,0 +1,3 @@
+[submodule "plugins/configgen"]
+	path = plugins/configgen
+	url = https://github.com/benprofessionaledition/configgen.git

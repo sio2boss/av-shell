@@ -19,6 +19,4 @@ ln -s `pwd`/av /usr/local/bin/av
 
 echo -e "${txtgrn}[AV-SHELL]${txtrst} Building ${txtpur}prompts/menu${txtrst} system"
 cd plugins/av-prompts && make; cd ../..
-
-echo -e "${txtgrn}[AV-SHELL]${txtrst} Installing ${txtpur}python${txtrst} dependencies"
-pip install -r ./requirements.txt
+cd plugins/configgen && make; cd ../..
