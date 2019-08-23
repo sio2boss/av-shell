@@ -4,3 +4,4 @@ plugins/av-prompts/bin/*
 .DS_Store
 .idea
 .vscode
+av-shell*.tar.gz
