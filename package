@@ -5,20 +5,28 @@ if [[ $1 == "" ]]; then
     exit
 fi
 
-excludes='--exclude .git --exclude .idea'
+excludes="--exclude=**/*.gz --exclude=**/.vscode --exclude=**/.idea --exclude=**/.DS_Store --exclude=**/.git"
 cd ..
 
 # Linux
 make linux -C .av/plugins/av-prompts
 make linux -C .av/plugins/configgen
-tar -c ${excludes} -z -f av-shell-$1-linux64.tar.gz .av
-echo -e "Produced: av-shell-$1-linux64.tar.gz"
+tar ${excludes} -c -z -f av-shell-$1-linux64.tar.gz .av
+echo
+echo -e "----------------------------------------------------------"
+echo -e "|   Produced: Produced: av-shell-$1-linux64.tar.gz"
+echo -e "----------------------------------------------------------"
+echo
 
 # OSX
 make -C .av/plugins/av-prompts
 make -C .av/plugins/configgen
-tar -c ${excludes} -z -f av-shell-$1-mac.tar.gz .av
-echo -e "Produced: av-shell-$1-linux64.tar.gz"
+tar ${excludes} -c -z -f av-shell-$1-mac.tar.gz .av
+echo
+echo -e "----------------------------------------------------------"
+echo -e "|   Produced: av-shell-$1-linux64.tar.gz"
+echo -e "----------------------------------------------------------"
+echo
 
 # Move into .av folder
 mv av-shell-$1-* .av
