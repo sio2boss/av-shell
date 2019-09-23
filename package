@@ -10,7 +10,7 @@ cd ..
 
 # Linux
 make linux -C .av/plugins/av-prompts
-make linux -C .av/plugins/configgen
+make linux -C .av/plugins/yamlmerge
 tar ${excludes} -c -z -f av-shell-$1-linux64.tar.gz .av
 echo
 echo -e "----------------------------------------------------------"
@@ -20,7 +20,7 @@ echo
 
 # OSX
 make -C .av/plugins/av-prompts
-make -C .av/plugins/configgen
+make -C .av/plugins/yamlmerge
 tar ${excludes} -c -z -f av-shell-$1-mac.tar.gz .av
 echo
 echo -e "----------------------------------------------------------"
