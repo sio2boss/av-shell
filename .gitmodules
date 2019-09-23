@@ -1,3 +1,0 @@
-[submodule "plugins/configgen"]
-	path = plugins/yamlmerge
-	url = https://github.com/benprofessionaledition/yamlmerge.git
