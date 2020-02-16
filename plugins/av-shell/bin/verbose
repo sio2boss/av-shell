@@ -26,6 +26,7 @@ if [[ "$1" == "off" ]]; then
 	exit
 fi
 
+echo "Usage: verbose [on|off]"
 exit 1
 
 #### End commands

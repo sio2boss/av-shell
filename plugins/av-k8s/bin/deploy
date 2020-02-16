@@ -1,0 +1,94 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+USAGE="\nUsage: deploy <namespace> <image-tag> <cluster>\n"
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-k8s" "Deploy via helm to kubernetes" "\n \
+Uses kubernetes\<container> folder as helm location.\n \
+${USAGE}"
+
+# Import system path
+avAppendSystemPath
+
+#### Put system commands here
+repo_server=$(getpv repo)
+if [ -z $repo_server ]; then
+   echo -e "${txtred}Unable to find repo server via getpv${txtrst}"
+   exit 1
+fi
+
+# Namespace
+NAMESPACE=$1
+if [[ -z NAMESPACE ]]; then
+	echo -e "${txtred}Unable to determine namespace from cli args${txtrst}${USAGE}"
+	exit 1
+fi
+
+# Define tag based on cli param or role
+tag=$2
+if [[ -z $tag ]]; then
+	echo -e "${txtred}Unable to determine image tag from cli args${txtrst}${USAGE}"
+	exit 1
+fi
+
+# Container
+CONTAINER=$(getpv container)
+
+# Find Chart.yaml
+KUBE_DIR=$AV_ROOT/../kubernetes/${CONTAINER}
+if [ ! -e ${KUBE_DIR}/Chart.yaml ]; then
+    KUBE_DIR=$AV_ROOT/../kubernetes/
+    if [ ! -e ${KUBE_DIR}/Chart.yaml ]; then
+	    echo -e "${txtred}Unable to find kubernetes folder with yamls${txtrst}"
+	    exit 1
+    fi
+fi
+
+# Define role based on av variable or cli param
+cluster=$3
+if [[ -z $cluster ]]; then
+    echo -e "${txtylw}Unable to determine cluster arg${txtrst}${USAGE}"
+    exit 1
+fi
+
+# Deploy with helm template
+echo -e "Deploying to ${txtgrn}${cluster}${txtrst}"
+action="apply"
+
+# Get additional flags
+shift
+shift
+shift
+if [[ "$1" == "--set" ]]; then
+    shift
+fi
+additional_tags=,$*
+
+
+# Verbose
+avCheckVerbose "helm template ${KUBE_DIR} --set Tag=${tag}${additional_tags} | \
+kubectl --cluster ${cluster} --namespace=${NAMESPACE} ${action} -f -"
+
+if [[ "$(getpv verbose)" == "true" ]]; then
+    echo
+    echo -e "${txtgrn}[AV-SHELL]${txtrst} Preview of kubernetes yamls:"
+    echo
+    echo -e "$(helm template ${KUBE_DIR} --set Tag=${tag}${additional_tags})"
+    echo
+    echo -en "${txtgrn}[AV-SHELL]${txtrst} Press any key to continue..."
+    read onward
+    echo -e "--------------------------------------------------------------"
+    echo
+fi
+
+# Deploy to k8s
+cd $AV_ROOT/.. && helm template ${KUBE_DIR} --set Tag=${tag}${additional_tags} | \
+    kubectl --cluster ${cluster} --namespace=${NAMESPACE} ${action} -f -
+    
+exit $?
+
+#### End commands
