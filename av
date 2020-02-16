@@ -133,7 +133,7 @@ if [ $# -eq 0 ]; then
 		echo -en "${txtgrn}[AV-SHELL]${txtred} Your local .av folder can be simplified...do so now? [Y/n]: ${txtrst}"
 		read prompt
 		if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then
-			AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_INSTALLED_PATH/config/rc -i -c invigorate
+			AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH ZDOTDIR=$AV_INSTALLED_PATH/config zsh -i -c invigorate
 		fi
 	else
 		CURRENT_DATE=`date +%s`
@@ -146,19 +146,19 @@ if [ $# -eq 0 ]; then
 				read prompt
 				echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
 				if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then
-					AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_INSTALLED_PATH/config/rc -i -c upgrade
+					AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH ZDOTDIR=$AV_INSTALLED_PATH/config zsh -i -c upgrade
 				fi
 			fi
 		fi
 	fi
 
 	# Open shell
-	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_ROOT=$AV_ROOT bash --rcfile $AV_INSTALLED_PATH/config/rc ${FORCED_COMMAND}
+	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_ROOT=$AV_ROOT ZDOTDIR=$AV_INSTALLED_PATH/config zsh ${FORCED_COMMAND}
 
 else
 
 	# Run command in shell
-	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH bash --rcfile $AV_INSTALLED_PATH/config/rc -i -c "$*"
+	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH ZDOTDIR=$AV_INSTALLED_PATH/config zsh -i -c "$*"
   exit $?
 
 fi
