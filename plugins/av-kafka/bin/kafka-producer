@@ -6,7 +6,7 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "Product messages to selected topic" "\n \
+avCheckHelpFlags "$1" "av-kafka" "Product messages to selected topic" "\n \
     Usage: $0 [any extra args]\n \
 \n"
 
@@ -17,12 +17,12 @@ avAppendSystemPath
 
 kafka_root=$AV_ROOT/../support/$(getpv kafka-version)/bin
 
-echo -e "Kafka Command: ./kafka-console-producer.sh \n\
+avCheckVerbose "KAFKA_HEAP_OPTS=\"-Xms512m -Xmx1g\" ./kafka-console-producer.sh \n\
         --broker-list $(getpv kafka-brokers) \n\
         --property parse.key=false \n\
         --topic $(getpv kafka-topic) $*\n"
 
-cd ${kafka_root} && ./kafka-console-producer.sh \
+cd ${kafka_root} && KAFKA_HEAP_OPTS="-Xms512m -Xmx1g" ./kafka-console-producer.sh \
                 --broker-list $(getpv kafka-brokers) \
                 --property parse.key=false \
                 --topic $(getpv kafka-topic) $*

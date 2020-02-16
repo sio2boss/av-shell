@@ -34,20 +34,19 @@ if [ ! -e "$container_path/Runfile" ]; then
     exit 1
 fi
 
+# Handle interactive override
 options=$(cat $container_path/Runfile)
 if [[ "$1" == "interactive" ]]; then
 	shift
 	options=$(echo "${options}" | sed -e 's/\-d\ /\-it\ /1')
 fi
 
-line="docker run ${options} ${domain}/${container} $*"
-echo  -e "[AV-SHELL] Runnning command: "
-echo
-echo  -e "${txtcyn}$line${txtrst}"
-echo
-cd ${container_path} && eval "$line"
+# Run
+avCheckVerbose "docker run ${options} ${domain}/${container} $*"
+cd ${container_path} && docker run ${options} ${domain}/${container} $*
 STATUS=$?
 
+# Capture the hash
 holdhash=$(getpv holdhash)
 if [[ "${holdhash}" == "true" ]]; then
 	setpv "lasthash" "`docker ps -l -q`"

@@ -5,3 +5,7 @@ plugins/av-prompts/bin/*
 .idea
 .vscode
 av-shell*.tar.gz
+
+config/.zsh_history
+
+config/.zcompdump

@@ -6,7 +6,7 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "Cat selected kafka topic" "\n \
+avCheckHelpFlags "$1" "av-kafka" "Cat selected kafka topic" "\n \
     Cat selected kafka topic.\n \
 \n"
 
@@ -20,6 +20,8 @@ if [[ -z $(which kafkacat) ]]; then
     echo -e "Please install kafkacat via https://github.com/edenhill/kafkacat"
     exit 1
 fi
+
+avCheckVerbose "kafkacat -C -b ${brokers} -t ${topic} $*"
 
 kafkacat -C -b ${brokers} -t ${topic} $*
                 

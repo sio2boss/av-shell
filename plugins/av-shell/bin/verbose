@@ -4,26 +4,25 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlags "$1" "docker" "Enables remembering last hash from docker commands" "\n \
-    Usage: holdhash [on|off].\n \
+avCheckHelpFlags "$1" "av-shell" "Show underlying commands" "\n \
+    Turn on showing underling commands before they are executed.\n \
+	Usage: verbose [on|off]\n \
 \n"
-
-
 
 #### Put system commands here
 
 if [[ "$1" == "" ]]; then
-	echo -e "holdhash is set to: $(getpv holdhash)"
+	echo -e "verbose is set to: $(getpv verbose)"
 	exit
 fi
 
 if [[ "$1" == "on" ]]; then
-	setpv "holdhash" "true"
+	setpv "verbose" "true"
 	exit
 fi
 
 if [[ "$1" == "off" ]]; then
-	setpv "holdhash" "false"
+	setpv "verbose" "false"
 	exit
 fi
 

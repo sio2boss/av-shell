@@ -6,7 +6,7 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "List kafka topics and select one to use" "\n \
+avCheckHelpFlags "$1" "av-kafka" "List kafka topics and select one to use" "\n \
     Usage: $0 [topic].\n \
 \n"
 
@@ -23,7 +23,7 @@ if [[ ! -z $1 ]]; then
 fi
 
 setpv kafka-topic ""
-echo "Kafka Command: ./kafka-topics.sh --list --zookeeper $(getpv kafka-zookeepers)"
+avCheckVerbose "./kafka-topics.sh --list --zookeeper $(getpv kafka-zookeepers)"
 topics=$(cd ${kafka_root} && ./kafka-topics.sh --list --zookeeper $(getpv kafka-zookeepers) | awk '{ print "\""$0"\""}' | tr '\n' ' ')
 if [[ -z ${topics} ]]; then
     echo "No topics found"

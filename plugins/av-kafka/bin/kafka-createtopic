@@ -6,7 +6,7 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "Create kafka topic" "\n \
+avCheckHelpFlags "$1" "av-kafka" "Create kafka topic" "\n \
     Usage: kafka-createtopic <topic name>\n \
 \n"
 
@@ -22,7 +22,8 @@ fi
 
 kafka_root=$AV_ROOT/../support/$(getpv kafka-version)/bin
 
-echo "Kafka Command: ./kafka-topics.sh --create --zookeeper $(getpv kafka-zookeepers) --partitions $(getpv kafka-partitions) --replication-factor $(getpv kafka-replication) --topic $*"
+avCheckVerbose "./kafka-topics.sh --create --zookeeper $(getpv kafka-zookeepers) --partitions $(getpv kafka-partitions) --replication-factor $(getpv kafka-replication) --topic $*"
+
 cd ${kafka_root} && ./kafka-topics.sh --create --zookeeper $(getpv kafka-zookeepers) --partitions $(getpv kafka-partitions) --replication-factor $(getpv kafka-replication) --topic $*
 
 if [[ $? -eq 0 ]]; then

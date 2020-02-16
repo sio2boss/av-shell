@@ -3,7 +3,7 @@
 # Import color
 source $AV_CONFIG_DIR/default_imports
 
-avCheckHelpFlags "$1" "builtin" "What you see here" "\n \
+avCheckHelpFlags "$1" "av-shell" "What you see here" "\n \
 This runs all the commands with a -h.  Also sets \n \
 the AV_SINGLE_LINE_HELP variable which should make\n \
 each command produce a single line of help.  We section\n \

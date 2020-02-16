@@ -13,17 +13,17 @@ avCheckHelpFlags "$1" "docker" "Choose a docker container to operate on" "\n \
 avAppendSystemPath
 
 #### Put system commands here
-cpath=$(getpv containerdir)
-if [ ! -e "$cpath" ]; then
-        echo -e "${txtred}Unable to determing container_path, make sure you have set your containerdir and container with setpv${txtrst}"
-        exit
-fi
-
 if [ $# -eq 1 ]; then
     
     setpv container $1
 
 else
+
+    cpath=$(getpv containerdir)
+    if [ ! -e "$cpath" ]; then
+            echo -e "${txtred}Unable to determine container_path, make sure you have set your 'containerdir' and 'container' vars${txtrst}"
+            exit
+    fi
 
     list=""
     list=`cd $AV_ROOT/../${cpath} && find . -name Dockerfile | sed -e "s/\.\///g" -e "s/^\///" -e "s/\/Dockerfile//g"`

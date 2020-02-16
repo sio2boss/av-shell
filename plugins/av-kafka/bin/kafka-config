@@ -1,0 +1,87 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-kafka" "Download necessary bundle for kafka things" "\n \
+    Download necessary bundle for kafka things.\n \
+\n"
+
+# Import system path
+avAppendSystemPath
+
+#### Put system commands here
+
+version=$(getpv kafka-version)
+partitions=$(getpv kafka-partitions)
+replication=$(getpv kafka-replication)
+offset=$(getpv kakfa-offset)
+group=$(getpv kafka-group)
+brokers=$(getpv kafka-brokers)
+multiline_brokers=$(echo ${brokers} | sed -e 's/,/\\n\ \ \ \ /g')
+zookeepers=$(getpv kafka-zookeepers)
+multiline_zookeepers=$(echo ${zookeepers} | sed -e 's/,/\\n\ \ \ \ /g')
+
+if [ -z $version ]; then
+	version=kafka_2.11-1.1.1
+fi
+
+if [ ! -z $partitions ]; then
+
+	# Dump table of values
+	echo -e "${txtbld}Version     : ${txtpur}${version}${txtrst}"
+	echo -e "${txtbld}Partitions  : ${txtpur}${partitions}${txtrst}"
+	echo -e "${txtbld}Replication : ${txtpur}${replication}${txtrst}"
+	echo -e "${txtbld}Offset      : ${txtpur}${offset}${txtrst}"
+	echo -e "${txtbld}Group       : ${txtpur}${group}${txtrst}"
+	echo -e "${txtbld}Brokers     : [\n    ${txtpur}${multiline_brokers}${txtrst}\n]"
+	echo -e "${txtbld}Zookeepers  : [\n    ${txtpur}${multiline_zookeepers}${txtrst}\n]"
+
+fi
+
+# Prompt / wizard
+echo
+echo -n "Would you like to change configuration? [Y/n] "
+read wizard
+if [[ "$wizard" != "" && ( "$wizard" == "n" || "$wizard" == "N" ) ]]; then
+	exit 0
+fi
+
+
+echo -en "${txtbld}Which version of kafka would you like to use? [${txtpur}${version}${txtrst}] "
+read wizard
+if [[ "$wizard" == "" ]]; then wizard=${version}; fi
+setpv kafka-version $wizard
+echo -en "${txtbld}How many partitions would you like to use? [${txtpur}${partitions}${txtrst}] "
+read wizard
+if [[ "$wizard" == "" ]]; then wizard=${partitions}; fi
+setpv kafka-partitions $wizard
+echo -en "${txtbld}Replication factor? [${txtpur}${replication}${txtrst}] "
+read wizard
+if [[ "$wizard" == "" ]]; then wizard=${replication}; fi
+setpv kafka-replication $wizard
+echo -en "${txtbld}What should the offset be? [${txtpur}${offset}${txtrst}] "
+read wizard
+if [[ "$wizard" == "" ]]; then wizard=${offset}; fi
+setpv kafka-offset $wizard
+echo -en "${txtbld}What group name should be used? [${txtpur}${group}${txtrst}] "
+read wizard
+if [[ "$wizard" == "" ]]; then wizard=${group}; fi
+setpv kafka-group $wizard
+echo -en "${txtbld}What should the broker list be? \n[\n   ${txtpur}${brokers}${txtrst}\n] "
+read wizard
+if [[ "$wizard" == "" ]]; then wizard=${multiline_brokers}; fi
+setpv kafka-brokers $wizard
+echo -en "${txtbld}What should the zookeeper list be? \n[\n   ${txtpur}${multiline_zookeepers}${txtrst}\n] "
+read wizard
+if [[ "$wizard" == "" ]]; then wizard=${zookeepers}; fi
+setpv kafka-zookeepers $wizard
+
+echo
+echo "If you changed the kafka version you will need to run kafka-download command"
+echo
+
+#### End commands

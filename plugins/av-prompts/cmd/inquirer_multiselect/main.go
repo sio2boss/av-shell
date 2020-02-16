@@ -17,7 +17,7 @@ Usage:
 func main() {
 
 	if os.Args[1] == "-h" {
-		fmt.Println("Selection of options via menu")
+		fmt.Println("Selection of multiple options via menu")
 		os.Exit(0)
 	}
 
