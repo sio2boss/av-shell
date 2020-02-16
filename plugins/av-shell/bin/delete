@@ -5,7 +5,7 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "Remove a command" "\n \
+avCheckHelpFlags "$1" "av-shell" "Remove a command" "\n \
 Just deletes it.  Remember to include the script category.\n \
    example: rm builtin/setprompt
 \n"

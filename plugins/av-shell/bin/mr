@@ -1,0 +1,33 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-shell" "Make a Merge Request" "\n \
+    Will push to an upstream branch of the same name and create a MR link.\n
+\n"
+
+avRestoreSystemPath
+
+# Get local branch name, if its master bail
+TEMP_DIR=/tmp/mr.temp
+
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+if [[ ${BRANCH_NAME} == "master" ]]; then
+	echo -e "ERROR: Not creating a merge request off of master"
+	exit 7
+fi
+
+# Now set remote branch name to be the same
+git push --set-upstream origin ${BRANCH_NAME} 2>&1 | tee $TEMP_DIR
+
+# Everything already up-to-date
+if [[ $(grep up-to-date ${TEMP_DIR}) != "" ]]; then
+	exit
+fi
+
+# Open MR
+MR_URL=$(grep https ${TEMP_DIR} | head -1 | awk '{print $2}')
+open ${MR_URL}
+exit $?

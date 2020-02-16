@@ -17,9 +17,9 @@ avAppendSystemPath
 
 kafka_root=$AV_ROOT/../support/$(getpv kafka-version)/bin
 
-avCheckVerbose "./kafka-topics.sh --describe --zookeeper $(getpv kafka-zookeepers) --topic $(getpv kafka-topic) $*"
+avCheckVerbose "./kafka-configs.sh --zookeeper $(getpv kafka-zookeepers) --entity-type topics --entity-name $(getpv kafka-topic) --alter $*"
 
-cd ${kafka_root} && ./kafka-topics.sh --describe --zookeeper $(getpv kafka-zookeepers) --topic $(getpv kafka-topic) $*
+cd ${kafka_root} && ./kafka-configs.sh --zookeeper $(getpv kafka-zookeepers) --entity-type topics --entity-name $(getpv kafka-topic) --alter $*
 
 
 #### End commands

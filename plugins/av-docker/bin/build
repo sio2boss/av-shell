@@ -24,11 +24,12 @@ fi
 
 cpath=$(container_path)
 if [ ! -e "$cpath" ]; then
-        echo -e "${txtred}Unable to determing container_path, make sure you have set your containerdir and container with setpv${txtrst}"
-        exit 1
+	echo -e "${txtred}Unable to determine container_path, make sure you have set 'containerdir' and 'container' vars${txtrst}"
+	exit 1
 fi
 
-cd $(container_path) && docker build -t $domain/$container .
+avCheckVerbose "docker build $@ -t $domain/$container ."
+cd $(container_path) && docker build $@ -t $domain/$container .
 
 exit $?
 

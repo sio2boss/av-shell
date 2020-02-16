@@ -5,7 +5,7 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "Upgrade av and plugins" "\n \
+avCheckHelpFlags "$1" "av-shell" "Upgrade av and plugins" "\n \
     Runs git pull on av and all all plugins\n \
 \n"
 

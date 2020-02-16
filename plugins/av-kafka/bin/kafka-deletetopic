@@ -6,7 +6,7 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "Delete kafka topic" "\n \
+avCheckHelpFlags "$1" "av-kafka" "Delete kafka topic" "\n \
     Usage: kafka-deletetopic <topic name>\n \
 \n"
 
@@ -22,7 +22,7 @@ fi
 
 kafka_root=$AV_ROOT/../support/$(getpv kafka-version)/bin
 
-echo "Kafka Command: ./kafka-topics.sh --delete --zookeeper $(getpv kafka-zookeepers) --topic $1"
+avCheckVerbose "./kafka-topics.sh --delete --zookeeper $(getpv kafka-zookeepers) --topic $1"
 
 echo -e "Deleting ${txtred}$1${txtrst} in 5 seconds (press CTRL-C to cancel)..."
 sleep 5

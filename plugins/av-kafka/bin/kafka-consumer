@@ -6,7 +6,7 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "Consume from selected kafka topic" "\n \
+avCheckHelpFlags "$1" "av-kafka" "Consume from selected kafka topic" "\n \
    Usage: $0 [any extra args]\n \
 \n"
 
@@ -17,12 +17,12 @@ avAppendSystemPath
 
 kafka_root=$AV_ROOT/../support/$(getpv kafka-version)/bin
 
-echo -e "Kafka Command: ./kafka-console-consumer.sh \n \
+avCheckVerbose "KAFKA_HEAP_OPTS=\"-Xms512m -Xmx1g\" ./kafka-console-consumer.sh \n \
                 --bootstrap-server $(getpv kafka-brokers) \n \
                 --property print.key=false \n \
                 --topic $(getpv kafka-topic) $*\n" 
 
-cd ${kafka_root} && ./kafka-console-consumer.sh \
+cd ${kafka_root} && KAFKA_HEAP_OPTS="-Xms512m -Xmx1g" ./kafka-console-consumer.sh \
                 --bootstrap-server $(getpv kafka-brokers) \
                 --property print.key=false \
                 --topic $(getpv kafka-topic) $*
