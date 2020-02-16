@@ -66,8 +66,6 @@ function avLaunchEditor
 	fi
 }
 
-
-
 # Same as avCheckHelpFlags but instead of outputing full help, run command
 function avCheckHelpFlagsPassThrough
 { 
@@ -89,3 +87,18 @@ function avCheckHelpFlagsPassThrough
 	fi
 }
 
+# Verbose
+function avCheckVerbose
+{
+	if [[ "$(getpv verbose)" == "true" ]]; then
+		echo
+		echo -e "${txtgrn}[AV-SHELL]${txtrst} Command:"
+		echo
+		echo -e "$1"
+		echo
+		echo -en "${txtgrn}[AV-SHELL]${txtrst} Press any key to continue..."
+		read onward
+		echo -e "--------------------------------------------------------------"
+		echo
+	fi
+}
