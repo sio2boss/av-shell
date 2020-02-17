@@ -5,7 +5,7 @@ if [[ $1 == "" ]]; then
     exit
 fi
 
-excludes="--exclude=**/*.gz --exclude=**/.vscode --exclude=**/.idea --exclude=**/.DS_Store --exclude=**/.git"
+excludes="--exclude=**/*.gz --exclude=**/.vscode --exclude=**/.idea --exclude=**/.DS_Store --exclude=**/.git --exclude=**/.zcompdump --exclude=**/.zsh_history"
 cd ..
 
 # Linux
