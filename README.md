@@ -131,3 +131,10 @@ example flow to push container:
     push latest
 
 
+## Releasing
+
+Update `config/version` and run the package script like this:
+
+    bash package `cat config/version`
+
+Go here https://github.com/sio2boss/av-shell/releases/new and make release
