@@ -10,11 +10,11 @@ cd ..
 
 # Linux
 make linux -C .av/plugins/av-prompts
-make linux -C .av/plugins/yamlmerge
+make -C .av/plugins/yamlmerge
 tar ${excludes} -c -z -f av-shell-$1-linux64.tar.gz .av
 echo
 echo -e "----------------------------------------------------------"
-echo -e "|   Produced: Produced: av-shell-$1-linux64.tar.gz"
+echo -e "|   Produced: av-shell-$1-linux64.tar.gz"
 echo -e "----------------------------------------------------------"
 echo
 
@@ -24,7 +24,7 @@ make -C .av/plugins/yamlmerge
 tar ${excludes} -c -z -f av-shell-$1-mac.tar.gz .av
 echo
 echo -e "----------------------------------------------------------"
-echo -e "|   Produced: av-shell-$1-linux64.tar.gz"
+echo -e "|   Produced: av-shell-$1-mac.tar.gz"
 echo -e "----------------------------------------------------------"
 echo
 
