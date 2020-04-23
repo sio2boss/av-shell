@@ -36,7 +36,7 @@ fi
 
 # Handle interactive override
 options="-it --rm"
-if [[ -e $container_path/Runfile ]]; then
+if [[ -e "$container_path/Runfile" ]]; then
 	options=$(cat $container_path/Runfile)
 fi
 if [[ "$1" == "interactive" ]]; then
@@ -48,8 +48,8 @@ fi
 options=$(cd ${container_path} && bash -c "echo ${options}")
 
 # Run
-avCheckVerbose "docker run ${options} ${domain}/${container} $*"
-cd ${container_path} && docker run ${options} ${domain}/${container} $*
+avCheckVerbose "docker run ${options} ${domain}/${container} $@"
+cd ${container_path} && docker run ${options} ${domain}/${container} "$@"
 STATUS=$?
 
 # Capture the hash
