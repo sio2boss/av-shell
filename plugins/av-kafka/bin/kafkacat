@@ -14,14 +14,14 @@ avCheckHelpFlags "$1" "av-kafka" "Cat selected kafka topic" "\n \
 brokers=$(getpv kafka-brokers)
 topic=$(getpv kafka-topic)
 
+avCheckVerbose "kafkacat -C -b ${brokers} -t ${topic} $*"
+
 avRestoreSystemPath
 
 if [[ -z $(which kafkacat) ]]; then
     echo -e "Please install kafkacat via https://github.com/edenhill/kafkacat"
     exit 1
 fi
-
-avCheckVerbose "kafkacat -C -b ${brokers} -t ${topic} $*"
 
 kafkacat -C -b ${brokers} -t ${topic} $*
                 
