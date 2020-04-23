@@ -35,11 +35,17 @@ if [ ! -e "$container_path/Runfile" ]; then
 fi
 
 # Handle interactive override
-options=$(cat $container_path/Runfile)
+options="-it --rm"
+if [[ -e $container_path/Runfile ]]; then
+	options=$(cat $container_path/Runfile)
+fi
 if [[ "$1" == "interactive" ]]; then
 	shift
 	options=$(echo "${options}" | sed -e 's/\-d\ /\-it\ /1')
 fi
+
+# Force resolution of pwd to allow relative paths with Docker
+options=$(bash -c "echo ${options}")
 
 # Run
 avCheckVerbose "docker run ${options} ${domain}/${container} $*"
