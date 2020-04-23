@@ -45,7 +45,7 @@ if [[ "$1" == "interactive" ]]; then
 fi
 
 # Force resolution of pwd to allow relative paths with Docker
-options=$(bash -c "echo ${options}")
+options=$(cd ${container_path} && bash -c "echo ${options}")
 
 # Run
 avCheckVerbose "docker run ${options} ${domain}/${container} $*"
