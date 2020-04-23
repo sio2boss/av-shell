@@ -17,7 +17,7 @@ count=`echo -e ${webpack_folders} | wc -l`
 if [[ ${count} -eq 1 ]]; then
 	echo -e "Running webpack $* in ${webpack_folders}"
 	avRestoreSystemPath
-	cd $AV_ROOT/../${webpack_folders} && webpack $*
+	cd $AV_ROOT/../${webpack_folders} && ./node_modules/.bin/webpack $*
 else
 	setpv folder ""
 	inquirer_menu webdir ${webpack_folders}
@@ -26,7 +26,7 @@ else
 	if [[ ! -z ${webdir} ]]; then
 		echo -e "Running webpack $* in ${webdir}"
 		avRestoreSystemPath
-		cd $AV_ROOT/../${webdir} && webpack $*
+		cd $AV_ROOT/../${webdir} && ./node_modules/.bin/webpack $*
 	fi
 fi
 
