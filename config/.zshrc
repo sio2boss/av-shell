@@ -170,10 +170,13 @@ function context_prompts() {
 
 # Welcome
 if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
+
+  # Set tab title for iTerm2
   p=`/bin/cat $AV_PROJECT_CONFIG_DIR/prompt`
+  echo -ne "\033]0;$p\007"
 
+  # Prompt
   setopt PROMPT_SUBST
-
   PROMPT="%(?:%F{green}$p%f:%F{red}$p%f)"
   PROMPT+=' $(context_prompts) '
   PROMPT+="➜ "
