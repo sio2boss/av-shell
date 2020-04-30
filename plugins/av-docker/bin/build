@@ -28,8 +28,8 @@ if [ ! -e "$cpath" ]; then
 	exit 1
 fi
 
-avCheckVerbose "docker build $@ -t $domain/$container ."
-cd $(container_path) && docker build $@ -t $domain/$container .
+avCheckVerbose "docker build $@ --build-arg CACHE_DATE=\"$(date)\" -t $domain/$container ."
+cd $(container_path) && docker build $@ --build-arg CACHE_DATE="$(date)" -t $domain/$container .
 
 exit $?
 
