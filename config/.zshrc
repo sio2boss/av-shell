@@ -93,18 +93,15 @@ alias rm=`whereis rm 2> /dev/null`
 alias node=`which node 2> /dev/null`
 alias clear=`which clear 2> /dev/null`
 alias ssh=`which ssh 2> /dev/null`
-alias which=`which which 2> /dev/null`
 alias mc=`which mc 2> /dev/null`
 alias tree=`which tree 2> /dev/null`
-alias pip=`which pip3 2> /dev/null`
-alias python=`which python3 2> /dev/null`
 alias vault=`which vault 2> /dev/null`
-
+alias basename=`which basename 2> /dev/null`
 
 # OSX specific
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    alias sublime=`which sublime 2> /dev/null`
-    alias subl=`which sublime 2> /dev/null`
+    alias sublime=`which subl 2> /dev/null`
+    alias subl=`which subl 2> /dev/null`
     alias caffeinate=`which caffeinate 2> /dev/null`
 fi
 
@@ -168,8 +165,22 @@ function context_prompts() {
     echo -e -n "]"
 }
 
+function venv_prompt() {
+    name=`basename "$VIRTUAL_ENV"`
+    if [[ ! -z name ]]; then
+        echo "${name} "
+    fi
+}
+
+
 # Welcome
 if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
+
+  # Search for python env
+  if [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then
+    source $AV_PROJ_TOP/venv/bin/activate
+    export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:${av_path}
+  fi
 
   # Set tab title for iTerm2
   p=`/bin/cat $AV_PROJECT_CONFIG_DIR/prompt`
@@ -177,7 +188,7 @@ if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
 
   # Prompt
   setopt PROMPT_SUBST
-  PROMPT="%(?:%F{green}$p%f:%F{red}$p%f)"
+  PROMPT="$(venv_prompt)%(?:%F{green}$p%f:%F{red}$p%f)"
   PROMPT+=' $(context_prompts) '
   PROMPT+="➜ "
   export PROMPT

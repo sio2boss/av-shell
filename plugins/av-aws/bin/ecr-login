@@ -10,12 +10,13 @@ avCheckHelpFlags "$1" "av-aws" "Automate ECR login with AWS credentails" "\n \
     Runs AWS command then runs docker command to log into ECR \n \
 \n"
 
+repo=$(getpv repo)
+
 # Import system path
 avRestoreSystemPath
 
 #### Put system commands here
 
-command=$(aws ecr get-login --no-include-email)
-bash -c "$command"
+aws ecr get-login-password | docker login -u AWS --password-stdin $repo
 
 #### End commands
