@@ -20,7 +20,7 @@ datestamp=$(git log -1 --pretty=tformat:%at ${commit_id})
 if [[ "$OSTYPE" == "darwin"* ]]; then
     today=$(date -r ${datestamp} +%y%m%dT%H)
 else
-    today=$(date --date=@${datestamp} +\"%y%m%dT%H\")
+    today=$(date --date=@${datestamp} +%y%m%dT%H)
 fi
 echo -e "${today}-${commit_id}"
 
