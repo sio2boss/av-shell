@@ -5,8 +5,8 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlags "$1" "docker" "Choose a docker container to operate on" "\n \
-    This allows you select from a list of containers from your configured containerdir variable to operate on.\n \
+avCheckHelpFlags "$1" "docker" "Choose a cluster to operate on" "\n \
+    This allows you select from a list of clusters from your configured clusterdir variable to operate on.\n \
 \n"
 
 # Import system path
@@ -15,11 +15,11 @@ avAppendSystemPath
 #### Put system commands here
 if [ $# -eq 1 ]; then
     
-    setpv container $1
+    setpv cluster $1
 
 else
 
-    cpath=clusters
+    cpath=`getpv clusterdir`
     list=""
     list=`cd $AV_ROOT/../${cpath} && ls -d *`
     list="$list None"

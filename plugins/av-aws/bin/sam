@@ -6,12 +6,13 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "template script" "\n \
-    Template to help you out.\n \
+avCheckHelpFlags "$1" "av-aws" "Run serverless application model (SAM) on selected cluster" "\n \
+    Runs AWS SAM in selected cluster and clusterdir folder.\n \
 \n"
 
 
 #### Put system commands here
+
 cluster=$(getpv cluster)
 if [[ -z $cluster ]]; then
 	echo "Unable to find cluster..."
@@ -21,6 +22,6 @@ folder=`getpv clusterdir`
 
 # Import system path
 avRestoreSystemPath
-cd $AV_ROOT/../$folder/$cluster/terraform && terraform $*
+cd $AV_ROOT/../$folder/$cluster/sam && sam $*
 
 #### End commands

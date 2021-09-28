@@ -6,20 +6,21 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "template script" "\n \
-    Template to help you out.\n \
+avCheckHelpFlags "$1" "builtin" "Operate on inventory" "\n \
+    Looks for inventory.hosts file in your selected clusterdir and specific cluster folder.\n \
 \n"
 
 # Import system path
 avAppendSystemPath
 
 #### Put system commands here
-folder=$(getpv cluster)
-if [[ -z $folder ]]; then
+cluster=$(getpv cluster)
+if [[ -z $cluster ]]; then
 	echo "Unable to find cluster..."
 	exit 1
 fi
+folder=`getpv clusterdir`
 
-/bin/cat $AV_ROOT/../clusters/$folder/inventory/inventory.hosts
+/bin/cat $AV_ROOT/../$folder/$cluster/inventory.hosts
 
 #### End commands

@@ -6,8 +6,8 @@ source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
 
 # Check for a help flag
-avCheckHelpFlags "$1" "builtin" "template script" "\n \
-    Template to help you out.\n \
+avCheckHelpFlags "$1" "builtin" "Run ansible on selected cluster" "\n \
+    Runs ansible on all selected cluster using inventory.hosts file.\n \
 \n"
 
 # Import system path
@@ -20,6 +20,6 @@ if [[ -z $folder ]]; then
 	exit 1
 fi
 
-cd $AV_ROOT/../clusters/$folder/ansible && ansible-playbook -i ../inventory/inventory.hosts $1.yaml
+cd $AV_ROOT/../`getpv clusterdir`/$folder/ansible && ansible-playbook -i ../inventory/inventory.hosts $1.yaml
 
 #### End commands
