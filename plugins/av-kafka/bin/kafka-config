@@ -26,7 +26,7 @@ zookeepers=$(getpv kafka-zookeepers)
 multiline_zookeepers=$(echo ${zookeepers} | sed -e 's/,/\\n\ \ \ \ /g')
 
 if [ -z $version ]; then
-	version=kafka_2.11-1.1.1
+	version=kafka_2.13-2.8.1
 fi
 
 if [ ! -z $partitions ]; then
