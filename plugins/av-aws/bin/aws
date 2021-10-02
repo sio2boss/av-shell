@@ -1,0 +1,27 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-aws" "Access to aws" "\n \
+    Runs AWS commands via aws cli.\n \
+\n"
+
+
+#### Put system commands here
+
+cluster=$(getpv cluster)
+if [[ -z $cluster ]]; then
+	echo "Unable to find cluster..."
+	exit 1
+fi
+folder=`getpv clusterdir`
+
+# Import system path
+avRestoreSystemPath
+cd $AV_ROOT/.. && aws $*
+
+#### End commands
