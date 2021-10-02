@@ -124,15 +124,17 @@ fi
 cd $AV_ROOT/.. > /dev/null
 
 # Support dotenv
-unamestr=$(uname)
-if [ "$unamestr" = 'Linux' ]; then
+if [[ -f .env ]]; then
+	unamestr=$(uname)
+	if [ "$unamestr" = 'Linux' ]; then
 
-  export $(grep -v '^#' .env | xargs -d '\n')
+	export $(grep -v '^#' .env | xargs -d '\n')
 
-elif [[ "$unamestr" = 'FreeBSD' || "$unamestr" = 'Darwin' ]]; then
+	elif [[ "$unamestr" = 'FreeBSD' || "$unamestr" = 'Darwin' ]]; then
 
-  export $(grep -v '^#' .env | xargs -0)
+	export $(grep -v '^#' .env | xargs -0)
 
+	fi
 fi
 
 # If there are arguments, just run them rather than opening a shell
