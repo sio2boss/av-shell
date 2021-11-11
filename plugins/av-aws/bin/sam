@@ -19,9 +19,11 @@ if [[ -z $cluster ]]; then
 	exit 1
 fi
 folder=`getpv clusterdir`
+environment=`getpv environment`
 
 # Import system path
 avRestoreSystemPath
-cd $AV_ROOT/../$folder/$cluster/sam && sam $*
+echo "cd $AV_ROOT/../$folder/$cluster/$environment/sam && sam $*"
+cd $AV_ROOT/../$folder/$cluster/$environment/sam && sam $*
 
 #### End commands

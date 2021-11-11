@@ -20,7 +20,8 @@ if [[ -z $cluster ]]; then
 	exit 1
 fi
 folder=`getpv clusterdir`
+environment=`getpv environment`
 
-/bin/cat $AV_ROOT/../$folder/$cluster/inventory.hosts
+/bin/cat $AV_ROOT/../$folder/$cluster/$environment/inventory/inventory.hosts
 
 #### End commands

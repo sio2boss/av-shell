@@ -20,6 +20,6 @@ if [[ -z $folder ]]; then
 	exit 1
 fi
 
-cd $AV_ROOT/../`getpv clusterdir`/$folder/ansible && ansible-playbook -i ../inventory/inventory.hosts $1.yaml
+cd $AV_ROOT/../`getpv clusterdir`/$folder/ansible && ansible-playbook -i $AV_ROOT/../`getpv clusterdir`/$folder/inventory/inventory.hosts $1.yaml
 
 #### End commands

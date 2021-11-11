@@ -1,0 +1,35 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "docker" "Choose a cluster to operate on" "\n \
+    This allows you select from a list of clusters from your configured clusterdir variable to operate on.\n \
+\n"
+
+# Import system path
+avAppendSystemPath
+
+#### Put system commands here
+if [ $# -eq 1 ]; then
+    
+    setpv cluster $1
+
+else
+
+    list=`cd $AV_ROOT/../ && ls -d .env.* | sed -e 's/.env.//g'`
+    list="$list None"
+    inquirer_menu environment $list
+
+fi
+
+environment=$(getpv environment)
+
+if [[ ! -z ${environment} && ${environment} != "None" ]]; then
+    cd $AV_ROOT/../ && ln -sf .env.${environment} .env
+    echo -e "Using ${txtcyn}${environment}${txtrst} as environment, you will need to restart your shell"
+fi
+
+#### End commands

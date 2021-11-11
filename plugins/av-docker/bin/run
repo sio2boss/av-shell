@@ -41,7 +41,7 @@ if [[ -e "$container_path/Runfile" ]]; then
 fi
 if [[ "$1" == "interactive" ]]; then
 	shift
-	options=$(echo "${options}" | sed -e 's/\-d\ /\-it\ /1')
+	options=$(echo "${options}" | sed -e 's/\-d[[:space:]]*/\-it\ /1')
 fi
 
 # Force resolution of pwd to allow relative paths with Docker

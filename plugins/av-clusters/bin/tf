@@ -12,15 +12,16 @@ avCheckHelpFlags "$1" "builtin" "template script" "\n \
 
 
 #### Put system commands here
+folder=`getpv clusterdir`
 cluster=$(getpv cluster)
 if [[ -z $cluster ]]; then
 	echo "Unable to find cluster..."
 	exit 1
 fi
-folder=`getpv clusterdir`
+environment=`getpv environment`
 
 # Import system path
 avRestoreSystemPath
-cd $AV_ROOT/../$folder/$cluster/terraform && terraform $*
+cd $AV_ROOT/../$folder/$cluster/$environment/terraform && terraform $*
 
 #### End commands

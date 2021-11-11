@@ -17,6 +17,6 @@ avRestoreSystemPath
 
 #### Put system commands here
 
-aws ecr get-login-password | docker login -u AWS --password-stdin $repo
+aws ecr get-login-password --profile $AWS_PROFILE | docker login -u AWS --password-stdin $repo
 
 #### End commands
