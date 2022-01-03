@@ -11,11 +11,11 @@ avCheckHelpFlags "$1" "av-web" "Run npm" "\n \
 avAppendSystemPath
 
 #### Put system commands here
-folders=`cd $AV_ROOT/.. && find . -name package.json | grep -v node_modules | sed -e 's/\/package.json//g' -e 's/^.\///g'`
+folders=`cd $AV_ROOT/.. && find -L . -name package.json | grep -v node_modules | grep -v venv | grep -v support | sed -e 's/\/package.json//g' -e 's/^.\///g'`
 count=`echo -e ${folders} | wc -l`
 
-if [[ ${count} -eq 1 ]]; then
-	echo -e "Running npm $* in ${folders}"
+if [[ ${count} == 1 ]]; then
+	echo -e "Running \'npm $*\' in ${folders}"
 	avRestoreSystemPath
 	cd $AV_ROOT/../${folders} && npm $*
 else

@@ -71,7 +71,7 @@ alias java=`which java 2> /dev/null`
 alias ln=`whereis ln 2> /dev/null`
 
 # Set prompt to something short and different
-export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin
+export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/opt/homebrew/bin/
 
 function container_prompt() {
     cur_container=`getpv container`
@@ -160,6 +160,24 @@ if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
   if [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then
     source $AV_PROJ_TOP/venv/bin/activate
     export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:${av_path}:/usr/local/bin:/usr/bin
+  fi
+  if [[ -e $AV_PROJ_TOP/venv/conda-meta ]]; then
+    # >>> conda initialize >>>
+    # !! Contents within this block are managed by 'conda init' !!
+    __conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+            . "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+        else
+            export PATH="/opt/homebrew/Caskroom/miniconda/base/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+    # <<< conda initialize <<<
+    export VIRTUAL_ENV="venv(conda)"
+    conda activate $AV_PROJ_TOP/venv
   fi
 
   # Set tab title for iTerm2
