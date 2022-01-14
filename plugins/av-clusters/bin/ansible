@@ -14,12 +14,14 @@ avCheckHelpFlags "$1" "builtin" "Run ansible on selected cluster" "\n \
 avAppendSystemPath
 
 #### Put system commands here
-folder=$(getpv cluster)
-if [[ -z $folder ]]; then
-	echo "Unable to find cluster..."
+
+# Get context
+context=`context`
+if [[ $? -ne 0 ]]; then
+	echo "Unable to determine context, please use 'switch' command to set."
 	exit 1
 fi
 
-cd $AV_ROOT/../`getpv clusterdir`/$folder/ansible && ansible-playbook -i $AV_ROOT/../`getpv clusterdir`/$folder/inventory/inventory.hosts $1.yaml
+cd $context/ansible && ansible-playbook -i $context/inventory/inventory.hosts $1.yaml
 
 #### End commands

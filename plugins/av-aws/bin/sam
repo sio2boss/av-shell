@@ -13,17 +13,15 @@ avCheckHelpFlags "$1" "av-aws" "Run serverless application model (SAM) on select
 
 #### Put system commands here
 
-cluster=$(getpv cluster)
-if [[ -z $cluster ]]; then
-	echo "Unable to find cluster..."
+# Get context
+context=`context`
+if [[ $? -ne 0 ]]; then
+	echo "Unable to determine context, please use 'switch' command to set."
 	exit 1
 fi
-folder=`getpv clusterdir`
-environment=`getpv environment`
 
 # Import system path
 avRestoreSystemPath
-echo "cd $AV_ROOT/../$folder/$cluster/$environment/sam && sam $*"
-cd $AV_ROOT/../$folder/$cluster/$environment/sam && sam $*
+cd $context/sam && sam $*
 
 #### End commands

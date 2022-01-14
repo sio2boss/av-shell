@@ -1,11 +1,18 @@
+# Node things
 node_modules
 config/update_checked
+
+# Golang generated binaries
 plugins/av-prompts/bin/*
+plugins/av-clusters/bin/switch
+
+# Cpde stiff
 .DS_Store
 .idea
 .vscode
 av-shell*.tar.gz
 
+# Bash things
 config/.zsh_history
-
 config/.zcompdump
+plugins/av-clusters/bin/switch
