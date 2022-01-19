@@ -15,13 +15,7 @@ import (
 // exists returns whether the given file or directory exists
 func exists(path string) bool {
 	_, err := os.Stat(path)
-	if err == nil {
-		return true
-	}
-	if os.IsNotExist(err) {
-		return false
-	}
-	return true
+	return !os.IsNotExist(err)
 }
 
 func FindDirectories(root string) ([]string, error) {
@@ -165,7 +159,9 @@ Options:
 	fmt.Println(" - Updated 'cluster' variable:" + contexts[selected].Cluster)
 
 	// Symlink .env if available
-	if exists(".env") {
+	dest, err := os.Readlink(".env")
+	if exists(".env") || (dest != "" && exists(dest) == false) {
+		fmt.Println(" - Removing existing .env")
 		os.Remove(".env")
 	}
 	err = os.Symlink(".env."+contexts[selected].Env, ".env")
@@ -177,14 +173,16 @@ Options:
 	// Run persistant variable updates based on selection
 	variables := clusterdir + "/" + contexts[selected].Account + "/" + contexts[selected].Env + "/" + contexts[selected].Cluster + "/inventory/variables.sh"
 	if exists(variables) {
+		os.Chmod(variables, 0700)
 		cmd := exec.Command(variables)
 		if err := cmd.Run(); err != nil {
-			log.Fatalf("Unable to set persistant variable based on inventory...\n")
+			log.Fatalf("Unable to set persistant variable based on inventory...\n%v", err)
 		}
 		fmt.Println(" - Updated variables as defined in 'inventory/variables.sh'")
 	}
 
 	contextLabel := contexts[selected].Account + " > " + contexts[selected].Env + " > " + contexts[selected].Cluster
+	fmt.Println()
 	fmt.Println("Using", contextLabel, "as environment, you will need to restart your shell")
 
 }
