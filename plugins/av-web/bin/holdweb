@@ -1,0 +1,30 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "web" "Enables remembering last web folder from web commands" "\n \
+    Usage: holdweb [on|off].\n \
+\n"
+
+#### Put system commands here
+
+if [[ "$1" == "" ]]; then
+	echo -e "holdweb is set to: $(getpv holdweb)"
+	exit
+fi
+
+if [[ "$1" == "on" ]]; then
+	setpv "holdweb" "true"
+	exit
+fi
+
+if [[ "$1" == "off" ]]; then
+	setpv "holdweb" "false"
+	exit
+fi
+
+exit 1
+
+#### End commands

@@ -12,16 +12,15 @@ avCheckHelpFlags "$1" "builtin" "template script" "\n \
 
 
 #### Put system commands here
-folder=`getpv clusterdir`
-cluster=$(getpv cluster)
-if [[ -z $cluster ]]; then
-	echo "Unable to find cluster..."
+# Get context
+context=`context`
+if [[ $? -ne 0 ]]; then
+	echo "Unable to determine context, please use 'switch' command to set."
 	exit 1
 fi
-environment=`getpv environment`
 
 # Import system path
 avRestoreSystemPath
-cd $AV_ROOT/../$folder/$cluster/$environment/terraform && terraform $*
+cd $context/terraform && terraform $*
 
 #### End commands

@@ -19,4 +19,5 @@ ln -s `pwd`/av /usr/local/bin/av
 
 echo -e "${txtgrn}[AV-SHELL]${txtrst} Building ${txtpur}prompts/menu${txtrst} system"
 cd plugins/av-prompts && make; cd ../..
+cd plugins/av-clusters && make; cd ../..
 cd plugins/yamlmerge && make; cd ../..

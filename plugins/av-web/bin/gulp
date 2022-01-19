@@ -11,10 +11,18 @@ avCheckHelpFlags "$1" "av-web" "Run gulp" "\n \
 avAppendSystemPath
 
 #### Put system commands here
-folders=`cd $AV_ROOT/.. && find . -name package.json | grep -v node_modules | sed -e 's/\/package.json//g' -e 's/^.\///g'`
-count=`echo -e ${folders} | wc -l`
+folders=`cd $AV_ROOT/.. && find . -name package.json | grep -v node_modules | grep -v support | grep -v venv | sed -e 's/\/package.json//g' -e 's/^.\///g'`
+count=`echo -e "${folders}" | wc -l`
+hold=$(getpv holdweb)
+if [[ "$hold" == "true" ]]; then
+	echo "Determined that holdweb is set to 'on', so using previous web folder"
+	folder=`getpv folder`
+elif [[ ${count} == 1 ]]; then
+	echo "Only one package.json found"
+	folder=${folders}
+fi
 
-if [[ ${count} -eq 1 ]]; then
+if [[ ! -z $folder ]]; then
 	echo -e "Running gulp $* in ${folders}"
 	avRestoreSystemPath
 	cd $AV_ROOT/../${folders} && gulp $*

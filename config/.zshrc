@@ -81,9 +81,10 @@ function container_prompt() {
 }
 
 function cluster_prompt() {
+    cur_environment=`getpv environment`
     cur_cluster=`getpv cluster`
     if [ ! -z ${cur_cluster} ]; then
-        echo -e -n "%F{olive}${cur_cluster}%f"
+        echo -e -n "%F{olive}${cur_environment}>${cur_cluster}%f"
     fi
 }
 
