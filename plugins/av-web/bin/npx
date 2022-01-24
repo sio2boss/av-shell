@@ -4,8 +4,7 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlags "$1" "av-web" "Run grunt" "\n \
-\n"
+avCheckHelpFlagsPassThrough "$1" "av-web" "Run npx" ""
 
 # Import system path
 avAppendSystemPath
@@ -23,19 +22,18 @@ elif [[ ${count} == 1 ]]; then
 fi
 
 if [[ ! -z $folder ]]; then
-	echo -e "Running grunt $* in ${folder}"
+	echo -e "Running npx $* in ${folder}"
 	avRestoreSystemPath
-	cd $AV_ROOT/../${folder} && grunt $*
+	cd $AV_ROOT/../${folder} && npx $*
 else
 	setpv folder ""
 	inquirer_menu folder ${folders}
 	sleep 1
 	folder=`getpv folder`
 	if [[ ! -z ${folder} ]]; then
-		echo -e "Running grunt $* in ${folder}"
+		echo -e "Running npx $* in ${folder}"
 		avRestoreSystemPath
-		cd $AV_ROOT/../${folder} && grunt $*
+		cd $AV_ROOT/../${folder} && npx $*
 	fi
 fi
-
 #### End commands
