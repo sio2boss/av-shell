@@ -1,0 +1,41 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "builtin" "Starts sshuttle via inventory.json" "\n \
+    Starts sshuttle via inventory.json.\n \
+\n"
+
+
+#### Put system commands here
+avAppendSystemPath
+
+# Get context
+context=`context`
+if [[ $? -ne 0 ]]; then
+	echo "Unable to determine context, please use 'switch' command to set."
+	exit 1
+fi
+
+INVENTORY_PATH=${context}/inventory
+INSTANCE_ID=`cat $INVENTORY_PATH/inventory.json | jq -r '.bastion.id'`
+CIDR=`cat $INVENTORY_PATH/inventory.json | jq -r '.vpc.cidr'`
+
+# Import system path
+avRestoreSystemPath
+
+# Make sure we are authed
+aws s3 ls > /dev/null
+ret=$?
+if [[ ${ret} -ne 0 ]]; then
+  aws sso login
+fi
+
+# shuttle
+sshuttle --dns -r ssm-user@$INSTANCE_ID $CIDR
+
+#### End commands

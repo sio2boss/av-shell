@@ -21,6 +21,11 @@ fi
 
 # Import system path
 avRestoreSystemPath
+
+if [ ! -d $context/terraform ]; then
+	echo "Unable to find path: $context/terraform"
+	exit 1
+fi
 cd $context/terraform && terraform $*
 
 #### End commands
