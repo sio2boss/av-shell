@@ -1,0 +1,33 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-aws" "Automate CodeArtifact login with AWS credentails" "\n \
+    Runs AWS command then runs pip configure to use the CodeArtifact repository.\n \
+\n"
+
+artifacts_repo=$(getpv artifacts-repo)
+artifacts_domain=$(getpv artifacts-domain)
+artifacts_account=$(getpv artifacts-account)
+
+#### Put system commands here
+
+if [[ "$VIRTUAL_ENV" == "" ]]; then
+    echo "Unable to login gobally...please activate a python virtual_env or conda environment"
+    exit 1
+fi
+
+if [[ -z ${artifacts_repo} ]]; then
+    options=`aws codeartifact list-repositories-in-domain --domain ${artifacts_domain} --domain-owner ${artifacts_account} --query 'repositories[*].name' --output text`
+    inquirer_menu artifacts-repo ${options}
+    artifacts_repo=$(getpv artifacts-repo)
+fi
+
+aws codeartifact login --tool pip --repository ${artifacts_repo} --domain ${artifacts_domain} --domain-owner ${artifacts_account}
+aws codeartifact login --tool twine --repository ${artifacts_repo} --domain ${artifacts_domain} --domain-owner ${artifacts_account}
+
+#### End commands
