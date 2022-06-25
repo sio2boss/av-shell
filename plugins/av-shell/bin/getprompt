@@ -1,0 +1,19 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-shell" "Get the prompt text." "\n \
+Get the prompt for this shell.\n \
+\n"
+
+# Import system path
+avRestoreSystemPath
+
+#### Put system commands here
+
+cat $AV_PROJECT_CONFIG_DIR/prompt
+
+#### End commands
