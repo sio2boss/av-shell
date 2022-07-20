@@ -92,7 +92,7 @@ function avCheckVerbose
 {
 	if [[ "$(getpv verbose)" == "true" ]]; then
 		echo
-		echo -e "${txtgrn}[AV-SHELL]${txtrst} Command:"
+		echo -e "${txtgrn}[AV-SHELL]${txtrst} Because `verbose on` was run, this is the command about to run:"
 		echo
 		echo -e "$@"
 		echo

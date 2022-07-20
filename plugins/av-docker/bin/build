@@ -29,8 +29,15 @@ if [ ! -e "$cpath" ]; then
 fi
 
 cachedate=$(date +%s)
-avCheckVerbose "docker build $@ --build-arg CACHE_DATE=${cachedate} -t $domain/$container ."
-cd $(container_path) && docker build $@ --build-arg CACHE_DATE=${cachedate} -t $domain/$container .
+build_args="--build-arg CACHE_DATE=${cachedate}"
+artifacts_url=$(getpv artifacts-url)
+if [[ ! -z "${artifacts_url}" ]]; then
+	build_args+=" --build-arg PIP_INDEX_URL=${artifacts_url}"
+fi
+
+
+avCheckVerbose "docker build $@ ${build_args} -t $domain/$container ."
+cd $(container_path) && docker build $@ ${build_args} -t $domain/$container .
 
 exit $?
 

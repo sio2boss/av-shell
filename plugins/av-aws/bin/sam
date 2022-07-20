@@ -20,8 +20,16 @@ if [[ $? -ne 0 ]]; then
 	exit 1
 fi
 
+build_args=""
+artifacts_url=$(getpv artifacts-url)
+if [[ ! -z "${artifacts_url}" && "$1" == "build" ]]; then
+	build_args+="--parameter-overrides IndexUrl=${artifacts_url}"
+fi
+
+
 # Import system path
+avCheckVerbose "sam $* ${build_args}"
 avRestoreSystemPath
-cd $context/sam && sam $*
+cd $context/sam && sam $* ${build_args}
 
 #### End commands

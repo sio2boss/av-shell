@@ -30,4 +30,8 @@ fi
 aws codeartifact login --tool pip --repository ${artifacts_repo} --domain ${artifacts_domain} --domain-owner ${artifacts_account}
 aws codeartifact login --tool twine --repository ${artifacts_repo} --domain ${artifacts_domain} --domain-owner ${artifacts_account}
 
+
+CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain "${artifacts_domain}" --domain-owner "${artifacts_account}" --query authorizationToken --output text)
+setpv artifacts-url "https://aws:${CODEARTIFACT_AUTH_TOKEN}@${artifacts_domain}-${artifacts_account}.d.codeartifact.$AWS_REGION.amazonaws.com/pypi/${artifacts_repo}/simple/"
+
 #### End commands
