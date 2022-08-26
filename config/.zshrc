@@ -48,6 +48,8 @@ zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey "^[[A" up-line-or-beginning-search # Up
 bindkey "^[[B" down-line-or-beginning-search # Down
+bindkey "^A" vi-beginning-of-line
+bindkey "^E" vi-end-of-line
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
