@@ -1,4 +1,7 @@
-.PHONY: darwin linux all
+.PHONY: all
+
+all:
+	make `uname -s`
 
 darwin: Darwin
 Darwin:
@@ -7,6 +10,3 @@ Darwin:
 linux:Linux
 Linux:
 	cd cmd/switch && GOOS=linux GOARCH=amd64 go build -o ../../bin/switch .
-
-all:
-	make `uname -s`
