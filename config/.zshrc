@@ -156,15 +156,13 @@ function docker_context() {
     fi
 }
 
-# Welcome
-if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
 
-  # Search for python env
-  if [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then
+# Search for python env
+if [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then
     source $AV_PROJ_TOP/venv/bin/activate
     export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:${av_path}:/usr/local/bin:/usr/bin
-  fi
-  if [[ -e $AV_PROJ_TOP/venv/conda-meta ]]; then
+fi
+if [[ -e $AV_PROJ_TOP/venv/conda-meta ]]; then
     # >>> conda initialize >>>
     # !! Contents within this block are managed by 'conda init' !!
     __conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
@@ -181,8 +179,10 @@ if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
     # <<< conda initialize <<<
     export VIRTUAL_ENV="venv(conda)"
     conda activate $AV_PROJ_TOP/venv
-  fi
+fi
 
+# Welcome
+if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
   # Set tab title for iTerm2
   p=`/bin/cat $AV_PROJECT_CONFIG_DIR/prompt`
   echo -ne "\033]0;$p\007"
