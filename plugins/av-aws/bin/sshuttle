@@ -25,6 +25,8 @@ INVENTORY_PATH=${context}/inventory
 INSTANCE_ID=`cat $INVENTORY_PATH/inventory.json | jq -r '.bastion.id'`
 CIDR=`cat $INVENTORY_PATH/inventory.json | jq -r '.vpc.cidr'`
 
+avCheckVerbose "sshuttle --dns -r ssm-user@$INSTANCE_ID $CIDR"
+
 # Import system path
 avRestoreSystemPath
 
