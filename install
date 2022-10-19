@@ -5,21 +5,57 @@ cd $(dirname "$0")
 
 # Import color
 source config/color
+av_shell_prompt="${txtblu}[AV-SHELL]${txtrst}"
+
+# Error Check
+function error_check {
+    if [[ $1 == 0 ]]; then
+        echo -e " - ${txtgrn}success${txtrst}"
+    else
+        echo -e " - ${txtred}failed${txtrst}"
+    fi
+}
+
+# Check for golang
+go_path=`which go`
+if [[ -z "${go_path}" ]]; then
+    echo -e "${av_shell_prompt} ${txtred}Unable to find golang which is required for install...try again${txtrst}"
+    exit 1
+fi
+
 
 # Verify osx
 if [[ "$OSTYPE" != "darwin"* && `whoami` != "root" && $1 != "--user" ]]; then
-    echo -e "${txtgrn}[AV-SHELL]${txtrst} install must be run as ${txtred}root${txtrst} on your system, re-running..."
+    echo -e "${av_shell_prompt} install must be run as ${txtred}root${txtrst} on your system, re-running..."
     sudo bash ./install
     exit $?
 fi
 
-echo -e "${txtgrn}[AV-SHELL]${txtrst} Creating symlink in ${txtpur}/usr/local/bin${txtrst}"
-rm -f /usr/local/bin/av > /dev/null
-ln -s `pwd`/av /usr/local/bin/av
+echo -en "${av_shell_prompt} Creating symlink in ${txtpur}/usr/local/bin${txtrst}"
+rm -f /usr/local/bin/av > /dev/null 2>&1
+ln -s `pwd`/av /usr/local/bin/av > /dev/null 2>&1
+if [[ $? != 0 && -z $1 ]]; then
+    echo -e " - ${txtylw}warning${txtrst}"
+    echo -e "${av_shell_prompt}${txtylw} So...symlink didn't work...trying with sudo${txtrst}"
+    sudo ln -sf `pwd`/av /usr/local/bin/av > /dev/null 2>&1
+    ret=$?
+    echo -en "${av_shell_prompt} Creating symlink with sudo in ${txtpur}/usr/local/bin${txtrst}"
+    error_check ${ret}
+else
+    echo -e " - ${txtgrn}success${txtrst}"
+fi
 
-echo -e "${txtgrn}[AV-SHELL]${txtrst} Building ${txtpur}prompts/menu${txtrst} plugin"
-cd plugins/av-prompts && make; cd ../..
-echo -e "${txtgrn}[AV-SHELL]${txtrst} Building ${txtpur}cluster${txtrst} plugin"
-cd plugins/av-clusters && make; cd ../..
-echo -e "${txtgrn}[AV-SHELL]${txtrst} Building ${txtpur}yamlmerge${txtrst} plugin"
-cd plugins/yamlmerge && make; cd ../..
+echo -en "${av_shell_prompt} Building ${txtpur}prompts/menu${txtrst} plugin"
+cd plugins/av-prompts && make > /dev/null
+error_check $?
+cd ../..
+
+echo -en "${av_shell_prompt} Building ${txtpur}cluster${txtrst} plugin"
+cd plugins/av-clusters && make > /dev/null
+error_check $?
+cd ../..
+
+echo -en "${av_shell_prompt} Building ${txtpur}yamlmerge${txtrst} plugin"
+cd plugins/yamlmerge && make > /dev/null
+error_check $?
+cd ../..
