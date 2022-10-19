@@ -46,16 +46,16 @@ else
 fi
 
 echo -en "${av_shell_prompt} Building ${txtpur}prompts/menu${txtrst} plugin"
-cd plugins/av-prompts && make > /dev/null
+cd plugins/av-prompts && make > /dev/null 2>&1
 error_check $?
 cd ../..
 
 echo -en "${av_shell_prompt} Building ${txtpur}cluster${txtrst} plugin"
-cd plugins/av-clusters && make > /dev/null
+cd plugins/av-clusters && make > /dev/null 2>&1
 error_check $?
 cd ../..
 
 echo -en "${av_shell_prompt} Building ${txtpur}yamlmerge${txtrst} plugin"
-cd plugins/yamlmerge && make > /dev/null
+cd plugins/yamlmerge && make > /dev/null 2>&1
 error_check $?
 cd ../..
