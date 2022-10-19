@@ -57,6 +57,11 @@ Options:
   -h --help            Show this screen.
   --version            Show version.`
 
+	if os.Getenv("AV_SINGLE_LINE_HELP") != "" {
+		fmt.Println("Switch between cloud deployment environments")
+		os.Exit(0)
+	}
+
 	osargs := os.Args[1:]
 	arguments, _ := docopt.ParseArgs(usage, osargs, "1.0")
 
