@@ -123,19 +123,6 @@ fi
 # Change dir to script root
 cd $AV_ROOT/.. > /dev/null
 
-# Support dotenv
-if [[ -f .env ]]; then
-	unamestr=$(uname)
-	if [ "$unamestr" = 'Linux' ]; then
-
-	export $(grep -v '^#' .env | xargs -d '\n')
-
-	elif [[ "$unamestr" = 'FreeBSD' || "$unamestr" = 'Darwin' ]]; then
-
-	export $(grep -v '^#' .env | xargs -0)
-
-	fi
-fi
 
 # If there are arguments, just run them rather than opening a shell
 if [ $# -eq 0 ]; then

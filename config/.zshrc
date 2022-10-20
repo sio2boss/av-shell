@@ -66,11 +66,11 @@ alias help='$AV_INSTALLED_PATH/plugins/av-shell/bin/help'
 alias team='$AV_INSTALLED_PATH/plugins/av-shell/bin/squad'
 alias update='$AV_INSTALLED_PATH/plugins/av-shell/bin/upgrade'
 alias get_tag_from_commit='$AV_INSTALLED_PATH/plugins/av-shell/bin/codehash'
-alias ls=`whereis ls 2> /dev/null`
-alias rm=`whereis rm 2> /dev/null`
+alias ls=`which ls 2> /dev/null`
+alias rm=`which rm 2> /dev/null`
 alias bash=`which bash 2> /dev/null`
 alias java=`which java 2> /dev/null`
-alias ln=`whereis ln 2> /dev/null`
+alias ln=`which ln 2> /dev/null`
 
 # Set prompt to something short and different
 export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/opt/homebrew/bin/
@@ -144,9 +144,6 @@ function aws_profile() {
     echo $AWS_PROFILE
 }
 
-function aws_profile() {
-    echo $AWS_PROFILE
-}
 
 function docker_context() {
     if [[ -z $DOCKER_HOST ]]; then
@@ -156,6 +153,22 @@ function docker_context() {
     fi
 }
 
+# Support dotenv
+function refresh () {
+    if [[ -f .env ]]; then
+        unamestr=$(uname)
+        if [ "$unamestr" = 'Linux' ]; then
+
+        export $(grep -v '^#' .env | xargs -d '\n')
+
+        elif [[ "$unamestr" = 'FreeBSD' || "$unamestr" = 'Darwin' ]]; then
+
+        export $(grep -v '^#' .env | xargs -0)
+
+        fi
+    fi
+}
+refresh
 
 # Search for python env
 if [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then

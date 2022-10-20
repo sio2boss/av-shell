@@ -189,8 +189,8 @@ Options:
 		fmt.Println(" - Updated variables as defined in 'inventory/variables.sh'")
 	}
 
-	contextLabel := sel_ctx.Account + " > " + sel_ctx.Env + " > " + sel_ctx.Cluster
 	fmt.Println()
-	fmt.Println("Using", contextLabel, "as environment, you will need to restart your shell")
+	fmt.Println("\033[33mRun 'refresh' for shell to pickup all changes")
+	fmt.Println()
 
 }
