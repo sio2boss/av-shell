@@ -1,0 +1,7 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+cd $AV_ROOT/../ && mkdir -p clusters
+setpv clusterdir ./clusters

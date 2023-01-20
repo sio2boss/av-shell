@@ -1,0 +1,25 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-stencil" "Apply additional features to your project" "\n \
+\n"
+
+# Import system path
+avAppendSystemPath
+
+#### Put system commands here
+
+config_dir=$AV_INSTALLED_PLUGINS/av-stencil/options
+folders=$(/bin/ls -1 ${config_dir})
+inquirer_menu stencil ${folders}
+sleep 1
+stencil=`getpv stencil`
+if [[ ! -z ${stencil} ]]; then
+    exec ${config_dir}/${stencil}/implement
+    exit $?
+fi
+
+#### End commands

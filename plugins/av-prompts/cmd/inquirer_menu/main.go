@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/manifoldco/promptui"
+	"github.com/spaceweasel/promptui"
 )
 
 var usage = `
@@ -37,7 +37,7 @@ func main() {
 			temp += " " + a
 			items = append(items, strings.Replace(temp, "\"", "", -1))
 			temp = ""
-		} else if ((a[0] == '"') && (a[len(a)-1] != '"')) {
+		} else if (a[0] == '"') && (a[len(a)-1] != '"') {
 			temp += a
 		} else if len(temp) > 0 {
 			temp += " " + a
@@ -50,10 +50,10 @@ func main() {
 	// active template. The details template is show at the bottom of the select's list and displays the full info
 	// for that pepper in a multi-line template.
 	templates := &promptui.SelectTemplates{
-		Label:    "{{\"Which do you want? \"| bold}}",
-		Active:   "{{\"❯\" | cyan }} {{ . | cyan | underline}}",
-		Inactive: "  {{ . | faint }}",
-		Selected: " {{\"✔\" | green }} {{\"Which do you want?\"| bold}} › {{ . }}",
+		Label:    `{{"Which do you want? "| bold}}`,
+		Active:   ` ➜ {{ . | cyan | bold }}`,
+		Inactive: `   {{ . | cyan }}`,
+		Selected: ` ✔ {{ . | cyan | bold }}`,
 	}
 
 	// A searcher function is implemented which enabled the search mode for the select. The function follows

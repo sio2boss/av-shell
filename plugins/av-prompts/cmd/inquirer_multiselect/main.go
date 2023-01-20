@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/manifoldco/promptui"
+	"github.com/spaceweasel/promptui"
 )
 
 var usage = `
@@ -28,20 +28,28 @@ func main() {
 
 	variable := os.Args[1]
 	items := os.Args[2:]
-	index := -1
+	var selected []int
 	var result string
 	var err error
 
-	for index < 0 {
-		prompt := promptui.SelectWithAdd{
-			Label: "Select the ones you want",
-			Items: items,
-		}
+	templates := &promptui.MultiSelectTemplates{
+		Label:    `{{"Which do you want? "| bold}}`,
+		Active:   ` ➜ {{ . | cyan | bold }}`,
+		Inactive: `   {{ . | cyan }}`,
+		Selected: ` ✔ {{ . | cyan | bold }}`,
+	}
 
-		index, result, err = prompt.Run()
+	prompt := promptui.MultiSelect{
+		Label:     "Select the ones you want",
+		Items:     items,
+		Templates: templates,
+	}
 
-		if index == -1 {
-			items = append(items, result)
+	selected, err = prompt.Run()
+
+	for _, index := range selected {
+		if index != -1 {
+			result = result + " " + items[index]
 		}
 	}
 

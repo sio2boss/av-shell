@@ -1,0 +1,54 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "builtin" "Download necessary bundle for kafka things" "\n \
+    Download necessary bundle for kafka things.\n \
+\n"
+
+# Import system path
+avAppendSystemPath
+
+#### Put system commands here
+
+version=$(getpv kafka-version)
+if [ -z $version ]; then
+	version=kafka_2.11-2.1.0
+fi
+
+if [[ ! -e $AV_ROOT/../support/${version} ]]; then
+
+	echo -e "Downloading ${txtpur}${version}${txtrst} ..."
+
+	setpv kafka-partitions 3
+	setpv kafka-replication 1
+	setpv kakfa-offset earliest
+	setpv kafka-version ${version}
+	setpv kafka-group testing-from-av-shell
+	setpv kafka-brokers localhost:9092
+	setpv kafka-zookeepers localhost:2181
+
+	shortversion=$(echo ${version} | sed -e "s/kafka.*\-//")
+
+	avAppendSystemPath
+	cd $AV_ROOT/.. && mkdir -p support && cd support && \
+		curl -o ${version}.tgz -# https://archive.apache.org/dist/kafka/${shortversion}/${version}.tgz && \
+		tar xfz ${version}.tgz && \
+		rm ${version}.tgz
+
+	if [[ -e $AV_ROOT/../.gitignore ]]; then
+		if [[ -z $(cat $AV_ROOT/../.gitignore | grep "\$support") ]]; then
+			echo "support/" >> $AV_ROOT/../.gitignore
+		fi
+	else
+		echo "support/" >> $AV_ROOT/../.gitignore
+	fi
+
+fi
+
+
+#### End commands

@@ -1,0 +1,1 @@
+-d -p 80:80 -v $(pwd)/../../log:/var/log/nginx

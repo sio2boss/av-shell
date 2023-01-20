@@ -1,6 +1,6 @@
 #! /bin/zsh
 
-export AV_OLD_SYSTEM_PATH=$PATH
+export AV_OLD_SYSTEM_PATH=/usr/local/bin:$PATH
 export AV_PROJECT_CONFIG_DIR=$AV_ROOT/config
 export AV_INSTALLED_BIN=$AV_INSTALLED_PATH/bin
 export AV_INSTALLED_PLUGINS=$AV_INSTALLED_PATH/plugins
@@ -71,6 +71,10 @@ alias rm=`which rm 2> /dev/null`
 alias bash=`which bash 2> /dev/null`
 alias java=`which java 2> /dev/null`
 alias ln=`which ln 2> /dev/null`
+
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # Set prompt to something short and different
 export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/opt/homebrew/bin/
@@ -153,22 +157,19 @@ function docker_context() {
     fi
 }
 
-# Support dotenv
+# Support .env.*
 function refresh () {
     if [[ -f .env ]]; then
         unamestr=$(uname)
         if [ "$unamestr" = 'Linux' ]; then
-
-        export $(grep -v '^#' .env | xargs -d '\n')
-
+            export $(grep -v '^#' .env | xargs -d '\n')
         elif [[ "$unamestr" = 'FreeBSD' || "$unamestr" = 'Darwin' ]]; then
-
-        export $(grep -v '^#' .env | xargs -0)
-
+            export $(grep -v '^#' .env | xargs -0)
         fi
     fi
 }
 refresh
+
 
 # Search for python env
 if [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then

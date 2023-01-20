@@ -159,7 +159,7 @@ else
 
 	# Run command in shell
 	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH ZDOTDIR=$AV_INSTALLED_PATH/config zsh -i -c "$*"
-  exit $?
+  	exit $?
 
 fi
 
