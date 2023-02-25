@@ -77,7 +77,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # Set prompt to something short and different
-export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/opt/homebrew/bin/
+export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/opt/homebrew/bin/:~/.local/bin
 
 function container_prompt() {
     cur_container=`getpv container`
@@ -174,7 +174,7 @@ refresh
 # Search for python env
 if [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then
     source $AV_PROJ_TOP/venv/bin/activate
-    export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:${av_path}:/usr/local/bin:/usr/bin
+    export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:$PATH
 fi
 if [[ -e $AV_PROJ_TOP/venv/conda-meta ]]; then
     # >>> conda initialize >>>
