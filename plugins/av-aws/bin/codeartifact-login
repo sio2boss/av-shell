@@ -17,7 +17,7 @@ artifacts_account=$(getpv artifacts-account)
 #### Put system commands here
 
 if [[ "$VIRTUAL_ENV" == "" ]]; then
-    echo "Unable to login gobally...please activate a python virtual_env or conda environment"
+    echo -e "Unable to login gobally...please activate a python virtual_env or conda environment"
     exit 1
 fi
 
@@ -27,14 +27,39 @@ if [[ -z ${artifacts_repo} ]]; then
     artifacts_repo=$(getpv artifacts-repo)
 fi
 
-aws codeartifact login --tool pip --repository ${artifacts_repo} --domain ${artifacts_domain} --domain-owner ${artifacts_account}
-aws codeartifact login --tool twine --repository ${artifacts_repo} --domain ${artifacts_domain} --domain-owner ${artifacts_account}
-
 CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain "${artifacts_domain}" --domain-owner "${artifacts_account}" --query authorizationToken --output text)
-setpv artifacts-token "${CODEARTIFACT_AUTH_TOKEN}"
-setpv artifacts-url "https://aws:${CODEARTIFACT_AUTH_TOKEN}@${artifacts_domain}-${artifacts_account}.d.codeartifact.$AWS_REGION.amazonaws.com/pypi/${artifacts_repo}/simple/"
+CODEARTIFACT_AUTH_URL="https://aws:${CODEARTIFACT_AUTH_TOKEN}@${artifacts_domain}-${artifacts_account}.d.codeartifact.$AWS_REGION.amazonaws.com/pypi/${artifacts_repo}/simple/"
+CODEARTIFACT_URL="https://${artifacts_domain}-${artifacts_account}.d.codeartifact.$AWS_REGION.amazonaws.com/pypi/${artifacts_repo}/simple/"
+echo -e "AWS CodeArtifact repository is ${txtblu}${CODEARTIFACT_URL}${txtrst}"
 
-poetry config http-basic.codeartifact aws $(getpv artifacts-token)
-poetry config http-basic.private aws $(getpv artifacts-token)
+# PIP
+if which pip >/dev/null; then
+    aws codeartifact login --tool pip --repository ${artifacts_repo} --domain ${artifacts_domain} --domain-owner ${artifacts_account} 2>&1 > /dev/null
+    if [[ $? -eq 0 ]]; then
+        echo -e "Successfully configured ${txtpur}pip${txtrst} to use AWS CodeArtifact repository"
+    fi
+fi
+
+# Twine
+if which twine >/dev/null; then
+    aws codeartifact login --tool twine --repository ${artifacts_repo} --domain ${artifacts_domain} --domain-owner ${artifacts_account} 2>&1 > /dev/null
+    if [[ $? -eq 0 ]]; then
+        echo -e "Successfully configured ${txtpur}twine${txtrst} to use AWS CodeArtifact repository"
+    fi
+fi
+
+# Twine
+if which poetry >/dev/null; then
+    poetry config http-basic.codeartifact aws "${CODEARTIFACT_AUTH_TOKEN}"
+    poetry config http-basic.private aws "${CODEARTIFACT_AUTH_TOKEN}"
+    if [[ $? -eq 0 ]]; then
+        echo -e "Successfully configured ${txtpur}poetry${txtrst} to use AWS CodeArtifact repository"
+    fi
+fi
+
+# av-shell
+setpv artifacts-token "${CODEARTIFACT_AUTH_TOKEN}"
+setpv artifacts-url "${CODEARTIFACT_AUTH_URL}"
+echo -e "Successfully configured ${txtpur}av-shell${txtrst} to store AWS CodeArtifact repository url and token"
 
 #### End commands
