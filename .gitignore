@@ -15,4 +15,4 @@ av-shell*.tar.gz
 # Bash things
 config/.zsh_history
 config/.zcompdump
-plugins/av-clusters/bin/switch
+.zsh_history

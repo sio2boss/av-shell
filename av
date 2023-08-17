@@ -128,37 +128,42 @@ cd $AV_ROOT/.. > /dev/null
 if [ $# -eq 0 ]; then
 
 	FORCED_COMMAND=""
-	if [ -e $AV_ROOT/config/version ]; then
 
-		echo -en "${txtgrn}[AV-SHELL]${txtred} Your local .av folder can be simplified...do so now? [Y/n]: ${txtrst}"
-		read prompt
-		if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then
-			AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH ZDOTDIR=$AV_INSTALLED_PATH/config zsh -i -c invigorate
-		fi
+	CURRENT_DATE=`date +%s`
+	if [[ ! -e $AV_INSTALLED_PATH/config/update_checked ]]; then
+		echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
 	else
-		CURRENT_DATE=`date +%s`
-		if [[ ! -e $AV_INSTALLED_PATH/config/update_checked ]]; then
+		LAST_CHECKED=`cat $AV_INSTALLED_PATH/config/update_checked`
+		if [[ `expr ${CURRENT_DATE} - ${LAST_CHECKED}` -gt 1728000 ]]; then
+			echo -en "${txtred}[AV-SHELL]${txtgrn} Would you like to check for updates? [Y/n]: ${txtrst}"
+			read prompt
 			echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
-		else
-			LAST_CHECKED=`cat $AV_INSTALLED_PATH/config/update_checked`
-			if [[ `expr ${CURRENT_DATE} - ${LAST_CHECKED}` -gt 1728000 ]]; then
-				echo -en "${txtred}[AV-SHELL]${txtgrn} Would you like to check for updates? [Y/n]: ${txtrst}"
-				read prompt
-				echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
-				if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then
-					AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH ZDOTDIR=$AV_INSTALLED_PATH/config zsh -i -c upgrade
-				fi
+			if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then
+				AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+				AV_NON_INTERACTIVE=true \
+				AV_ROOT=$AV_ROOT \
+				PATH=$AV_ROOT/bin:$PATH \
+				ZDOTDIR=$AV_INSTALLED_PATH/config \
+				zsh -i -c upgrade
 			fi
 		fi
 	fi
 
 	# Open shell
-	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_ROOT=$AV_ROOT ZDOTDIR=$AV_INSTALLED_PATH/config zsh ${FORCED_COMMAND}
+	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+	AV_ROOT=$AV_ROOT \
+	ZDOTDIR=$AV_INSTALLED_PATH/config \
+	zsh ${FORCED_COMMAND}
 
 else
 
 	# Run command in shell
-	AV_INSTALLED_PATH=$AV_INSTALLED_PATH AV_NON_INTERACTIVE=true AV_ROOT=$AV_ROOT PATH=$AV_ROOT/bin:$PATH ZDOTDIR=$AV_INSTALLED_PATH/config zsh -i -c "$*"
+	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+	AV_NON_INTERACTIVE=true \
+	AV_ROOT=$AV_ROOT \
+	PATH=$AV_ROOT/bin:$PATH \
+	ZDOTDIR=$AV_INSTALLED_PATH/config \
+	zsh -i -c "$*"
   	exit $?
 
 fi

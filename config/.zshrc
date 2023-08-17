@@ -20,41 +20,43 @@ for plugin in `ls -1 $AV_INSTALLED_PLUGINS`; do
   av_path=${av_path}:$AV_INSTALLED_PLUGINS/${plugin}/bin
 done
 
-# don't put duplicate lines in the history. See bash(1) for more options
-# ... or force ignoredups and ignorespace
-# HISTCONTROL=ignoredups:ignorespace
+# set a fancy prompt (non-color, unless we know we "want" color)
 TERM=xterm-256color
 LANG=en_US.UTF-8
 LC_CTYPE=en_US.UTF-8
-
-# append to the history file, don't overwrite it
-# shopt -s histappend
-# shopt -s cdspell
-# shopt -s nocaseglob
- 
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-# HISTSIZE=1000
-# HISTFILESIZE=2000
- 
-# Zsh style history search
-autoload -Uz compinit && compinit
-zmodload -i zsh/complist
-zstyle ':completion:*' menu select
-bindkey '^[[Z' reverse-menu-complete
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=teal'
-autoload -U up-line-or-beginning-search
-autoload -U down-line-or-beginning-search
-zle -N up-line-or-beginning-search
-zle -N down-line-or-beginning-search
-bindkey "^[[A" up-line-or-beginning-search # Up
-bindkey "^[[B" down-line-or-beginning-search # Down
-bindkey "^A" vi-beginning-of-line
-bindkey "^E" vi-end-of-line
-
-# set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
     xterm-color) color_prompt=yes;;
 esac
+ 
+# Zsh style history search
+HISTFILE=$AV_INSTALLED_PATH/.zsh_history
+HISTSIZE=100000000
+SAVEHIST=100000000
+setopt HIST_IGNORE_SPACE
+setopt appendhistory autocd beep extendedglob nomatch notify
+autoload -Uz compinit && compinit
+zmodload -i zsh/complist
+zstyle ':completion:*' menu select
+unsetopt banghist
+bindkey '^[[Z' reverse-menu-complete
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=teal'
+bindkey "^A" vi-beginning-of-line
+bindkey "^E" vi-end-of-line
+bindkey "^[[A" up-line-or-beginning-search # Up
+bindkey "^[[B" down-line-or-beginning-search # Down
+# start typing + [Up-Arrow] - fuzzy find history forward
+if [[ "${terminfo[kcuu1]}" != "" ]]; then
+    autoload -U up-line-or-beginning-search
+    zle -N up-line-or-beginning-search
+    bindkey "${terminfo[kcuu1]}" up-line-or-beginning-search
+fi
+# start typing + [Down-Arrow] - fuzzy find history backward
+if [[ "${terminfo[kcud1]}" != "" ]]; then
+    autoload -U down-line-or-beginning-search
+    zle -N down-line-or-beginning-search
+    bindkey "${terminfo[kcud1]}" down-line-or-beginning-search
+fi
+
  
 # leave some commands out of history log
 export HISTIGNORE="&:bg:fg:ll:h:??:[ ]*:clear:exit:logout"

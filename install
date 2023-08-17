@@ -23,24 +23,12 @@ if [[ -z "${go_path}" ]]; then
     exit 1
 fi
 
-
-# Verify osx
-if [[ "$OSTYPE" != "darwin"* && `whoami` != "root" && $1 != "--user" ]]; then
-    echo -e "${av_shell_prompt} install must be run as ${txtred}root${txtrst} on your system, re-running..."
-    sudo bash ./install
-    exit $?
-fi
-
-echo -en "${av_shell_prompt} Creating symlink in ${txtpur}/usr/local/bin${txtrst}"
-rm -f /usr/local/bin/av > /dev/null 2>&1
-ln -s `pwd`/av /usr/local/bin/av > /dev/null 2>&1
+INSTALL_DIR="$HOME/.local/bin"
+echo -en "${av_shell_prompt} Creating symlink in ${txtpur}${INSTALL_DIR}${txtrst}"
+rm -f ${INSTALL_DIR}/av > /dev/null 2>&1
+ln -s `pwd`/av ${INSTALL_DIR}/av > /dev/null 2>&1
 if [[ $? != 0 && -z $1 ]]; then
-    echo -e " - ${txtylw}warning${txtrst}"
-    echo -e "${av_shell_prompt}${txtylw} So...symlink didn't work...trying with sudo${txtrst}"
-    sudo ln -sf `pwd`/av /usr/local/bin/av > /dev/null 2>&1
-    ret=$?
-    echo -en "${av_shell_prompt} Creating symlink with sudo in ${txtpur}/usr/local/bin${txtrst}"
-    error_check ${ret}
+    error_check $?
 else
     echo -e " - ${txtgrn}success${txtrst}"
 fi
