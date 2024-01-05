@@ -1,6 +1,5 @@
 #! /bin/bash
 
-
 # Import color
 source $AV_CONFIG_DIR/default_imports
 source $AV_CONFIG_DIR/findjar
@@ -10,22 +9,32 @@ avCheckHelpFlags "$1" "builtin" "Shortcut for terraform" "\n\
 $(terraform -help)\
 \n"
 
-
 #### Put system commands here
 # Get context
+ACCOUNT=$(getpv account)
 context=`context`
 if [[ $? -ne 0 ]]; then
 	echo "Unable to determine context, please use 'switch' command to set."
 	exit 1
 fi
 
-# Import system path
-avRestoreSystemPath
-
 if [ ! -d $context/terraform ]; then
 	echo "Unable to find path: $context/terraform"
 	exit 1
 fi
-cd $context/terraform && terraform $*
+
+
+cmd="$@"
+if [[ $1 == "up" ]]; then
+	cmd="init -upgrade"
+fi
+
+avCheckVerbose "cd $context/terraform && terraform ${cmd}"
+
+# Import system path
+avRestoreSystemPath
+
+eval "$(AWS_PROFILE=${ACCOUNT} aws configure export-credentials --format env)"
+cd $context/terraform && terraform ${cmd}
 
 #### End commands
