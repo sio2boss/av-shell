@@ -73,7 +73,7 @@ alias rm=`which rm 2> /dev/null`
 alias bash=`which bash 2> /dev/null`
 alias java=`which java 2> /dev/null`
 alias ln=`which ln 2> /dev/null`
-
+alias cat=`which cat 2> /dev/null`
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
