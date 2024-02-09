@@ -77,7 +77,7 @@ if [[ "$(getpv verbose)" == "true" ]]; then
     echo
     echo -e "${txtgrn}[AV-SHELL]${txtrst} Preview of kubernetes yamls:"
     echo
-    echo -e "$(helm template ${KUBE_DIR} --set Tag=${tag}${additional_tags})"
+    echo -e "$(helm template ${KUBE_DIR} --set Tag=${tag},Env=$(getpv environment),image.repository=$(getpv repo)${additional_tags})"
     echo
     echo -en "${txtgrn}[AV-SHELL]${txtrst} Press any key to continue..."
     read onward
@@ -86,7 +86,7 @@ if [[ "$(getpv verbose)" == "true" ]]; then
 fi
 
 # Deploy to k8s
-cd $AV_ROOT/.. && helm template ${KUBE_DIR} --set Tag=${tag}${additional_tags} | \
+cd $AV_ROOT/.. && helm template ${KUBE_DIR} --set Tag=${tag},Env=$(getpv environment),image.repository=$(getpv repo)${additional_tags} | \
     kubectl --cluster ${cluster} --namespace=${NAMESPACE} ${action} -f -
     
 exit $?

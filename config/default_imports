@@ -9,8 +9,8 @@ source $AV_CONFIG_DIR/color
 # $3: single help line
 # $4: full help
 function avCheckHelpFlags
-{ 
-	if [[ $# -ne 4 ]]; then
+{
+		if [[ $# -ne 4 ]]; then
 		echo -e "Error in calling avCheckHelpFlags!"
 		exit
 	fi
