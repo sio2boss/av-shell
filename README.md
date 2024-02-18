@@ -26,7 +26,7 @@ Your project now has a domain specific shell, just run for interactive:
 
 Looks like this:
 
-![Starting up with av](https://raw.githubusercontent.com/sio2boss/av/master/doc/start.png)
+![Starting up with av](https://raw.githubusercontent.com/sio2boss/av/master/doc/docker.gif)
 
 Or for non-interactive, where help can be replaced with any command:
 
