@@ -96,8 +96,10 @@ function avCheckVerbose
 		echo
 		echo -e "$@"
 		echo
-		echo -en "${txtgrn}[AV-SHELL]${txtrst} Press any key to continue..."
-		read onward
+		gum confirm "Okay to continue?"
+		if [[ $? -ne 0 ]]; then
+			exit
+		fi
 		echo -e "--------------------------------------------------------------"
 		echo
 	fi

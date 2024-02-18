@@ -61,8 +61,8 @@ if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
     	exit
     fi
 
-	echo "your prompt should be named?:"
-	read prompt
+	echo 
+	prompt=$(gum input --prompt="your prompt should be named?: " --placeholder="like project name...")
 
 	echo
 	echo "copying files..."
@@ -135,10 +135,9 @@ if [ $# -eq 0 ]; then
 	else
 		LAST_CHECKED=`cat $AV_INSTALLED_PATH/config/update_checked`
 		if [[ `expr ${CURRENT_DATE} - ${LAST_CHECKED}` -gt 1728000 ]]; then
-			echo -en "${txtred}[AV-SHELL]${txtgrn} Would you like to check for updates? [Y/n]: ${txtrst}"
-			read prompt
 			echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
-			if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then
+			gum confirm "[AV-SHELL] Would you like to check for updates?"
+			if [[ $? -eq 0 ]]; then
 				AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
 				AV_NON_INTERACTIVE=true \
 				AV_ROOT=$AV_ROOT \

@@ -1,4 +1,0 @@
-[submodule "plugins/yamlmerge"]
-	path = plugins/yamlmerge
-	url = https://github.com/sio2boss/yamlmerge.git
-	branch = master

@@ -33,6 +33,7 @@ HISTFILE=$AV_INSTALLED_PATH/.zsh_history
 HISTSIZE=100000000
 SAVEHIST=100000000
 setopt HIST_IGNORE_SPACE
+setopt interactivecomments
 setopt appendhistory autocd beep extendedglob nomatch notify
 autoload -Uz compinit && compinit
 zmodload -i zsh/complist
@@ -79,7 +80,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # Set prompt to something short and different
-export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/opt/homebrew/bin/:~/.local/bin
+export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin
 
 function container_prompt() {
     cur_container=`getpv container`

@@ -15,8 +15,7 @@ fi
 # Set docker repository
 repo=$(getpv repo)
 if [[ -z ${repo} ]]; then
-    echo -n "What docker repository would you like to use: "
-    read repo
+    repo=$(gum input --prompt="What docker repository would you like to use?: ")
     if [[ ! -z ${repo} ]]; then
         setpv repo ${repo}
     fi
@@ -35,8 +34,7 @@ if [[ $? -eq 0 ]]; then
     container=`getpv container`
     if [[ ! -z ${container} ]]; then
         
-        echo -n "What would you like to name your container [${container}]: "
-        read new_container
+        new_container=$(gum input --prompt="What would you like to name your container?: " --placeholder="${container}")
         if [[ -z ${new_container} ]]; then
             new_container=${container}
         fi

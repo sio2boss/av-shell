@@ -16,12 +16,25 @@ function error_check {
     fi
 }
 
+# Check for brew and install dependencies
+if [[ -z "$(which brew)" ]]; then
+    echo "${av_shell_prompt} Brew must be installed to ensure dependencies are fulfilled, "
+    echo
+    echo "Run the following command and retry"
+    echo
+    echo "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+    echo
+    exit 1
+fi
+brew install jq gum k9s octant dive
+
 # Check for golang
 go_path=`which go`
 if [[ -z "${go_path}" ]]; then
     echo -e "${av_shell_prompt} ${txtred}Unable to find golang which is required for install...try again${txtrst}"
     exit 1
 fi
+go install github.com/erning/gorun@latest
 
 INSTALL_DIR="$HOME/.local/bin"
 echo -en "${av_shell_prompt} Creating symlink in ${txtpur}${INSTALL_DIR}${txtrst}"
@@ -32,18 +45,3 @@ if [[ $? != 0 && -z $1 ]]; then
 else
     echo -e " - ${txtgrn}success${txtrst}"
 fi
-
-echo -en "${av_shell_prompt} Building ${txtpur}prompts/menu${txtrst} plugin"
-cd plugins/av-prompts && make > /dev/null 2>&1
-error_check $?
-cd ../..
-
-echo -en "${av_shell_prompt} Building ${txtpur}cluster${txtrst} plugin"
-cd plugins/av-clusters && make > /dev/null 2>&1
-error_check $?
-cd ../..
-
-echo -en "${av_shell_prompt} Building ${txtpur}yamlmerge${txtrst} plugin"
-cd plugins/yamlmerge && make > /dev/null 2>&1
-error_check $?
-cd ../..
