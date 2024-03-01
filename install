@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/zsh
 
 # Get to the root of av-shell install
 cd $(dirname "$0")
@@ -7,41 +7,191 @@ cd $(dirname "$0")
 source config/color
 av_shell_prompt="${txtblu}[AV-SHELL]${txtrst}"
 
+# Check for a help flag
+if [[ $1 == "--help" ]]; then
+    echo -e "${av_shell_prompt} Install the av-shell plugin"
+    echo
+    echo "Usage: $0 [--silent]"
+    echo "       $0 --help"
+    exit 0
+fi
+
 # Error Check
 function error_check {
     if [[ $1 == 0 ]]; then
-        echo -e " - ${txtgrn}success${txtrst}"
+        echo -e "$2 - ${txtgrn}success${txtrst}"
     else
-        echo -e " - ${txtred}failed${txtrst}"
+        echo -e "$2 - ${txtred}failed${txtrst}"
+        exit $1
     fi
 }
 
-# Check for brew and install dependencies
+# Check dependencies
+echo "Checking for dependencies...\n"
+dependencies="brew go jq gum k9s octant dive gorun"
+to_install=""
+for dep in $=dependencies; do
+    tool_path=$(which $dep &> /dev/null)
+    installed=$?
+    result=$(if [[ $installed -eq 0 ]]; then echo "[${txtgrn} OK ${txtrst}]"; else echo "[${txtylw} NO ${txtrst}]"; fi)
+    printf "${txtb}%-15s %-6s\n" "$dep" "$result"
+    if [[ "$dep" != "go" && "$dep" != "brew" && "$dep" != "gorun" ]]; then
+        if [[ $installed -eq 1 ]]; then
+            to_install="$to_install $dep"
+        fi
+    fi
+done
+to_install=${to_install#"${to_install%%[![:space:]]*}"}
+echo
+
+
+# Figure out if we should install brew automatically
 if [[ -z "$(which brew)" ]]; then
-    echo "${av_shell_prompt} Brew must be installed to ensure dependencies are fulfilled, "
-    echo
-    echo "Run the following command and retry"
-    echo
-    echo "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-    echo
-    exit 1
-fi
-brew install jq gum k9s octant dive
+    just_install=false
+    if [[ "$1" == "--silent" ]]; then
+        just_install=true
+    else
+        echo
+        echo "Would you like to install brew? (y/n) "
+        read -p ">> " install
+        if [[ "$install" == "y" ]]; then
+            just_install=true
+        fi
+    fi
 
-# Check for golang
-go_path=`which go`
-if [[ -z "${go_path}" ]]; then
-    echo -e "${av_shell_prompt} ${txtred}Unable to find golang which is required for install...try again${txtrst}"
-    exit 1
-fi
-go install github.com/erning/gorun@latest
+    if [[ $just_install == false ]]; then
+        echo
+        echo "Brew must be installed to ensure dependencies are fulfilled,"
+        echo "run the following command and retry"
+        echo "  |"
+        echo "  | /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+        echo "  |"
+        echo
+        exit 1
+    fi 
 
+    echo "Installing brew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    error_check $? "brew install"
+else
+    echo "brew is already installed - ${txtgrn}success${txtrst}"
+fi
+
+# With brew installed then we can just install stuff
+if [[ ! -z "$(which brew)" && -n "$to_install" ]]; then
+    just_install=false
+    if [[ "$1" == "--silent" ]]; then
+        just_install=true
+    else
+        echo
+        echo -n "Would you like to install missing dependencies with brew? (y/n): "
+        read install
+        if [[ "$install" == "y" ]]; then
+            just_install=true
+        fi
+    fi
+
+    if [[ $just_install == false ]]; then
+        echo
+        echo "You can install dependencies with the following command:"
+        echo "  |"
+        echo "  | brew install ${to_install[@]}"
+        echo "  |"
+        echo
+        exit 1
+    fi
+    eval "brew install ${to_install[@]} &> /dev/null"
+    error_check $? "dependency install"
+else
+    echo "brew dependencies are already installed - ${txtgrn}success${txtrst}"
+fi
+
+
+# Add go/bin path to PATH
+export PATH=$PATH:~/go/bin
+output=$(cat ~/.zshrc | grep "~/go/bin")
+if [[ $output != *"PATH"* ]]; then
+    echo "export PATH=\$PATH:~/go/bin" >> ~/.zshrc
+fi
+error_check $? "ensuring ~/go/bin is on PATH"
+
+# With golang installed we can add gorun
+if [[ -z "$(which gorun | grep -v 'gorun not found')" ]]; then
+    just_install=false
+    if [[ "$1" == "--silent" ]]; then
+        just_install=true
+    else
+        echo
+        echo -n "Would you like to install missing gorun dependency? (y/n): "
+        read install
+        if [[ "$install" == "y" ]]; then
+            just_install=true
+        fi
+    fi
+
+    if [[ $just_install == false ]]; then
+        echo 
+        echo "You can install gorun with the following command:"
+        echo "  |"
+        echo "  | go install github.com/erning/gorun@latest"
+        echo "  |"
+        echo
+        exit 1
+    fi
+
+    go install github.com/erning/gorun@latest
+    error_check $? "gorun install"
+else
+    echo "gorun is already installed - ${txtgrn}success${txtrst}"
+fi
+
+# Symlink av command
 INSTALL_DIR="$HOME/.local/bin"
-echo -en "${av_shell_prompt} Creating symlink in ${txtpur}${INSTALL_DIR}${txtrst}"
 rm -f ${INSTALL_DIR}/av > /dev/null 2>&1
 ln -s `pwd`/av ${INSTALL_DIR}/av > /dev/null 2>&1
-if [[ $? != 0 && -z $1 ]]; then
-    error_check $?
-else
-    echo -e " - ${txtgrn}success${txtrst}"
+error_check $? "Creating symlink in ${txtpur}${INSTALL_DIR}${txtrst}"
+
+# Detect oh-my-zsh and install av-shell plugin
+if [[ ! -z "$(which omz)" ]]; then
+
+    just_install=false
+    if [[ "$1" == "--silent" ]]; then
+        just_install=true
+    else
+        echo
+        echo -n "Would you like to install av-shell plugin for oh-my-zsh? (y/n): "
+        read install
+        if [[ "$install" == "y" ]]; then
+            just_install=true
+        fi
+    fi
+
+    if [[ $just_install == false ]]; then
+
+        echo
+        echo "Later, you can install av-shell plugin for oh-my-zsh with the following commands:"
+        echo "  |"
+        echo "  | ln -sf ~/.av/zsh-plugin/av.plugin.zsh ~/.oh-my-zsh/custom/plugins/av"
+        echo "  | omz plugin enable av"
+        echo "  |"
+        echo
+        exit 0
+    fi
+
+    mkdir -p ~/.oh-my-zsh/custom/plugins/av
+    ln -sf ~/.av/zsh-plugin/av.plugin.zsh ~/.oh-my-zsh/custom/plugins/av/ &>/dev/null 2>&1
+    error_check $? "av-shell plugin for oh-my-zsh install"
+    output=$(omz plugin enable av)
+    if [[ $output == *"av is already enabled"* ]]; then
+        echo ""
+    fi
+    error_check $? "adding av to oh-my-zsh plugins list"
+
 fi
+
+echo
+echo "Next steps:"
+echo ""
+echo "1. 'source ~/.zshrc' to reload your shell"
+echo "2. In your favorite project directory run 'av init' to setup the project"
+echo

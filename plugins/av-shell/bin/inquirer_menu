@@ -1,0 +1,29 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "builtin" "select an option" "\n \
+    Usage: $1 <variable> <options...>\n \
+\n"
+
+# Import system path
+avAppendSystemPath
+
+#### Put system commands here
+
+if [[ -z $2 ]]; then
+    echo "Usage: $1 <variable> <options...>"
+    exit 1
+fi
+
+mkdir -p $AV_PROJECT_CONFIG_DIR/vars
+variable=$1
+shift
+selected=$(gum filter --placeholder "Pick a $variable..." --indicator ">" --height 10 --limit 1 "$@")
+echo -n "$selected" > $AV_PROJECT_CONFIG_DIR/vars/$variable
+
+#### End commands

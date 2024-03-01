@@ -217,7 +217,6 @@ if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
 
   # Set tab title for iTerm2
   echo -ne "\033]0;$p\007"
-  echo "asdf"
 
   # Prompt
   setopt PROMPT_SUBST

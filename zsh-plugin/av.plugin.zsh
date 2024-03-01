@@ -74,9 +74,15 @@ function av() {
             return $?
     fi
 
-    if [[ "$1" == "init" ]]; then
-        $AV_COMMAND init
+    # Support av-shell global commands without a mounted av project
+    if [[ "$1" == "init" || "$1" == "upgrade" || "$1" == "update" || "$1" == "get" || "$1" == "status" ]]; then
+        shift
+        $AV_COMMAND "$@"
         return $?
     fi
 
+    if [[ "$1" == "activate" || "$1" == "deactivate" ]]; then
+        echo "$fg_bold[yellow]You must be in an av-shell enabled project to run this command$reset_color"
+        return 1
+    fi
 }

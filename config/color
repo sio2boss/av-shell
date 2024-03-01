@@ -8,6 +8,7 @@ txtblu="\033[0;34m"       # blue
 txtpur="\033[0;35m"       # purple
 txtcyn="\033[0;36m"       # cyan
 txtwht="\033[0;37m"       # white
+txtgry="\033[0;90m"       # gray
 bldred="\033[1;31m"       # red    - Bold
 bldgrn="\033[1;32m"       # green
 bldylw="\033[1;33m"       # yellow
