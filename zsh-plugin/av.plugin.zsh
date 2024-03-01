@@ -61,7 +61,7 @@ function av_prompt_info() {
 function av() {
 
     # If no args, launch interactive
-    if [ $# -eq 0 ]; then
+    if [[ $# -eq 0 ]]; then
         source <($AV_COMMAND deactivate)
         $AV_COMMAND
         return $?
@@ -69,8 +69,14 @@ function av() {
 
     # When we have mounted and activated av, pass through
     if [[ ! -z "$__CURRENT_AV_STATUS" && -z "$AV_ROOT" ]]; then
-        shift
-        $AV_COMMAND "$@"
+            shift
+            $AV_COMMAND "$@"
+            return $?
+    fi
+
+    if [[ "$1" == "init" ]]; then
+        $AV_COMMAND init
         return $?
     fi
+
 }

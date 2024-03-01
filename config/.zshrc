@@ -20,7 +20,7 @@ done
 # Bring in color
 source $AV_CONFIG_DIR/color
 
-if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
+if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
 
     # set a fancy prompt (non-color, unless we know we "want" color)
     TERM=xterm-256color
@@ -183,7 +183,10 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 # Search for python env
-if [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then
+if [[ -e $AV_PROJ_TOP/.venv/bin/activate ]]; then
+    source $AV_PROJ_TOP/.venv/bin/activate
+    export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:$PATH
+elif [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then
     source $AV_PROJ_TOP/venv/bin/activate
     export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:$PATH
 fi
@@ -207,7 +210,7 @@ if [[ -e $AV_PROJ_TOP/venv/conda-meta ]]; then
 fi
 
 # Welcome
-if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
+if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
 
   # Set tab title for iTerm2
   echo -ne "\033]0;$p\007"
