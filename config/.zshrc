@@ -11,85 +11,93 @@ export AV_PROJ_TOP=$AV_ROOT/..
 # Figure out OS
 THIS_OS=`uname`
 
-# Bring in color
-source $AV_CONFIG_DIR/color
-
 # Setup path
 av_path="$AV_INSTALLED_BIN"
 for plugin in `ls -1 $AV_INSTALLED_PLUGINS`; do
   av_path=${av_path}:$AV_INSTALLED_PLUGINS/${plugin}/bin
 done
 
-# set a fancy prompt (non-color, unless we know we "want" color)
-TERM=xterm-256color
-LANG=en_US.UTF-8
-LC_CTYPE=en_US.UTF-8
-case "$TERM" in
-    xterm-color) color_prompt=yes;;
-esac
- 
-# Zsh style history search
-HISTFILE=$AV_INSTALLED_PATH/.zsh_history
-HISTSIZE=100000000
-SAVEHIST=100000000
-setopt HIST_IGNORE_SPACE
-setopt interactivecomments
-setopt appendhistory autocd beep extendedglob nomatch notify
-autoload -Uz compinit && compinit
-zmodload -i zsh/complist
-zstyle ':completion:*' menu select
-unsetopt banghist
-bindkey '^[[Z' reverse-menu-complete
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=teal'
-bindkey "^A" vi-beginning-of-line
-bindkey "^E" vi-end-of-line
-bindkey "^[[A" up-line-or-beginning-search # Up
-bindkey "^[[B" down-line-or-beginning-search # Down
-# start typing + [Up-Arrow] - fuzzy find history forward
-if [[ "${terminfo[kcuu1]}" != "" ]]; then
-    autoload -U up-line-or-beginning-search
-    zle -N up-line-or-beginning-search
-    bindkey "${terminfo[kcuu1]}" up-line-or-beginning-search
+# Bring in color
+source $AV_CONFIG_DIR/color
+
+if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
+
+    # set a fancy prompt (non-color, unless we know we "want" color)
+    TERM=xterm-256color
+    LANG=en_US.UTF-8
+    LC_CTYPE=en_US.UTF-8
+    case "$TERM" in
+        xterm-color) color_prompt=yes;;
+    esac
+    
+    # Zsh style history search
+    HISTFILE=$AV_INSTALLED_PATH/.zsh_history
+    HISTSIZE=100000000
+    SAVEHIST=100000000
+    setopt HIST_IGNORE_SPACE
+    setopt appendhistory autocd beep extendedglob nomatch notify
+    autoload -Uz compinit && compinit
+    zmodload -i zsh/complist
+    zstyle ':completion:*' menu select
+    unsetopt banghist
+    bindkey '^[[Z' reverse-menu-complete
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=teal'
+    bindkey "^A" vi-beginning-of-line
+    bindkey "^E" vi-end-of-line
+    bindkey "^[[A" up-line-or-beginning-search # Up
+    bindkey "^[[B" down-line-or-beginning-search # Down
+    # start typing + [Up-Arrow] - fuzzy find history forward
+    if [[ "${terminfo[kcuu1]}" != "" ]]; then
+        autoload -U up-line-or-beginning-search
+        zle -N up-line-or-beginning-search
+        bindkey "${terminfo[kcuu1]}" up-line-or-beginning-search
+    fi
+    # start typing + [Down-Arrow] - fuzzy find history backward
+    if [[ "${terminfo[kcud1]}" != "" ]]; then
+        autoload -U down-line-or-beginning-search
+        zle -N down-line-or-beginning-search
+        bindkey "${terminfo[kcud1]}" down-line-or-beginning-search
+    fi
+
+    
+    # leave some commands out of history log
+    export HISTIGNORE="&:bg:fg:ll:h:??:[ ]*:clear:exit:logout"
+    export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
+    export HISTTIMEFORMAT="%H:%M > "
+
+    # Make an alias so that help can run
+    alias help='$AV_INSTALLED_PATH/plugins/av-shell/bin/help'
+    alias team='$AV_INSTALLED_PATH/plugins/av-shell/bin/squad'
+    alias update='$AV_INSTALLED_PATH/plugins/av-shell/bin/upgrade'
+    alias get_tag_from_commit='$AV_INSTALLED_PATH/plugins/av-shell/bin/codehash'
+    alias ls=`which ls 2> /dev/null`
+    alias rm=`which rm 2> /dev/null`
+    alias bash=`which bash 2> /dev/null`
+    alias java=`which java 2> /dev/null`
+    alias ln=`which ln 2> /dev/null`
+    alias cat=`which cat 2> /dev/null`
+
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
+    # Set prompt to something short and different
+    export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin
+else
+    export PATH=$AV_BIN_DIR:${av_path}:$PATH
 fi
-# start typing + [Down-Arrow] - fuzzy find history backward
-if [[ "${terminfo[kcud1]}" != "" ]]; then
-    autoload -U down-line-or-beginning-search
-    zle -N down-line-or-beginning-search
-    bindkey "${terminfo[kcud1]}" down-line-or-beginning-search
-fi
 
- 
-# leave some commands out of history log
-export HISTIGNORE="&:bg:fg:ll:h:??:[ ]*:clear:exit:logout"
-export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
-export HISTTIMEFORMAT="%H:%M > "
+function av_project_prompt_inputs() {
+    echo -e -n `/bin/cat $AV_PROJECT_CONFIG_DIR/prompt`
+}
 
-# Make an alias so that help can run
-alias help='$AV_INSTALLED_PATH/plugins/av-shell/bin/help'
-alias team='$AV_INSTALLED_PATH/plugins/av-shell/bin/squad'
-alias update='$AV_INSTALLED_PATH/plugins/av-shell/bin/upgrade'
-alias get_tag_from_commit='$AV_INSTALLED_PATH/plugins/av-shell/bin/codehash'
-alias ls=`which ls 2> /dev/null`
-alias rm=`which rm 2> /dev/null`
-alias bash=`which bash 2> /dev/null`
-alias java=`which java 2> /dev/null`
-alias ln=`which ln 2> /dev/null`
-alias cat=`which cat 2> /dev/null`
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-
-# Set prompt to something short and different
-export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin
-
-function container_prompt() {
+function av_container_prompt_inputs() {
     cur_container=`getpv container`
     if [ ! -z ${cur_container} ]; then
         echo -e -n "%F{blue}${cur_container}%f"
     fi
 }
 
-function cluster_prompt() {
+function av_cluster_prompt_inputs() {
     cur_environment=`getpv environment`
     cur_cluster=`getpv cluster`
     if [ ! -z ${cur_cluster} ]; then
@@ -97,14 +105,14 @@ function cluster_prompt() {
     fi
 }
 
-function role_prompt() {
+function av_role_prompt_inputs() {
     cur_role=`getpv role`
     if [ ! -z ${cur_role} ]; then
         echo -e -n "%F{aqua}[${cur_role}"
     fi
 }
 
-function topic_prompt() {
+function av_topic_prompt_inputs() {
     cur_role=`getpv kafka-topic`
     if [ ! -z ${cur_role} ]; then
         echo -e -n "%F{magenta}${cur_role}%f"
@@ -112,10 +120,10 @@ function topic_prompt() {
 }
 
 function context_prompts() {
-    cluster=$(cluster_prompt)
-    container=$(container_prompt)
-    role=$(role_prompt)
-    topic=$(topic_prompt)
+    cluster=$(av_cluster_prompt_inputs)
+    container=$(av_container_prompt_inputs)
+    role=$(av_role_prompt_inputs)
+    topic=$(av_topic_prompt_inputs)
 
     echo -e -n "["
     echo -e -n "$cluster"
@@ -140,19 +148,19 @@ function context_prompts() {
     echo -e -n "]"
 }
 
-function venv_prompt() {
+function av_venv_prompt_inputs() {
     name=`basename "$VIRTUAL_ENV"`
     if [[ ! -z name ]]; then
         echo "${name}"
     fi
 }
 
-function aws_profile() {
-    echo $AWS_PROFILE
+function av_aws_profile_prompt_inputs() {
+    echo -e -n $AWS_PROFILE
 }
 
 
-function docker_context() {
+function av_docker_context_prompt_inputs() {
     if [[ -z $DOCKER_HOST ]]; then
         echo "localhost"
     else
@@ -173,9 +181,15 @@ function refresh () {
 }
 refresh
 
+# This loads nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 # Search for python env
-if [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then
+if [[ -e $AV_PROJ_TOP/.venv/bin/activate ]]; then
+    source $AV_PROJ_TOP/.venv/bin/activate
+    export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:$PATH
+elif [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then
     source $AV_PROJ_TOP/venv/bin/activate
     export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:$PATH
 fi
@@ -199,19 +213,21 @@ if [[ -e $AV_PROJ_TOP/venv/conda-meta ]]; then
 fi
 
 # Welcome
-if [[ "$AV_NON_INTERACTIVE" != "true" ]]; then
+if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
+
   # Set tab title for iTerm2
-  p=`/bin/cat $AV_PROJECT_CONFIG_DIR/prompt`
   echo -ne "\033]0;$p\007"
+  echo "asdf"
 
   # Prompt
   setopt PROMPT_SUBST
+  p=$(av_project_prompt_inputs)
   PROMPT="%(?:%F{green}$p%f:%F{red}$p%f)"
   PROMPT+=' $(context_prompts) '
   PROMPT+="➜ "
   export PROMPT
-
-  export RPROMPT="$(aws_profile):$(venv_prompt):$(docker_context)"
+  export AV_OLD_RPROMPT=$RPROMPT
+  export RPROMPT="$(av_aws_profile_prompt_inputs):$(av_venv_prompt_inputs):$(av_docker_context_prompt_inputs)"
 
   $AV_CONFIG_DIR/welcome
 fi

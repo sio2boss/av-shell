@@ -30,7 +30,21 @@ if [ -z $repo ]; then
 	echo 1
 fi
 
-cd $AV_ROOT/.. && docker push $repo/$domain/$container:$*
+container_push=$repo/$domain/$container:$*
+if [[ $1 == "--one-repo" ]]; then
+	shift
+	container_push=$repo/$domain:$container-$*
+fi
+
+if [[ $1 == "--name-override" ]]; then
+	shift
+	exact_container=$1
+	shift
+	container_push=$repo/$exact_container:$*
+fi
+
+avCheckVerbose "docker push ${container_push}"
+cd $AV_ROOT/.. && docker push ${container_push}
 exit $?
 
 #### End commands

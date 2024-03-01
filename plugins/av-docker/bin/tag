@@ -11,7 +11,7 @@ avAppendSystemPath
 
 #### Put system commands here
 
-if [ $# -ne 1 ]; then
+if [ $# -lt 1 ]; then
 	echo "usage: tag <version>"
 	exit 1
 fi
@@ -34,8 +34,22 @@ if [ -z $repo ]; then
 	exit 1
 fi
 
-echo -e "docker command: docker tag $domain/$container $repo/$domain/$container:$*"
-cd $AV_ROOT/.. && docker tag $domain/$container $repo/$domain/$container:$*
+
+container_push=$repo/$domain/$container:$*
+if [[ $1 == "--one-repo" ]]; then
+	shift
+	container_push=$repo/$domain:$container-$*
+fi
+
+if [[ $1 == "--name-override" ]]; then
+	shift
+	exact_container=$1
+	shift
+	container_push=$repo/$exact_container:$*
+fi
+
+avCheckVerbose "docker tag $domain/$container ${container_push}"
+cd $AV_ROOT/.. && docker tag $domain/$container ${container_push}
 exit $?
 
 #### End commands

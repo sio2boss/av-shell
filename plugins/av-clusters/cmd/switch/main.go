@@ -98,6 +98,7 @@ Options:
 	arguments.Bind(&config)
 
 	// Find cluster directory
+
 	contents, err := ioutil.ReadFile(".av/config/vars/clusterdir")
 	if err != nil {
 		log.Fatalf("Unable to read clusterdir persistant variable\n%v", err)
