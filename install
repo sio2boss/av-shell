@@ -26,9 +26,16 @@ function error_check {
     fi
 }
 
+# Verify zsh
+if [[ "$SHELL" != *"zsh" ]]; then
+    echo "${txtred}Unable to continue because your shell is not zsh${txtrst}"
+    echo
+    exit 1
+fi
+
 # Check dependencies
 echo "Checking for dependencies...\n"
-dependencies="brew go jq gum k9s octant dive gorun"
+dependencies="brew go jq gum k9s dive gorun"
 to_install=""
 for dep in $=dependencies; do
     tool_path=$(which $dep &> /dev/null)
@@ -46,7 +53,7 @@ echo
 
 
 # Figure out if we should install brew automatically
-if [[ -z "$(which brew)" ]]; then
+if [[ -z "$(which brew)" && ]]; then
     just_install=false
     if [[ "$1" == "--silent" ]]; then
         just_install=true
@@ -64,17 +71,27 @@ if [[ -z "$(which brew)" ]]; then
         echo "Brew must be installed to ensure dependencies are fulfilled,"
         echo "run the following command and retry"
         echo "  |"
-        echo "  | /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+        echo "  | bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
         echo "  |"
         echo
         exit 1
     fi 
 
     echo "Installing brew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     error_check $? "brew install"
 else
     echo "brew is already installed - ${txtgrn}success${txtrst}"
+fi
+
+# Ensure brew is on path
+if [ "$(uname)" == "Linux" ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    output=$(cat ~/.zshrc | grep "linuxbrew")
+    if [[ $output != *"shellenv"* ]]; then
+        echo "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" >> ~/.zshrc
+    fi
+    error_check $? "ensuring brew is on PATH"
 fi
 
 # With brew installed then we can just install stuff
@@ -116,7 +133,7 @@ fi
 error_check $? "ensuring ~/go/bin is on PATH"
 
 # With golang installed we can add gorun
-if [[ -z "$(which gorun | grep -v 'gorun not found')" ]]; then
+if [[ -z "$(which gorun | grep -v 'not found')" ]]; then
     just_install=false
     if [[ "$1" == "--silent" ]]; then
         just_install=true
