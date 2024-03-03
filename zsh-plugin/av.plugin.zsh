@@ -67,20 +67,20 @@ function av() {
         return $?
     fi
 
-    # When we have mounted and activated av, pass through
-    if [[ ! -z "$__CURRENT_AV_STATUS" && -z "$AV_ROOT" ]]; then
-            shift
-            $AV_COMMAND "$@"
-            return $?
-    fi
-
     # Support av-shell global commands without a mounted av project
     if [[ "$1" == "init" || "$1" == "upgrade" || "$1" == "update" || "$1" == "get" || "$1" == "status" ]]; then
+        $AV_COMMAND "$@"
+        return $?
+    fi
+
+    # When we have mounted and activated av, pass through
+    if [[ ! -z "$__CURRENT_AV_STATUS" && -z "$AV_ROOT" ]]; then
         shift
         $AV_COMMAND "$@"
         return $?
     fi
 
+    # Display error when not in av project
     if [[ "$1" == "activate" || "$1" == "deactivate" ]]; then
         echo "$fg_bold[yellow]You must be in an av-shell enabled project to run this command$reset_color"
         return 1

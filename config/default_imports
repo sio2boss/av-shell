@@ -50,9 +50,10 @@ function avLaunchEditor
 {
 	if [ -z "$EDITOR" ]; then
 
-		echo -e "set your EDITOR to something you like, I'm picking vi"
-		echo
-		echo -e "    something like: export EDITOR=sublime"
+		echo "set your EDITOR to something you like:"
+		echo "  | "
+		echo "  | export EDITOR=sublime"
+		echo "  | "
 		echo
 		sleep 2
 		echo
@@ -91,16 +92,18 @@ function avCheckHelpFlagsPassThrough
 function avCheckVerbose
 {
 	if [[ "$(getpv verbose)" == "true" ]]; then
-		echo
-		echo -e "${txtgrn}[AV-SHELL]${txtrst} Because `verbose on` was run, this is the command about to run:"
-		echo
-		echo -e "$@"
-		echo
+
+		gum format -t markdown -- "# AV-SHELL" \
+			"Pausing for confirmation \`verbose\` was set to \"on\"." \
+			"This is the command about to be run:"
+		echo "$@" | gum format -t code
+		
 		gum confirm "Okay to continue?"
 		if [[ $? -ne 0 ]]; then
+			echo
 			exit
 		fi
-		echo -e "--------------------------------------------------------------"
+		echo -e "  --------------------------------------------------------------"
 		echo
 	fi
 }

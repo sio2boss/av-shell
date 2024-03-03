@@ -2,7 +2,15 @@
 
 txtred="\033[0;31m"       # red
 txtgrn="\033[0;32m"       # green
+bldgrn="\033[1;32m"       # bold green
 txtrst="\033[0m"          # Text reset
+
+export GUM_FORMAT_THEME="dark"
+export GUM_INPUT_CURSOR_FOREGROUND="#00FF00"
+export GUM_INPUT_PROMPT_FOREGROUND="#00FF00"
+export GUM_CHOOSE_CURSOR_FOREGROUND="#00FF00"
+export GUM_CHOOSE_HEADER_FOREGROUND="#00FF00"
+export GUM_SPIN_SPINNER_FOREGROUND="#00FF00"
 
 # Get the absolute path of the executable
 # function realpath {
@@ -55,33 +63,37 @@ fi
 
 
 if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
-	echo "This utility creates a new domain specific shell in your current path"
-	echo
 
     if [[ -e .av ]]; then
     	echo "It appears 'av' is already installed"
-    	exit
+    	exit 0
     fi
 
-	echo 
-	prompt=$(gum input --prompt="your prompt should be named?: " --placeholder="like project name...")
+	gum format -t markdown -- "# AV-SHELL" \
+		"This utility creates a new domain specific shell in your current path."
 
 	echo
-	echo "copying files..."
-	mkdir .av
-	mkdir .av/bin
-	mkdir .av/config
-	touch .av/config/.gitignore
-	echo "vars/container" >> .av/config/.gitignore
-    echo "vars/cluster" >> .av/config/.gitignore
-    echo "vars/branch" >> .av/config/.gitignore
-    echo "vars/cluster_type" >> .av/config/.gitignore
-    echo "vars/profile" >> .av/config/.gitignore
-	echo "vars/lasthash" >> .av/config/.gitignore
+	prompt=$(gum input --prompt="  Your prompt should be named?: " --placeholder="cool-project name without spaces")
+	if [[ -z "$prompt" ]]; then
+		exit 1
+	fi
+	echo "  Prompt will be: $prompt"
+	echo
+
+	gum spin --spinner line --title "Copying..." -- sh -c '
+		mkdir -p .av/config && touch .av/config/.gitignore
+		echo "vars/container" >> .av/config/.gitignore
+		echo "vars/cluster" >> .av/config/.gitignore
+		echo "vars/branch" >> .av/config/.gitignore
+		echo "vars/cluster_type" >> .av/config/.gitignore
+		echo "vars/profile" >> .av/config/.gitignore
+		echo "vars/lasthash" >> .av/config/.gitignore
+		sleep 1
+	'
 	echo "$prompt" > .av/config/prompt
 
+	echo -e "  ${bldgrn}Done${txtrst}"
 	echo
-	echo "done"
 
 	exit
 fi
@@ -205,10 +217,7 @@ else
 	AV_ROOT=$AV_ROOT \
 	PATH=$AV_ROOT/bin:$PATH \
 	ZDOTDIR=$AV_INSTALLED_PATH/config \
-	zsh -i -c "$*"
+		zsh -i -c "$*"
   	exit $?
 
 fi
-
-# Go back
-cd - > /dev/null
