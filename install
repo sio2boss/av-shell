@@ -26,7 +26,6 @@ function error_check {
     fi
 }
 
-
 # Check dependencies
 echo "Checking for dependencies...\n"
 dependencies="brew go jq gum k9s dive gorun"
@@ -70,7 +69,7 @@ if [[ -z "$(which brew | grep -v 'not found')" ]]; then
         exit 1
     fi 
 
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    NONINTERACTIVE=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     error_check $? "brew install"
 else
     echo "brew is already installed - ${txtgrn}success${txtrst}"
@@ -78,7 +77,7 @@ fi
 
 # Ensure brew is on path
 if [[ "$(uname)" == "Linux" ]]; then
-    $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
     output=$(cat ~/.zshrc | grep "linuxbrew")
     if [[ $output != *"shellenv"* ]]; then
         echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.zshrc
@@ -193,8 +192,11 @@ if [[ ! -z "$(which omz)" && -z "$cat ~/.zshrc | grep plugins | grep ' av)\|(av 
         exit 0
     fi
 
-    mkdir -p ~/.oh-my-zsh/custom/plugins/av
-    ln -sf ~/.av/zsh-plugin/av.plugin.zsh ~/.oh-my-zsh/custom/plugins/av/ &>/dev/null 2>&1
+    mkdir -p ~/.oh-my-zsh/custom/plugins
+    if [[ -d ~/.oh-my-zsh/custom/plugins/av ]]; then
+        rm -rf ~/.oh-my-zsh/custom/plugins/av
+    fi
+    ln -sf ~/.av/zsh-plugin ~/.oh-my-zsh/custom/plugins/av &>/dev/null 2>&1
     error_check $? "av-shell plugin for oh-my-zsh install"
     output=$(omz plugin enable av)
     if [[ $output == *"av is already enabled"* ]]; then

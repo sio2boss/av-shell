@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/zsh
 
 
 # Import color
@@ -16,7 +16,8 @@ cd $AV_INSTALLED_PLUGINS
 for plugin in `ls -1`; do
     echo -en "Updating: ${txtpur}$plugin${txtrst}..." && cd $AV_INSTALLED_PLUGINS/${plugin} && git pull
 done
+echo
 
-cd $AV_CONFIG_DIR/../ && bash ./install
+cd $AV_CONFIG_DIR/../ && zsh ./install "$@"
 
 #### End commands

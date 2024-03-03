@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 txtred="\033[0;31m"       # red
 txtgrn="\033[0;32m"       # green
@@ -179,7 +179,7 @@ fi
 cd $AV_ROOT/.. > /dev/null
 
 # If there are arguments, just run them rather than opening a shell
-if [ $# -eq 0 ]; then
+if [[ $# -eq 0 ]]; then
 
 	FORCED_COMMAND=""
 
@@ -210,6 +210,16 @@ if [ $# -eq 0 ]; then
 	ZDOTDIR=$AV_INSTALLED_PATH/config \
 	zsh ${FORCED_COMMAND}
 
+elif [[ "$1" == "update" || "$1" == "upgrade" ]]; then
+
+	shift
+	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+	AV_INTERACTIVE_MODE="single" \
+	AV_ROOT=$AV_ROOT \
+	PATH=$AV_ROOT/bin:$PATH \
+	ZDOTDIR=$AV_INSTALLED_PATH/config \
+	zsh -i -c "upgrade $@"
+
 else
 
 	# Run command in shell
@@ -218,7 +228,7 @@ else
 	AV_ROOT=$AV_ROOT \
 	PATH=$AV_ROOT/bin:$PATH \
 	ZDOTDIR=$AV_INSTALLED_PATH/config \
-		zsh -i -c "$*"
+		zsh -i -c "$@"
 
 fi
 
