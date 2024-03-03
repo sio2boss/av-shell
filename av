@@ -185,12 +185,13 @@ if [ $# -eq 0 ]; then
 
 	CURRENT_DATE=`date +%s`
 	if [[ ! -e $AV_INSTALLED_PATH/config/update_checked ]]; then
-		echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
+		echo -n "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
 	else
 		LAST_CHECKED=`cat $AV_INSTALLED_PATH/config/update_checked`
 		if [[ `expr ${CURRENT_DATE} - ${LAST_CHECKED}` -gt 1728000 ]]; then
-			echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
-			gum confirm "[AV-SHELL] Would you like to check for updates?"
+			echo -n "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
+			gum format -t markdown -- "# AV-SHELL"
+			gum confirm "  Would you like to check for updates?"
 			if [[ $? -eq 0 ]]; then
 				AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
 				AV_INTERACTIVE_MODE="single" \
@@ -218,6 +219,7 @@ else
 	PATH=$AV_ROOT/bin:$PATH \
 	ZDOTDIR=$AV_INSTALLED_PATH/config \
 		zsh -i -c "$*"
-  	exit $?
 
 fi
+
+exit $?

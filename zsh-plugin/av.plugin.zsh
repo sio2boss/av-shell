@@ -60,16 +60,16 @@ function av_prompt_info() {
 # Over ride av command with this plugin
 function av() {
 
+    # Support av-shell global commands without a mounted av project
+    if [[ "$1" == "init" || "$1" == "upgrade" || "$1" == "update" || "$1" == "get" || "$1" == "status" ]]; then
+        $AV_COMMAND "$@"
+        return $?
+    fi
+
     # If no args, launch interactive
     if [[ $# -eq 0 ]]; then
         source <($AV_COMMAND deactivate)
         $AV_COMMAND
-        return $?
-    fi
-
-    # Support av-shell global commands without a mounted av project
-    if [[ "$1" == "init" || "$1" == "upgrade" || "$1" == "update" || "$1" == "get" || "$1" == "status" ]]; then
-        $AV_COMMAND "$@"
         return $?
     fi
 

@@ -11,7 +11,7 @@ av_shell_prompt="${txtblu}[AV-SHELL]${txtrst}"
 if [[ $1 == "--help" ]]; then
     echo -e "${av_shell_prompt} Install the av-shell plugin"
     echo
-    echo "Usage: $0 [--silent]"
+    echo "Usage: $0 [--yes]"
     echo "       $0 --help"
     exit 0
 fi
@@ -32,7 +32,7 @@ echo "Checking for dependencies...\n"
 dependencies="brew go jq gum k9s dive gorun"
 to_install=""
 for dep in $=dependencies; do
-    tool_path=$(which $dep 2> /dev/null)
+    tool_path=$(which $dep | grep -v 'not found')
     installed=$?
     result=$(if [[ $installed -eq 0 ]]; then echo "[${txtgrn} OK ${txtrst}]"; else echo "[${txtylw} NO ${txtrst}]"; fi)
     printf "${txtb}%-15s %-6s\n" "$dep" "$result"
@@ -45,16 +45,15 @@ done
 to_install=${to_install#"${to_install%%[![:space:]]*}"}
 echo
 
-
 # Figure out if we should install brew automatically
-if [[ -z "$(which brew 2> /dev/null)" ]]; then
+if [[ -z "$(which brew | grep -v 'not found')" ]]; then
     just_install=false
-    if [[ "$1" == "--silent" ]]; then
+    if [[ "$1" == "--yes" ]]; then
         just_install=true
     else
         echo
-        echo "Would you like to install brew? (y/n) "
-        read -p ">> " install
+        echo -n "Would you like to install brew? (y/n): "
+        read install
         if [[ "$install" == "y" ]]; then
             just_install=true
         fi
@@ -65,13 +64,12 @@ if [[ -z "$(which brew 2> /dev/null)" ]]; then
         echo "Brew must be installed to ensure dependencies are fulfilled,"
         echo "run the following command and retry"
         echo "  |"
-        echo "  | bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+        echo '  | bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"'
         echo "  |"
         echo
         exit 1
     fi 
 
-    echo "Installing brew..."
     bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     error_check $? "brew install"
 else
@@ -80,18 +78,18 @@ fi
 
 # Ensure brew is on path
 if [[ "$(uname)" == "Linux" ]]; then
-    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
     output=$(cat ~/.zshrc | grep "linuxbrew")
     if [[ $output != *"shellenv"* ]]; then
-        echo "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" >> ~/.zshrc
+        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.zshrc
     fi
     error_check $? "ensuring brew is on PATH"
 fi
 
 # With brew installed then we can just install stuff
-if [[ ! -z "$(which brew 2> /dev/null)" && -n "$to_install" ]]; then
+if [[ ! -z "$(which brew | grep -v 'not found')" && -n "$to_install" ]]; then
     just_install=false
-    if [[ "$1" == "--silent" ]]; then
+    if [[ "$1" == "--yes" ]]; then
         just_install=true
     else
         echo
@@ -112,7 +110,7 @@ if [[ ! -z "$(which brew 2> /dev/null)" && -n "$to_install" ]]; then
         exit 1
     fi
     eval "brew install ${to_install[@]} &> /dev/null"
-    error_check $? "dependency install"
+    error_check $? "brew dependencies install"
 else
     echo "brew dependencies are already installed - ${txtgrn}success${txtrst}"
 fi
@@ -135,7 +133,7 @@ error_check $? "ensuring ~/go/bin is on PATH"
 # With golang installed we can add gorun
 if [[ -z "$(which gorun  2> /dev/null)" ]]; then
     just_install=false
-    if [[ "$1" == "--silent" ]]; then
+    if [[ "$1" == "--yes" ]]; then
         just_install=true
     else
         echo
@@ -169,10 +167,10 @@ ln -s `pwd`/av ${INSTALL_DIR}/av > /dev/null 2>&1
 error_check $? "Creating symlink in ${txtpur}${INSTALL_DIR}${txtrst}"
 
 # Detect oh-my-zsh and install av-shell plugin
-if [[ ! -z "$(which omz 2> /dev/null)" ]]; then
+if [[ ! -z "$(which omz)" && -z "$cat ~/.zshrc | grep plugins | grep ' av)\|(av \| av '" ]]; then
 
     just_install=false
-    if [[ "$1" == "--silent" ]]; then
+    if [[ "$1" == "--yes" ]]; then
         just_install=true
     else
         echo
@@ -204,6 +202,8 @@ if [[ ! -z "$(which omz 2> /dev/null)" ]]; then
     fi
     error_check $? "adding av to oh-my-zsh plugins list"
 
+else
+    echo "av oh-my-zsh plugin already installed - ${txtgrn}success${txtrst}"
 fi
 
 echo
