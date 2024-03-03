@@ -12,7 +12,7 @@ Contracts:
 
 You will need the latest golang.  Not using npm anymore. Using oh-my-zsh style of putting it in your home directory under a dot-folder.
    
-    git clone --recurse-submodules https://github.com/sio2boss/av-shell ~/.av && bash ~/.av/install
+    git clone --depth=1 https://github.com/sio2boss/av-shell ~/.av && zsh ~/.av/install  --silent
 
 ## Using av with your project
 
@@ -26,7 +26,7 @@ Your project now has a domain specific shell, just run for interactive:
 
 Looks like this:
 
-![Starting up with av](https://raw.githubusercontent.com/sio2boss/av/master/doc/start.png)
+![Starting up with av](https://raw.githubusercontent.com/sio2boss/av/master/doc/docker.gif)
 
 Or for non-interactive, where help can be replaced with any command:
 

@@ -2,18 +2,26 @@
 
 txtred="\033[0;31m"       # red
 txtgrn="\033[0;32m"       # green
+bldgrn="\033[1;32m"       # bold green
 txtrst="\033[0m"          # Text reset
 
+export GUM_FORMAT_THEME="dark"
+export GUM_INPUT_CURSOR_FOREGROUND="#00FF00"
+export GUM_INPUT_PROMPT_FOREGROUND="#00FF00"
+export GUM_CHOOSE_CURSOR_FOREGROUND="#00FF00"
+export GUM_CHOOSE_HEADER_FOREGROUND="#00FF00"
+export GUM_SPIN_SPINNER_FOREGROUND="#00FF00"
+
 # Get the absolute path of the executable
-function realpath {
-    local r=$1; local t=$(readlink $r)
-    while [ $t ]; do
-        r=$(cd $(dirname $r) && cd $(dirname $t) && pwd -P)/$(basename $t)
-        t=$(readlink $r)
-    done
-    echo $r
-}
-AV_INSTALLED_PATH=$(dirname $(realpath "$0"))
+# function realpath {
+#     local r=$1; local t=$(readlink $r)
+#     while [ $t ]; do
+#         r=$(cd $(dirname $r) && cd $(dirname $t) && pwd -P)/$(basename $t)
+#         t=$(readlink $r)
+#     done
+#     echo $r
+# }
+AV_INSTALLED_PATH=~/.av
 
 # Figure out where the .av directory is starting with pwd
 upsearch () {
@@ -47,39 +55,45 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
 	echo "  invigorate  - checks your domain specific shell's version and imposes the changes necessary"
 	echo "  upgrade     - pull updates for av-shell and plugins, system wide"
 	echo "  update      - same as upgrade"
+	echo "  activate    - produce content that can be sourced to activate like python virtualenvs"
+	echo "  deactivate  - undo the activate sub-command"
 	echo
 	exit
 fi
 
 
 if [[ "$1" == "init" && -z "$AV_ROOT" ]]; then
-	echo "This utility creates a new domain specific shell in your current path"
-	echo
 
     if [[ -e .av ]]; then
     	echo "It appears 'av' is already installed"
-    	exit
+    	exit 0
     fi
 
-	echo "your prompt should be named?:"
-	read prompt
+	gum format -t markdown -- "# AV-SHELL" \
+		"This utility creates a new domain specific shell in your current path."
 
 	echo
-	echo "copying files..."
-	mkdir .av
-	mkdir .av/bin
-	mkdir .av/config
-	touch .av/config/.gitignore
-	echo "vars/container" >> .av/config/.gitignore
-    echo "vars/cluster" >> .av/config/.gitignore
-    echo "vars/branch" >> .av/config/.gitignore
-    echo "vars/cluster_type" >> .av/config/.gitignore
-    echo "vars/profile" >> .av/config/.gitignore
-	echo "vars/lasthash" >> .av/config/.gitignore
+	prompt=$(gum input --prompt="  Your prompt should be named?: " --placeholder="cool-project name without spaces")
+	if [[ -z "$prompt" ]]; then
+		exit 1
+	fi
+	echo "  Prompt will be: $prompt"
+	echo
+
+	gum spin --spinner line --title "Copying..." -- sh -c '
+		mkdir -p .av/config && touch .av/config/.gitignore
+		echo "vars/container" >> .av/config/.gitignore
+		echo "vars/cluster" >> .av/config/.gitignore
+		echo "vars/branch" >> .av/config/.gitignore
+		echo "vars/cluster_type" >> .av/config/.gitignore
+		echo "vars/profile" >> .av/config/.gitignore
+		echo "vars/lasthash" >> .av/config/.gitignore
+		sleep 1
+	'
 	echo "$prompt" > .av/config/prompt
 
+	echo -e "  ${bldgrn}Done${txtrst}"
 	echo
-	echo "done"
 
 	exit
 fi
@@ -103,12 +117,12 @@ if [[ "$1" == "get" && -z "$AV_ROOT" ]]; then
 fi
 
 # See if there is an .av directory
+unset AV_ROOT
 upsearch ".av"
-
 
 if [[ "$1" == "status" ]]; then
 	if [[ ! -z $AV_ROOT ]]; then
-		echo -n "av"
+		echo -n "$AV_ROOT"
 	fi
 	exit
 fi
@@ -120,9 +134,49 @@ fi
 
 # --------------------------------------------------------------------
 
+# Mount like pyenv mode
+if [[ "$1" == "activate" ]]; then
+
+	echo -e "export AV_ROOT=$AV_ROOT"
+	echo -e "export AV_INTERACTIVE_MODE=\"mounted\""
+	echo -e "export AV_INSTALLED_PATH=$AV_INSTALLED_PATH"
+	echo -e "source $AV_INSTALLED_PATH/config/.zshrc"
+	echo -e "if [ -n \"${BASH:-}\" -o -n \"${ZSH_VERSION:-}\" ] ; then"
+	echo -e "	hash -r 2> /dev/null"
+	echo -e "fi"
+
+	exit
+fi
+
+if [[ "$1" == "deactivate" ]]; then
+
+    echo -e "unset AV_ROOT"
+    echo -e "unset AV_INTERACTIVE_MODE"
+    echo -e "unset AV_INSTALLED_PATH"
+	echo -e "unset AV_PROJ_TOP"
+	echo -e "unset ZDOTDIR"
+    echo -e "if [ ! -z \"$AV_OLD_SYSTEM_PATH\" ]; then"
+	echo -e "   export PATH=\"$AV_OLD_SYSTEM_PATH\""
+	echo -e "   unset AV_OLD_SYSTEM_PATH"
+	echo -e "fi"
+    echo -e "RPROMPT=$AV_OLD_RPROMPT"
+	echo -e "if [ -n \"${BASH:-}\" -o -n \"${ZSH_VERSION:-}\" ] ; then"
+	echo -e "	hash -r 2> /dev/null"
+	echo -e "fi"
+
+	exit
+fi
+
+# Don't allow av to be called recursively
+if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
+	echo
+	echo "You are already in the av-shell!"
+	echo
+	exit
+fi
+
 # Change dir to script root
 cd $AV_ROOT/.. > /dev/null
-
 
 # If there are arguments, just run them rather than opening a shell
 if [ $# -eq 0 ]; then
@@ -131,16 +185,16 @@ if [ $# -eq 0 ]; then
 
 	CURRENT_DATE=`date +%s`
 	if [[ ! -e $AV_INSTALLED_PATH/config/update_checked ]]; then
-		echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
+		echo -n "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
 	else
 		LAST_CHECKED=`cat $AV_INSTALLED_PATH/config/update_checked`
 		if [[ `expr ${CURRENT_DATE} - ${LAST_CHECKED}` -gt 1728000 ]]; then
-			echo -en "${txtred}[AV-SHELL]${txtgrn} Would you like to check for updates? [Y/n]: ${txtrst}"
-			read prompt
-			echo "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
-			if [[ "$prompt" != "n" && "$prompt" != "N" ]]; then
+			echo -n "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
+			gum format -t markdown -- "# AV-SHELL"
+			gum confirm "  Would you like to check for updates?"
+			if [[ $? -eq 0 ]]; then
 				AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
-				AV_NON_INTERACTIVE=true \
+				AV_INTERACTIVE_MODE="single" \
 				AV_ROOT=$AV_ROOT \
 				PATH=$AV_ROOT/bin:$PATH \
 				ZDOTDIR=$AV_INSTALLED_PATH/config \
@@ -151,6 +205,7 @@ if [ $# -eq 0 ]; then
 
 	# Open shell
 	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+	AV_INTERACTIVE_MODE="interactive" \
 	AV_ROOT=$AV_ROOT \
 	ZDOTDIR=$AV_INSTALLED_PATH/config \
 	zsh ${FORCED_COMMAND}
@@ -159,14 +214,12 @@ else
 
 	# Run command in shell
 	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
-	AV_NON_INTERACTIVE=true \
+	AV_INTERACTIVE_MODE="single" \
 	AV_ROOT=$AV_ROOT \
 	PATH=$AV_ROOT/bin:$PATH \
 	ZDOTDIR=$AV_INSTALLED_PATH/config \
-	zsh -i -c "$*"
-  	exit $?
+		zsh -i -c "$*"
 
 fi
 
-# Go back
-cd - > /dev/null
+exit $?

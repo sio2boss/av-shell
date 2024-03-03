@@ -15,7 +15,8 @@ avCheckHelpFlags "$1" "av-shell" "Read a value from persistent storage" "\n \
 
 # Get variable stored on disks
 if [ -e $AV_PROJECT_CONFIG_DIR/vars/$1 ]; then
-        /bin/cat $AV_PROJECT_CONFIG_DIR/vars/$1
+        value=$(/bin/cat $AV_PROJECT_CONFIG_DIR/vars/$1)
+        echo "$value"
 fi
 
 #### End commands

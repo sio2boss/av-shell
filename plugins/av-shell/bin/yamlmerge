@@ -1,0 +1,20 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-shell" "YAML Merge" "\n \
+$(gorun ~/.av/plugins/av-shell/cmd/yamlmerge/main.go --help) \
+\n"
+
+# Import system path
+avAppendSystemPath
+
+#### Put system commands here
+
+gorun ~/.av/plugins/av-shell/cmd/yamlmerge/main.go
+
+#### End commands

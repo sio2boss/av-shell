@@ -44,9 +44,8 @@ fi
 
 # Prompt / wizard
 echo
-echo -n "Would you like to change configuration? [Y/n] "
-read wizard
-if [[ "$wizard" != "" && ( "$wizard" == "n" || "$wizard" == "N" ) ]]; then
+gum confirm "Would you like to change configuration?"
+if [[ $? -ne 0 ]]; then
 	exit 0
 fi
 
