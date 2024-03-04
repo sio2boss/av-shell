@@ -46,7 +46,7 @@ Have fun!
 
 # Oh-My-Zsh Plugin
 
-https://gist.github.com/sio2boss/f480b310b233bd639d69
+The install script now detects oh-my-zsh and enables the av-shell plugin.
 
 
 # Docker Support

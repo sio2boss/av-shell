@@ -155,11 +155,6 @@ function av_venv_prompt_inputs() {
     fi
 }
 
-function av_aws_profile_prompt_inputs() {
-    echo -e -n $AWS_PROFILE
-}
-
-
 function av_docker_context_prompt_inputs() {
     if [[ -z $DOCKER_HOST ]]; then
         echo "localhost"
@@ -173,13 +168,36 @@ function refresh () {
     if [[ -f .env ]]; then
         unamestr=$(uname)
         if [ "$unamestr" = 'Linux' ]; then
+            if [[ "$AV_INTERACTIVE_MODE" == "interactive" && -z "$1" ]]; then
+                echo -e " - Reloading .env file..."
+            fi
             export $(grep -v '^#' .env | xargs -d '\n')
         elif [[ "$unamestr" = 'FreeBSD' || "$unamestr" = 'Darwin' ]]; then
+            if [[ "$AV_INTERACTIVE_MODE" == "interactive" && -z "$1" ]]; then
+                echo -e " - Reloading .env file..."
+            fi
             export $(grep -v '^#' .env | xargs -0)
         fi
     fi
 }
-refresh
+
+# Wrap commands that change .env files so reload always happens
+function switch() {   
+    $AV_INSTALLED_PLUGINS/av-clusters/bin/switch "$@"
+    if [[ $? -eq 0 ]]; then
+        refresh
+    fi
+}
+
+
+function inventory_state() {
+    $AV_INSTALLED_PLUGINS/av-pagos/bin/inventory_state "$@"
+    if [[ $? -eq 0 && "$1" == "restore" ]]; then
+        sleep 1
+        refresh
+    fi
+}
+
 
 # This loads nvm
 export NVM_DIR="$HOME/.nvm"
@@ -212,13 +230,14 @@ if [[ -e $AV_PROJ_TOP/venv/conda-meta ]]; then
     conda activate $AV_PROJ_TOP/venv
 fi
 
+# Set tab title for iTerm2
+echo -ne "\033]0;$p\007"
+
 # Welcome
 if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
 
-  # Set tab title for iTerm2
-  echo -ne "\033]0;$p\007"
-
   # Prompt
+  refresh start
   setopt PROMPT_SUBST
   p=$(av_project_prompt_inputs)
   PROMPT="%(?:%F{green}$p%f:%F{red}$p%f)"
@@ -226,7 +245,7 @@ if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
   PROMPT+="➜ "
   export PROMPT
   export AV_OLD_RPROMPT=$RPROMPT
-  export RPROMPT="$(av_aws_profile_prompt_inputs):$(av_venv_prompt_inputs):$(av_docker_context_prompt_inputs)"
+  export RPROMPT="\$AWS_PROFILE:$(av_venv_prompt_inputs):$(av_docker_context_prompt_inputs)"
 
   $AV_CONFIG_DIR/welcome
 fi

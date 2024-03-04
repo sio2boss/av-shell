@@ -77,10 +77,10 @@ fi
 
 # Ensure brew is on path
 if [[ "$(uname)" == "Linux" ]]; then
-    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
     output=$(cat ~/.zshrc | grep "linuxbrew")
     if [[ $output != *"shellenv"* ]]; then
-        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.zshrc
+        echo 'eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)' >> ~/.zshrc
     fi
     error_check $? "ensuring brew is on PATH"
 fi
@@ -130,7 +130,7 @@ fi
 error_check $? "ensuring ~/go/bin is on PATH"
 
 # With golang installed we can add gorun
-if [[ -z "$(which gorun  2> /dev/null)" ]]; then
+if [[ -z "$(which gorun | grep -v 'not found')" ]]; then
     just_install=false
     if [[ "$1" == "--yes" ]]; then
         just_install=true
@@ -166,7 +166,7 @@ ln -s `pwd`/av ${INSTALL_DIR}/av > /dev/null 2>&1
 error_check $? "Creating symlink in ${txtpur}${INSTALL_DIR}${txtrst}"
 
 # Detect oh-my-zsh and install av-shell plugin
-if [[ ! -z "$(which omz)" && -z "$cat ~/.zshrc | grep plugins | grep ' av)\|(av \| av '" ]]; then
+if [[ ! -z "$(zsh -i -c 'which omz' | grep -v 'not found')" || -z "$(cat ~/.zshrc | grep plugins | grep ' av)\|(av \| av ')" ]]; then
 
     just_install=false
     if [[ "$1" == "--yes" ]]; then
@@ -198,7 +198,7 @@ if [[ ! -z "$(which omz)" && -z "$cat ~/.zshrc | grep plugins | grep ' av)\|(av 
     fi
     ln -sf ~/.av/zsh-plugin ~/.oh-my-zsh/custom/plugins/av &>/dev/null 2>&1
     error_check $? "av-shell plugin for oh-my-zsh install"
-    output=$(omz plugin enable av)
+    output=$(zsh -i -c 'omz plugin enable av')
     if [[ $output == *"av is already enabled"* ]]; then
         echo ""
     fi

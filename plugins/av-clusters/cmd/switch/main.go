@@ -219,8 +219,4 @@ Options:
 		fmt.Println(" - Updated variables as defined in 'inventory/variables.sh'")
 	}
 
-	fmt.Println()
-	fmt.Println("\033[33mRun 'refresh' for shell to pickup all changes")
-	fmt.Println()
-
 }

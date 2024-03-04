@@ -24,7 +24,7 @@ fi
 
 setpv kafka-topic ""
 avCheckVerbose "./kafka-topics.sh --list --command-config $AV_ROOT/../.av/config/vars/kafka-config --bootstrap-server $(getpv kafka-brokers)"
-topics=$(cd ${kafka_root} && ./kafka-topics.sh --list --command-config $AV_ROOT/../.av/config/vars/kafka-config --bootstrap-server $(getpv kafka-brokers) | awk '{ print "\""$0"\""}' | tr '\n' ' ')
+topics=$(cd ${kafka_root} && ./kafka-topics.sh --list --command-config $AV_ROOT/../.av/config/vars/kafka-config --bootstrap-server $(getpv kafka-brokers) | awk '{ print $0 }' | tr '\n' ' ')
 if [[ -z ${topics} ]]; then
     echo "No topics found"
     exit 1

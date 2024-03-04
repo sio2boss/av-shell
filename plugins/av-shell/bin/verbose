@@ -12,20 +12,25 @@ avCheckHelpFlags "$1" "av-shell" "Show underlying commands" "\n \
 #### Put system commands here
 
 if [[ "$1" == "check" ]]; then
-	echo -e "verbose is set to: $(getpv verbose)"
-	exit
+	if [[ $(getpv verbose) ]]; then
+		echo -e "holdhash is set to: ${bldgrn}On${txtrst}"
+	else
+		echo -e "holdhash is set to: ${bldgrn}Off${txtrst}"
+	fi
+	exit 0
 fi
 
 if [[ "$1" == "on" ]]; then
 	setpv "verbose" "true"
-	exit
+	exit 0
 fi
 
 if [[ "$1" == "off" ]]; then
 	setpv "verbose" "false"
-	exit
+	exit 0
 fi
 
+avAppendSystemPath
 CHOICE=$(gum confirm "Verbose Mode?" --affirmative="On" --negative="Off")
 if [[ $? -eq 0 ]]; then
 	setpv "verbose" "true"
@@ -33,6 +38,6 @@ else
 	setpv "verbose" "false"
 fi
 
-exit 1
+exit 0
 
 #### End commands

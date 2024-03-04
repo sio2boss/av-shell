@@ -11,6 +11,8 @@ export GUM_INPUT_PROMPT_FOREGROUND="#00FF00"
 export GUM_CHOOSE_CURSOR_FOREGROUND="#00FF00"
 export GUM_CHOOSE_HEADER_FOREGROUND="#00FF00"
 export GUM_SPIN_SPINNER_FOREGROUND="#00FF00"
+export GUM_CONFIRM_SELECTED_BACKGROUND="#00FF00"
+export GUM_CONFIRM_SELECTED_FOREGROUND="#000000"
 
 # Get the absolute path of the executable
 # function realpath {
@@ -107,7 +109,7 @@ if [[ "$1" == "get" && -z "$AV_ROOT" ]]; then
 
   reponame="$(basename "${2%.*}")"
   if [[ -e ~/.av/plugins/${reponame} ]]; then
-		echo -e "${txtgrn}[AV-SHELL]${txtrst} Plugin already installed, pulling latest"
+		echo -e "${txtgrn}[AV-SHELL]${txtrst} Plugin already installed, pulling latest..."
 		cd ~/.av/plugins/${reponame} && git pull
 	else
 		cd ~/.av/plugins && git clone $2
@@ -141,9 +143,11 @@ if [[ "$1" == "activate" ]]; then
 	echo -e "export AV_INTERACTIVE_MODE=\"mounted\""
 	echo -e "export AV_INSTALLED_PATH=$AV_INSTALLED_PATH"
 	echo -e "source $AV_INSTALLED_PATH/config/.zshrc"
+	echo -e 'export PATH=$AV_BIN_DIR:${av_path}:$PATH'
 	echo -e "if [ -n \"${BASH:-}\" -o -n \"${ZSH_VERSION:-}\" ] ; then"
 	echo -e "	hash -r 2> /dev/null"
 	echo -e "fi"
+	echo -e "refresh"
 
 	exit
 fi

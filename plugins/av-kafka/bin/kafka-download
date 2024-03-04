@@ -36,7 +36,7 @@ if [[ ! -e $AV_ROOT/../support/${version} ]]; then
 
 	avAppendSystemPath
 	cd $AV_ROOT/.. && mkdir -p support && cd support && \
-		curl -o ${version}.tgz -# https://archive.apache.org/dist/kafka/${shortversion}/${version}.tgz && \
+		curl --max-time 900  -o ${version}.tgz -# https://archive.apache.org/dist/kafka/${shortversion}/${version}.tgz && \
 		tar xfz ${version}.tgz && \
 		rm ${version}.tgz
 

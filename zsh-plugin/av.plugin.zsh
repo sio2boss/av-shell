@@ -40,7 +40,7 @@ function update_current_av_vars() {
             fi
             
             # Mount the project
-            export AV_OLD_SYSTEM_PATH=/usr/local/bin:$PATH
+            export AV_OLD_SYSTEM_PATH=$PATH
             source <($AV_COMMAND activate)
         fi
 
@@ -64,6 +64,9 @@ function av() {
     if [[ $# -eq 0 ]]; then
         source <($AV_COMMAND deactivate)
         $AV_COMMAND
+        if [[ ! -z "$(which refresh | grep -v "not found")" ]]; then
+            refresh
+        fi
         return $?
     fi
 
@@ -77,6 +80,9 @@ function av() {
     if [[ ! -z "$__CURRENT_AV_STATUS" && -z "$AV_ROOT" ]]; then
         shift
         $AV_COMMAND "$@"
+        if [[ ! -z "$(which refresh | grep -v "not found")" ]]; then
+            refresh
+        fi
         return $?
     fi
 

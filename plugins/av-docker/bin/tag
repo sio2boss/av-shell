@@ -4,7 +4,21 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlagsPassThrough "$1" "docker" "Tag current container on a repository" "usage: tag <version>"
+avCheckHelpFlags "$1" "docker" "Tag current container on a repository" "\
+Usage: 
+
+    tag --name-override <version>
+
+        Resulting image: <repo>/<container>:<version>
+
+    tag --one-repo <version>
+
+        Resulting image: <repo>/<domain>:<container>-<version>
+
+    tag <version>
+
+        Resulting image: <repo>/<domain>/<container>:<version>
+"
 
 # Import system path
 avAppendSystemPath
@@ -47,6 +61,8 @@ if [[ $1 == "--name-override" ]]; then
 	shift
 	container_push=$repo/$exact_container:$*
 fi
+
+
 
 avCheckVerbose "docker tag $domain/$container ${container_push}"
 cd $AV_ROOT/.. && docker tag $domain/$container ${container_push}

@@ -12,21 +12,33 @@ avCheckHelpFlags "$1" "docker" "Enables remembering last hash from docker comman
 
 #### Put system commands here
 
-if [[ "$1" == "" ]]; then
-	echo -e "holdhash is set to: $(getpv holdhash)"
-	exit
+if [[ "$1" == "check" ]]; then
+	if [[ $(getpv holdhash) ]]; then
+		echo -e "holdhash is set to: ${bldgrn}On${txtrst}"
+	else
+		echo -e "holdhash is set to: ${bldgrn}Off${txtrst}"
+	fi
+	exit 0
 fi
 
 if [[ "$1" == "on" ]]; then
 	setpv "holdhash" "true"
-	exit
+	exit 0
 fi
 
 if [[ "$1" == "off" ]]; then
 	setpv "holdhash" "false"
-	exit
+	exit 0
 fi
 
-exit 1
+avAppendSystemPath
+CHOICE=$(gum confirm "Hold container hash mode?" --affirmative="On" --negative="Off")
+if [[ $? -eq 0 ]]; then
+	setpv "holdhash" "true"
+else
+	setpv "holdhash" "false"
+fi
+
+exit 0
 
 #### End commands
