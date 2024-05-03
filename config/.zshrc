@@ -7,6 +7,7 @@ export AV_INSTALLED_PLUGINS=$AV_INSTALLED_PATH/plugins
 export AV_CONFIG_DIR=$AV_INSTALLED_PATH/config
 export AV_BIN_DIR=$AV_ROOT/bin
 export AV_PROJ_TOP=$AV_ROOT/..
+export PROJECT_ROOT=$AV_ROOT/..
 
 # Figure out OS
 THIS_OS=`uname`
