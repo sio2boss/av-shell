@@ -11,6 +11,11 @@ $(gorun ~/.av/plugins/av-clusters/cmd/switch/main.go --help) \
 \n"
 
 #### Put system commands here
+folder=`getpv clusterdir`
+if [[ -z $folder ]]; then
+	folder="infrastructure"
+	setpv clusterdir infrastructure
+fi
 
 gorun ~/.av/plugins/av-clusters/cmd/switch/main.go
 

@@ -11,30 +11,33 @@ avCheckHelpFlags "$1" "av-web" "Run npm" "\n \
 avAppendSystemPath
 
 #### Put system commands here
-folders=`cd $AV_ROOT/.. && find -L . -name package.json | grep -v node_modules | grep -v venv | grep -v support | sed -e 's/\/package.json//g' -e 's/^.\///g'`
-count=`echo -e ${folders} | wc -l`
 hold=$(getpv holdweb)
-if [[ "$hold" == "true" ]]; then
+web_folder=`getpv folder`
+if [[ ! -z web_folder && "$hold" == "true" ]]; then
 	echo "Determined that holdweb is set to 'on', so using previous web folder"
-	folder=`getpv folder`
-elif [[ ${count} == 1 ]]; then
-	echo "Only one package.json found"
-	folder=${folders}
+else
+	folders=`findpackage.jsons`
+	count=`echo -e ${folders} | wc -l`
+	if [[ $count -eq 1 ]]; then
+		echo "Only one package.json found"
+		web_folder=$folders
+		setpv folder "$web_folder"
+	fi
 fi
 
-if [[ ! -z $folder ]]; then
-	echo -e "Running \'npm $*\' in ${folder}"
+if [[ ! -z $web_folder ]]; then
+	echo -e "Running 'npm $*' in ${web_folder}"
 	avRestoreSystemPath
-	cd $AV_ROOT/../${folder} && npm $*
+	cd $AV_ROOT/../${web_folder} && npm $*
 else
 	setpv folder ""
 	inquirer_menu folder ${folders}
 	sleep 1
-	folder=`getpv folder`
-	if [[ ! -z ${folder} ]]; then
-		echo -e "Running npm $* in ${folder}"
+	web_folder=`getpv folder`
+	if [[ ! -z ${web_folder} ]]; then
+		echo -e "Running npm $* in ${web_folder}"
 		avRestoreSystemPath
-		cd $AV_ROOT/../${folder} && npm $*
+		cd $AV_ROOT/../${web_folder} && npm $*
 	fi
 fi
 

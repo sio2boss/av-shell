@@ -18,8 +18,8 @@ avAppendSystemPath
 
 folder=`getpv clusterdir`
 if [[ -z $folder ]]; then
-	echo "Unable to find clusterdir variable...use 'setpv clusterdir xyz' to set"
-	exit 1
+	folder="infrastructure"
+	setpv clusterdir infrastructure
 fi
 account=`getpv account`
 if [[ -z $account ]]; then

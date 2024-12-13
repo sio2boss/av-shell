@@ -24,6 +24,9 @@ mkdir -p $AV_PROJECT_CONFIG_DIR/vars
 variable=$1
 shift
 selected=$(gum filter --placeholder "Pick a $variable..." --indicator ">" --height 10 --limit 1 "$@")
+if [[ $? -gt 0 || -z "${selected}" ]]; then
+    exit 1
+fi
 echo -n "$selected" > $AV_PROJECT_CONFIG_DIR/vars/$variable
 
 #### End commands

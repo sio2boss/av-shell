@@ -143,6 +143,7 @@ if [[ "$1" == "activate" ]]; then
 	echo -e "export AV_INTERACTIVE_MODE=\"mounted\""
 	echo -e "export AV_INSTALLED_PATH=$AV_INSTALLED_PATH"
 	echo -e "source $AV_INSTALLED_PATH/config/.zshrc"
+	echo -e "export AV_OLD_SYSTEM_PATH=\"$PATH\""
 	echo -e 'export PATH=$AV_BIN_DIR:${av_path}:$PATH'
 	echo -e "if [ -n \"${BASH:-}\" -o -n \"${ZSH_VERSION:-}\" ] ; then"
 	echo -e "	hash -r 2> /dev/null"

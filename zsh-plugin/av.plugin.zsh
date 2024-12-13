@@ -92,3 +92,5 @@ function av() {
         return 1
     fi
 }
+
+update_current_av_vars

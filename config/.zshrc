@@ -78,13 +78,10 @@ if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
     alias ln=`which ln 2> /dev/null`
     alias cat=`which cat 2> /dev/null`
 
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-
     # Set prompt to something short and different
-    export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin
+    export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin
 else
-    export PATH=$AV_BIN_DIR:${av_path}:$PATH
+    export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin:$PATH
 fi
 
 function av_project_prompt_inputs() {
@@ -199,36 +196,51 @@ function inventory_state() {
     fi
 }
 
+# Mise-en-place
+if [[ -e $AV_ROOT/../.mise.toml ]]; then
+    eval "$(mise activate zsh)"
+    eval "$(mise settings set experimental true)"
+fi
 
 # This loads nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+if [[ ! -e $AV_ROOT/../.mise.toml ]]; then
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+    # Auto load the right version of node
+    if [[ -e $AV_ROOT/../.nvmrc ]]; then
+        nvm use `cat $AV_ROOT/../.nvmrc`
+        export PATH=$PATH:$AV_ROOT/../node_modules/.bin
+    fi
+fi
 
 # Search for python env
-if [[ -e $AV_PROJ_TOP/.venv/bin/activate ]]; then
-    source $AV_PROJ_TOP/.venv/bin/activate
-    export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:$PATH
-elif [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then
-    source $AV_PROJ_TOP/venv/bin/activate
-    export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:$PATH
-fi
-if [[ -e $AV_PROJ_TOP/venv/conda-meta ]]; then
-    # >>> conda initialize >>>
-    # !! Contents within this block are managed by 'conda init' !!
-    __conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-    if [ $? -eq 0 ]; then
-        eval "$__conda_setup"
-    else
-        if [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
-            . "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
-        else
-            export PATH="/opt/homebrew/Caskroom/miniconda/base/bin:$PATH"
-        fi
+if [[ ! -e $AV_ROOT/../.mise.toml ]]; then
+    if [[ -e $AV_PROJ_TOP/.venv/bin/activate ]]; then
+        source $AV_PROJ_TOP/.venv/bin/activate
+        export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:$PATH
+    elif [[ -e $AV_PROJ_TOP/venv/bin/activate ]]; then
+        source $AV_PROJ_TOP/venv/bin/activate
+        export PATH=$AV_BIN_DIR:$VIRTUAL_ENV/bin:$PATH
     fi
-    unset __conda_setup
-    # <<< conda initialize <<<
-    export VIRTUAL_ENV="venv(conda)"
-    conda activate $AV_PROJ_TOP/venv
+    if [[ -e $AV_PROJ_TOP/venv/conda-meta ]]; then
+        # >>> conda initialize >>>
+        # !! Contents within this block are managed by 'conda init' !!
+        __conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+        if [ $? -eq 0 ]; then
+            eval "$__conda_setup"
+        else
+            if [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+                . "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+            else
+                export PATH="/opt/homebrew/Caskroom/miniconda/base/bin:$PATH"
+            fi
+        fi
+        unset __conda_setup
+        # <<< conda initialize <<<
+        export VIRTUAL_ENV="venv(conda)"
+        conda activate $AV_PROJ_TOP/venv
+    fi
 fi
 
 # Set tab title for iTerm2
