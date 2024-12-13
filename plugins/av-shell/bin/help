@@ -18,24 +18,33 @@ avRestoreSystemPath
 #### Put system commands here
 
 # Plugins / global commands
-export AV_SINGLE_LINE_HELP=true  
+export AV_SINGLE_LINE_HELP=true
 echo
-av_path="$AV_INSTALLED_BIN"
-for plugin in `ls -1 $AV_INSTALLED_PLUGINS`; do
-	plugin_dir=$AV_INSTALLED_PLUGINS/${plugin}/bin
-	if [ -d ${plugin_dir} ]; then
-		echo -e "Category ${txtred}$plugin${txtrst}:\n"
+if [ "$1" != "--full" ]; then
+    echo "To see the complete command set, add the --full flag."
+	echo
+else
+	av_path="$AV_INSTALLED_BIN"
+	for plugin in `ls -1 $AV_INSTALLED_PLUGINS`; do
+		plugin_dir=$AV_INSTALLED_PLUGINS/${plugin}/bin
+		if [ -d ${plugin_dir} ]; then
+			echo -e "Category ${txtred}$plugin${txtrst}:\n"
 
-		for command in `ls -1 ${plugin_dir}`; do
-			printf "    %-30s - %s\n" "$command" "$(${plugin_dir}/$command -h)"
-		done
+			for command in `ls -1 ${plugin_dir}`; do
+				printf "    %-30s - %s\n" "$command" "$(${plugin_dir}/$command -h)"
+			done
 
-		echo
-	fi
-done
+			echo
+		fi
+	done
+fi
 
 # Local commands
-echo -e "Category ${txtred}yours${txtrst}:\n"
+prompt="yours"
+if [ -f "$AV_ROOT/../.av/config/prompt" ]; then
+    prompt=$(cat $AV_ROOT/../.av/config/prompt)
+fi
+echo -e "Category ${txtred}${prompt}${txtrst}:\n"
 for command in ` ls -F $AV_BIN_DIR/ | grep -v '/'`; do
 		command=$(echo "${command}" | sed -e 's/\*$//')
     	if [[ -e $AV_BIN_DIR/$command ]]; then
@@ -45,6 +54,7 @@ done
 
 echo
 
-export AV_SINGLE_LINE_HELP=false 
+export AV_SINGLE_LINE_HELP=false
 
 #### End commands
+

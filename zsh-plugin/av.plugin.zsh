@@ -24,8 +24,8 @@ function chpwd_update_av_vars() {
 function update_current_av_vars() {
     unset __CURRENT_AV_STATUS
 
-    _AV_STATUS=`$AV_COMMAND status`
-    if [ ! -z ${_AV_STATUS} ]; then
+    _AV_STATUS=$(command $AV_COMMAND status 2>/dev/null)
+    if [ ! -z "${_AV_STATUS}" ]; then
 
         # We are in an av project directory
         __CURRENT_AV_STATUS="av"
@@ -36,17 +36,17 @@ function update_current_av_vars() {
 
             # Unmount existing
             if [[ -z "$AV_ROOT" ]]; then
-                source <($AV_COMMAND deactivate)
+                source <(command $AV_COMMAND deactivate 2>/dev/null)
             fi
             
             # Mount the project
             export AV_OLD_SYSTEM_PATH=$PATH
-            source <($AV_COMMAND activate)
+            source <(command $AV_COMMAND activate 2>/dev/null)
         fi
 
     elif [ ! -z "$AV_ROOT" ]; then
         # We are NOT in an av project directory
-        source <($AV_COMMAND deactivate)
+        source <(command $AV_COMMAND deactivate 2>/dev/null)
     fi
 }
 
