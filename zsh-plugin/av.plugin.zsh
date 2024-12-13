@@ -24,29 +24,28 @@ function chpwd_update_av_vars() {
 function update_current_av_vars() {
     unset __CURRENT_AV_STATUS
 
-    _AV_STATUS=$(command $AV_COMMAND status 2>/dev/null)
+    _AV_STATUS=$($AV_COMMAND status 2>/dev/null)
     if [ ! -z "${_AV_STATUS}" ]; then
 
         # We are in an av project directory
         __CURRENT_AV_STATUS="av"
 
-
-        # TODO: check if we have mounted this project and isn't already activated
+        # Check if we have mounted this project and isn't already activated
         if [[ "$AV_ROOT" != ${_AV_STATUS} ]]; then
 
             # Unmount existing
             if [[ -z "$AV_ROOT" ]]; then
-                source <(command $AV_COMMAND deactivate 2>/dev/null)
+                source <($AV_COMMAND deactivate 2>/dev/null)
             fi
             
             # Mount the project
             export AV_OLD_SYSTEM_PATH=$PATH
-            source <(command $AV_COMMAND activate 2>/dev/null)
+            source <($AV_COMMAND activate 2>/dev/null)
         fi
 
     elif [ ! -z "$AV_ROOT" ]; then
         # We are NOT in an av project directory
-        source <(command $AV_COMMAND deactivate 2>/dev/null)
+        source <($AV_COMMAND deactivate 2>/dev/null)
     fi
 }
 
@@ -57,7 +56,7 @@ function av_prompt_info() {
     fi
 }
 
-# Over ride av command with this plugin
+# Override av command with this plugin
 function av() {
 
     # If no args, launch interactive
