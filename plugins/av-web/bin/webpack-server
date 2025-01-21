@@ -11,31 +11,24 @@ avCheckHelpFlags "$1" "av-web" "Run webpack dev server" "\n \
 avAppendSystemPath
 
 #### Put system commands here
-folders=`cd $AV_ROOT/.. && find . -name webpack.*.js | grep -v node_modules | grep -v venv | grep -v support | sed -e 's/\/webpack..*.js//g' -e 's/^.\///g' | uniq`
-count=`echo -e "${folders}" | wc -l`
+
 hold=$(getpv holdweb)
 if [[ "$hold" == "true" ]]; then
-	echo "Determined that holdweb is set to 'on', so using previous web folder"
-	folder=`getpv folder`
-elif [[ ${count} == 1 ]]; then
-	echo "Only one webpack folder found"
-	folder=${folders}
+	
+	folder=$(getpv webfolder)
+	if [[ ! -z $folder ]]; then
+		echo -e "Web folder is not set, please use the ${bldpur}holdweb${txtrst} command to do so"
+		exit 1
+	fi
+
+	echo -e "Running guwebpacklp $* in ${folder}"
+	avRestoreSystemPath
+	cd $AV_ROOT/../${folder} && ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --color $*
+	exit $?
 fi
 
-if [[ ! -z $folder ]]; then
-	echo -e "Running webpack-dev-server --progress --color $* in ${folder}"
-	# avRestoreSystemPath
-	cd $AV_ROOT/../${folder} && ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --color $*
-else
-	setpv folder ""
-	inquirer_menu folder ${folders}
-	sleep 1
-	folder=`getpv folder`
-	if [[ ! -z ${folder} ]]; then
-		echo -e "Running webpack-dev-server --progress --color $* in ${folder}"
-		# avRestoreSystemPath
-		cd $AV_ROOT/../${folder} && ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --color $*
-	fi
-fi
+avRestoreSystemPath
+./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --color $*
+exit $?
 
 #### End commands

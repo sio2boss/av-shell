@@ -32,6 +32,10 @@ function avRestoreSystemPath
 {
 	export PATH=$AV_OLD_SYSTEM_PATH
 }
+function avRestorePreloadedPath
+{
+	export PATH=$AV_PRELOADED_PATH
+}
 
 # Restore system path
 function avAppendSystemPath

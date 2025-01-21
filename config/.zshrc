@@ -79,9 +79,9 @@ if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
     alias cat=`which cat 2> /dev/null`
 
     # Set prompt to something short and different
-    export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin
+    export PATH=/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin
 else
-    export PATH=$AV_BIN_DIR:${av_path}:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin:$PATH
+    export PATH=/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin:$PATH
 fi
 
 function av_project_prompt_inputs() {
@@ -180,7 +180,7 @@ function refresh () {
 }
 
 # Wrap commands that change .env files so reload always happens
-function switch() {   
+function switch() {
     $AV_INSTALLED_PLUGINS/av-clusters/bin/switch "$@"
     if [[ $? -eq 0 ]]; then
         refresh
@@ -242,6 +242,9 @@ if [[ ! -e $AV_ROOT/../.mise.toml ]]; then
         conda activate $AV_PROJ_TOP/venv
     fi
 fi
+
+export AV_PRELOADED_PATH=$PATH
+export PATH=$AV_BIN_DIR:${av_path}:$PATH
 
 # Set tab title for iTerm2
 echo -ne "\033]0;$p\007"

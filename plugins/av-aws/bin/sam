@@ -16,8 +16,10 @@ avCheckHelpFlags "$1" "av-aws" "Run serverless application model (SAM) on select
 # Get context
 context=`context`
 if [[ $? -ne 0 ]]; then
-	echo "Unable to determine context, please use 'switch' command to set."
-	exit 1
+	echo "Unable to determine context, please use 'switch' command to set. Assuming local directory"
+	avRestoreSystemPath
+	sam $*
+	exit $?
 fi
 
 build_args=""

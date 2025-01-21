@@ -5,26 +5,64 @@ source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
 avCheckHelpFlags "$1" "web" "Enables remembering last web folder from web commands" "\n \
-    Usage: holdweb [on|off].\n \
+    Usage: holdweb [on|off|check|up|update].\n \
 \n"
 
 #### Put system commands here
 
-if [[ "$1" == "" ]]; then
-	echo -e "holdweb is set to: $(getpv holdweb)"
-	exit
+# This function will set the webfolder persistant variable
+function set_webfolder() {
+	folders=`findpackage.jsons`
+	count=`echo -e "${folders}" | wc -l`
+	if [[ ${count} == 1 ]]; then
+		echo "Only one package.json found, in: ${folders}"
+		setpv webfolder ${folders}
+	else
+		setpv webfolder ""
+		inquirer_menu webfolder ${folders}
+	fi
+
+	folder=`getpv webfolder`
+
+}
+
+if [[ "$1" == "check" ]]; then
+	if [[ $(getpv holdweb) ]]; then
+		echo -e "holdweb is set to: ${bldgrn}On${txtrst}"
+		echo -e "webfolder is set to: ${bldblue}$(getpv webfolder)${txtrst}"
+	else
+		echo -e "holdweb is set to: ${bldgrn}Off${txtrst}"
+	fi
+	exit 0
 fi
+
+if [[ "$1" == "up" || "$1" == "update" ]]; then
+	set_webfolder
+	exit $?
+fi
+
 
 if [[ "$1" == "on" ]]; then
 	setpv "holdweb" "true"
-	exit
+	set_webfolder
+	exit 0
 fi
 
 if [[ "$1" == "off" ]]; then
 	setpv "holdweb" "false"
-	exit
+	exit 0
+fi
+
+avAppendSystemPath
+CHOICE=$(gum confirm "Hold web folder for commands related to node?" --affirmative="On" --negative="Off")
+if [[ $? -eq 0 ]]; then
+	setpv "holdweb" "true"
+	set_webfolder
+else
+	setpv "holdweb" "false"
 fi
 
 exit 1
+
 
 #### End commands

@@ -11,31 +11,24 @@ avCheckHelpFlags "$1" "av-web" "Run yarn" "\n \
 avAppendSystemPath
 
 #### Put system commands here
-folders=`cd $AV_ROOT/.. && find -L . -name package.json | grep -v node_modules | grep -v support | grep -v venv | sed -e 's/\/package.json//g' -e 's/^.\///g'`
-count=`echo -e "${folders}" | wc -l`
+
 hold=$(getpv holdweb)
 if [[ "$hold" == "true" ]]; then
-	echo "Determined that holdweb is set to 'on', so using previous web folder"
-	folder=`getpv folder`
-elif [[ ${count} == 1 ]]; then
-	echo "Only one package.json found"
-	folder=${folders}
-fi
+	
+	folder=$(getpv webfolder)
+	if [[ ! -z $folder ]]; then
+		echo -e "Web folder is not set, please use the ${bldpur}holdweb${txtrst} command to do so"
+		exit 1
+	fi
 
-if [[ ! -z $folder ]]; then
 	echo -e "Running yarn $* in ${folder}"
 	avRestoreSystemPath
 	cd $AV_ROOT/../${folder} && yarn $*
-else
-	setpv folder ""
-	inquirer_menu folder ${folders}
-	sleep 1
-	folder=`getpv folder`
-	if [[ ! -z ${folder} ]]; then
-		echo -e "Running yarn $* in ${folder}"
-		avRestoreSystemPath
-		cd $AV_ROOT/../${folder} && yarn $*
-	fi
+	exit $?
 fi
+
+avRestoreSystemPath
+yarn $*
+exit $?
 
 #### End commands

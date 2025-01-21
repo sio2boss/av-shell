@@ -21,12 +21,12 @@ else
 
     cpath=$(getpv containerdir)
     if [ ! -e "$cpath" ]; then
-            echo -e "${txtred}Unable to determine container_path, make sure you have set your 'containerdir' and 'container' vars${txtrst}"
-            exit
+        setpv containerdir containers
+        cpath="containers"
     fi
 
     list=""
-    list=`cd $AV_ROOT/../${cpath} && find . -name Dockerfile | sed -e "s/\.\///g" -e "s/^\///" -e "s/\/Dockerfile//g"`
+    list=$(cd "$AV_ROOT/../${cpath}" && find . \( -name Dockerfile -o -name docker-compose.yml \) -exec dirname {} \; | sed -e "s/^\.\///g" -e "s/^\///g" | sort -u)
     list="$list None"
     inquirer_menu container $list
 

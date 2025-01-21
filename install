@@ -118,14 +118,15 @@ fi
 output=$(cat ~/.zshrc | grep "~/.local/bin")
 if [[ $output != *"PATH"* ]]; then
     echo "export PATH=\$PATH:~/.local/bin" >> ~/.zshrc
+    export PATH=$PATH:~/.local/bin
 fi
 error_check $? "ensuring ~/.local/bin is on PATH"
 
 # Add go/bin path to PATH
-export PATH=$PATH:~/go/bin
 output=$(cat ~/.zshrc | grep "~/go/bin")
 if [[ $output != *"PATH"* ]]; then
     echo "export PATH=\$PATH:~/go/bin" >> ~/.zshrc
+    export PATH=$PATH:~/go/bin
 fi
 error_check $? "ensuring ~/go/bin is on PATH"
 
@@ -161,6 +162,7 @@ fi
 
 # Symlink av command
 INSTALL_DIR="$HOME/.local/bin"
+mkdir -p ${INSTALL_DIR} 2>&1
 rm -f ${INSTALL_DIR}/av > /dev/null 2>&1
 ln -s `pwd`/av ${INSTALL_DIR}/av > /dev/null 2>&1
 error_check $? "Creating symlink in ${txtpur}${INSTALL_DIR}${txtrst}"

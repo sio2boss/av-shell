@@ -11,6 +11,7 @@ avAppendSystemPath
 
 
 #### Put system commands here
+
 cd $AV_ROOT/.. && find . -name package.json | grep -v node_modules | grep -v support | grep -v venv | sed -e 's/\/package.json//g' -e 's/^.\///g'
 
 #### End commands
