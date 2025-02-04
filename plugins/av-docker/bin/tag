@@ -48,11 +48,16 @@ if [ -z $repo ]; then
 	exit 1
 fi
 
+if [[ ! -z $DEPLOYMENT_ENV ]]; then
+	container_domain=$container-$DEPLOYMENT_ENV
+else
+	container_domain=$container
+fi
 
-container_push=$repo/$domain/$container:$*
+container_push=$repo/$container_domain/$container:$*
 if [[ $1 == "--one-repo" ]]; then
 	shift
-	container_push=$repo/$domain:$container-$*
+	container_push=$repo/$container_domain:$container-$*
 fi
 
 if [[ $1 == "--name-override" ]]; then

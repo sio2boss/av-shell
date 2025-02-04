@@ -137,3 +137,12 @@ function activate_venv() {
         conda activate $AV_PROJ_TOP/venv
     fi
 }
+
+functionformat_args() {
+    local args="$1"
+    if [ ${#args} -gt 1 ]; then
+        echo " $args "
+    else
+        echo " "
+    fi
+}

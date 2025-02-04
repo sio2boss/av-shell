@@ -34,6 +34,11 @@ artifacts_url=$(getpv artifacts-url)
 if [[ ! -z "${artifacts_url}" ]]; then
 	build_args+=" --build-arg PIP_INDEX_URL=${artifacts_url}"
 fi
+artifacts_auth_token=$(getpv artifacts-token)
+if [[ ! -z "${artifacts_auth_token}" ]]; then
+	export CODEARTIFACT_AUTH_TOKEN=${artifacts_auth_token}
+	build_args+=" --build-arg CODEARTIFACT_URL=${artifacts_url} --secret id=codeartifact-auth-token,env=CODEARTIFACT_AUTH_TOKEN --build-arg NPM_TOKEN=$NPM_TOKEN"
+fi
 
 
 avCheckVerbose "docker build $@ ${build_args} -t $domain/$container ."
