@@ -20,7 +20,7 @@ if [[ "$hold" == "true" ]]; then
 		exit 1
 	fi
 
-	echo -e "Running npx $* in ${folder}"
+	echo -e "Running npx$(format_args "$*")in ${folder}"
 	avRestorePreloadedPath
 	cd $AV_ROOT/../${folder} && npx $*
 	exit $?

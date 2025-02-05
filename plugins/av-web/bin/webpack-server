@@ -16,18 +16,18 @@ hold=$(getpv holdweb)
 if [[ "$hold" == "true" ]]; then
 	
 	folder=$(getpv webfolder)
-	if [[ ! -z $folder ]]; then
+	if [[ -z $folder ]]; then
 		echo -e "Web folder is not set, please use the ${bldpur}holdweb${txtrst} command to do so"
 		exit 1
 	fi
 
-	echo -e "Running guwebpacklp $* in ${folder}"
-	avRestoreSystemPath
+	echo -e "Running webpack dev server in ${folder}"
+	avRestorePreloadedPath
 	cd $AV_ROOT/../${folder} && ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --color $*
 	exit $?
 fi
 
-avRestoreSystemPath
+avRestorePreloadedPath
 ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --color $*
 exit $?
 

@@ -16,4 +16,4 @@ av-shell*.tar.gz
 config/.zsh_history
 config/.zcompdump
 .zsh_history
-plugins/av-pagos
+example/
