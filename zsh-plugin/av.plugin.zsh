@@ -1,7 +1,10 @@
 # AV Plugin from:
 export __AV_PROMPT_DIR=$ZSH/plugins/av
-AV_COMMAND=`which av`
-if [ -z "$AV_COMMAND" ]; then
+if [ -f ~/.local/bin/av ]; then
+    AV_COMMAND=~/.local/bin/av
+elif [ -f /usr/local/bin/av ]; then
+    AV_COMMAND=/usr/local/bin/av
+else
     return
 fi
 
