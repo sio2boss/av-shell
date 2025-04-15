@@ -1,0 +1,23 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "docker" "Enables remembering last web folder from web commands" "\n \
+    Usage: holdweb [set].\n \
+\n"
+
+#### Put system commands here
+
+# This function will set the webfolder persistant variable
+if [[ "$1" == "set" ]]; then
+	setpv "container_provider" "$2"
+	exit 0
+fi
+echo $(getpv container_provider)
+
+exit 1
+
+
+#### End commands

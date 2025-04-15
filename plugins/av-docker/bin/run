@@ -6,10 +6,13 @@ source $AV_CONFIG_DIR/default_imports
 # Check for a help flag
 avCheckHelpFlagsPassThrough "$1" "docker" "Run a command in a new container" "docker run --help"
 
-# Import system path
-avAppendSystemPath
-
 #### Put system commands here
+
+# Get container provider, default to docker if not set
+provider=$(container_provider)
+if [ -z "$provider" ]; then
+    provider="docker"
+fi
 
 domain=$(cat $AV_PROJECT_CONFIG_DIR/prompt | sed "s/\ /\_/g")
 if [ -z $domain ]; then
@@ -47,15 +50,18 @@ fi
 # Force resolution of pwd to allow relative paths with Docker
 options=$(cd ${container_path} && bash -c "echo ${options}")
 
+# Import system path
+avAppendSystemPath
+
 # Run
-avCheckVerbose "docker run ${options} ${domain}/${container} $@"
-cd ${container_path} && docker run ${options} ${domain}/${container} "$@"
+avCheckVerbose "$provider run ${options} ${domain}/${container} $@"
+cd ${container_path} && $provider run ${options} ${domain}/${container} "$@"
 STATUS=$?
 
 # Capture the hash
 holdhash=$(getpv holdhash)
 if [[ "${holdhash}" == "true" ]]; then
-	setpv "lasthash" "`docker ps -l -q`"
+	setpv "lasthash" "`$provider ps -l -q`"
 fi
 
 exit $STATUS
