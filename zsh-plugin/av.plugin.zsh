@@ -17,6 +17,18 @@ typeset -ga chpwd_functions
 # Append functions needed for mounting and unmounting av projects.
 chpwd_functions+='chpwd_update_av_vars'
 
+# Add a precmd hook to ensure update_current_av_vars is called after shell initialization
+typeset -ga precmd_functions
+precmd_functions+='precmd_update_av_vars'
+
+function precmd_update_av_vars() {
+    # Only run once during shell initialization
+    if [[ -z "$__AV_INITIALIZED" ]]; then
+        update_current_av_vars
+        export __AV_INITIALIZED=1
+    fi
+}
+
 
 # when we change working directory mount or unmount av
 function chpwd_update_av_vars() {
@@ -37,7 +49,7 @@ function update_current_av_vars() {
         if [[ "$AV_ROOT" != ${_AV_STATUS} ]]; then
 
             # Unmount existing
-            if [[ -z "$AV_ROOT" ]]; then
+            if [[ ! -z "$AV_ROOT" ]]; then
                 source <($AV_COMMAND deactivate 2>/dev/null)
             fi
             
@@ -94,5 +106,3 @@ function av() {
         return 1
     fi
 }
-
-update_current_av_vars
