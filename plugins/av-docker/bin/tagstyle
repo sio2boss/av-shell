@@ -1,0 +1,72 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "docker" "Enables remembering tag style for docker tag/push commands" "\n \
+    Usage: tagstyle [with-domain|one-repo|sans-domain|check|list]\n \
+\n \
+    with-domain    - Use format: <repo>/<domain>/<container>:<version>\n \
+    one-repo       - Use format: <repo>/<domain>:<container>-<version>\n \
+    sans-domain    - Use format: <repo>/<container>:<version>\n \
+    check          - Display current setting\n \
+    list           - List all available formats with examples\n \
+\n"
+
+#### Put system commands here
+
+# Function to show available formats
+show_formats() {
+    echo -e "\nAvailable tag style formats:\n"
+    echo -e "${bldwht}with-domain${txtrst}"
+    echo -e "Format: <repo>/<domain>/<container>:<version>"
+    echo -e "Example: registry.example.com/myapp/frontend:1.0.0\n"
+    
+    echo -e "${bldwht}one-repo${txtrst}"
+    echo -e "Format: <repo>/<domain>:<container>-<version>"
+    echo -e "Example: registry.example.com/myapp:frontend-1.0.0\n"
+    
+    echo -e "${bldwht}sans-domain${txtrst}"
+    echo -e "Format: <repo>/<container>:<version>"
+    echo -e "Example: registry.example.com/frontend:1.0.0\n"
+}
+
+if [[ "$1" == "list" ]]; then
+    show_formats
+    exit 0
+fi
+
+if [[ "$1" == "check" ]]; then
+    tag_style=$(getpv tagstyle)
+    if [[ -z "$tag_style" ]]; then
+        echo -e "Tag style is set to: ${bldgrn}with-domain${txtrst} (default)"
+    else
+        echo -e "Tag style is set to: ${bldgrn}${tag_style}${txtrst}"
+    fi
+    exit 0
+fi
+
+if [[ "$1" == "with-domain" || "$1" == "one-repo" || "$1" == "sans-domain" ]]; then
+    setpv "tagstyle" "$1"
+    echo -e "Tag style set to: ${bldgrn}$1${txtrst}"
+    exit 0
+fi
+
+# If no argument provided, show formats and interactive menu
+if [[ $# -eq 0 ]]; then
+    show_formats
+    echo -e "Choose a format:\n"
+    
+    avAppendSystemPath
+    CHOICE=$(gum choose "with-domain" "one-repo" "sans-domain")
+    if [[ $? -eq 0 ]]; then
+        setpv "tagstyle" "$CHOICE"
+        echo -e "Tag style set to: ${bldgrn}${CHOICE}${txtrst}"
+        exit 0
+    fi
+fi
+
+exit 1
+
+#### End commands
