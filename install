@@ -213,6 +213,9 @@ fi
 echo
 echo "Next steps:"
 echo ""
-echo "1. 'source ~/.zshrc' to reload your shell"
-echo "2. In your favorite project directory run 'av init' to setup the project"
+echo "1. Restart the shell to apply changes"
+echo "2. Change directory to your favorite project, run 'av init' to setup the project ONCE"
+echo "   (this will create a .av directory with configuration files)"
+echo "   If an existing project, run 'av' to enter the project specific shell"
+echo "3. Run 'help' to see available commands"
 echo
