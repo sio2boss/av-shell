@@ -13,10 +13,10 @@ avCheckHelpFlags "$1" "av-aws" "Run serverless application model (SAM) on select
 
 #### Put system commands here
 
-# Get context
-context=`context`
+# Get cluster
+context=`cluster`
 if [[ $? -ne 0 ]]; then
-	echo "Unable to determine context, please use 'switch' command to set. Assuming local directory"
+	echo "Unable to determine cluster, please use 'switch' command to set. Assuming local directory"
 	avRestoreSystemPath
 	sam $*
 	exit $?

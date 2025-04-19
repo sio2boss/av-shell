@@ -14,10 +14,10 @@ avCheckHelpFlags "$1" "builtin" "Starts sshuttle via inventory.json" "\n \
 #### Put system commands here
 avAppendSystemPath
 
-# Get context
-context=`context`
+# Get cluster
+context=`cluster`
 if [[ $? -ne 0 ]]; then
-	echo "Unable to determine context, please use 'switch' command to set."
+	echo "Unable to determine cluster, please use 'switch' command to set."
 	exit 1
 fi
 

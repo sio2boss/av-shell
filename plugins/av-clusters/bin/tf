@@ -12,9 +12,9 @@ $(terraform -help)\
 #### Put system commands here
 # Get context
 ACCOUNT=$(getpv account)
-context=`context`
+context=`cluster`
 if [[ $? -ne 0 ]]; then
-	echo "Unable to determine context, please use 'switch' command to set."
+	echo "Unable to determine cluster, please use 'switch' command to set."
 	exit 1
 fi
 

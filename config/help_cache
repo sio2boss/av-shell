@@ -1,0 +1,144 @@
+#!/bin/bash
+
+# Function to generate hash for plugins
+generate_plugins_hash() {
+    local hash=""
+    for plugin in `ls -1 $AV_INSTALLED_PLUGINS`; do
+        plugin_dir=$AV_INSTALLED_PLUGINS/${plugin}/bin
+        if [ -d ${plugin_dir} ]; then
+            # Get modification times of all files in the plugin's bin directory
+            local plugin_hash=$(find ${plugin_dir} -type f -exec stat -f "%m" {} \; | sort | md5)
+            hash="${hash}${plugin_hash}"
+        fi
+    done
+    echo "$hash" | md5
+}
+
+# Function to generate hash for local commands
+generate_local_hash() {
+    if [ -d "$AV_BIN_DIR" ]; then
+        find "$AV_BIN_DIR" -type f -exec stat -f "%m" {} \; | sort | md5
+    else
+        echo "no_local_commands"
+    fi
+}
+
+# Function to generate and cache plugin help output
+generate_plugins_cache() {
+    local full_flag=$1
+    local cache_file=$GLOBAL_CACHE
+    
+    # Generate the plugin help output and save to cache
+    {
+        # Plugins / global commands
+        export AV_SINGLE_LINE_HELP=true
+        echo
+        av_path="$AV_INSTALLED_BIN"
+        for plugin in `ls -1 $AV_INSTALLED_PLUGINS`; do
+            plugin_dir=$AV_INSTALLED_PLUGINS/${plugin}/bin
+            if [ -d ${plugin_dir} ]; then
+                echo -e "Category ${txtred}$plugin${txtrst}:\n"
+
+                for command in `ls -1 ${plugin_dir}`; do
+                    printf "    %-30s - %s\n" "$command" "$(${plugin_dir}/$command -h)"
+                done
+
+                echo
+            fi
+        done
+    } > "$cache_file"
+    
+    # Save the current plugins hash
+    generate_plugins_hash > "$PLUGINS_HASH_FILE"
+}
+
+# Function to generate and cache local command help output
+generate_local_cache() {
+    local full_flag=$1
+    local cache_file=$LOCAL_CACHE
+       
+    # Generate the local help output and save to cache
+    {
+        # Local commands
+        prompt="yours"
+        if [ -f "$AV_ROOT/../.av/config/prompt" ]; then
+            prompt=$(cat $AV_ROOT/../.av/config/prompt)
+        fi
+        echo -e "Category ${txtred}${prompt}${txtrst}:\n"
+        for command in ` ls -F $AV_BIN_DIR/ | grep -v '/'`; do
+                command=$(echo "${command}" | sed -e 's/\*$//')
+                if [[ -e $AV_BIN_DIR/$command ]]; then
+                    printf "    %-30s - %s\n" "$command" "`$AV_BIN_DIR/$command -h`"
+                fi
+        done
+
+        echo
+    } > "$cache_file"
+    
+    # Save the current local hash
+    generate_local_hash > "$LOCAL_HASH_FILE"
+}
+
+# Check if we need to regenerate the plugins cache
+should_regenerate_plugins_cache() {
+    local flag=$1
+    local cache_file=$PLUGINS_CACHE
+    
+    # If refresh flag is passed, always regenerate
+    if [ "$flag" == "--refresh" ]; then
+        return 0
+    fi
+    
+    # If cache doesn't exist, regenerate
+    if [ ! -f "$cache_file" ]; then
+        return 0
+    fi
+    
+    # If hash file doesn't exist, regenerate
+    if [ ! -f "$PLUGINS_HASH_FILE" ]; then
+        return 0
+    fi
+    
+    # Check if plugins have changed
+    local current_plugins_hash=$(generate_plugins_hash)
+    local cached_plugins_hash=$(cat "$PLUGINS_HASH_FILE")
+    
+    if [ "$current_plugins_hash" != "$cached_plugins_hash" ]; then
+        return 0
+    fi
+    
+    # Cache is valid
+    return 1
+}
+
+# Check if we need to regenerate the local cache
+should_regenerate_local_cache() {
+    local flag=$1
+    local cache_file=$LOCAL_CACHE
+    
+    # If refresh flag is passed, always regenerate
+    if [ "$flag" == "--refresh" ]; then
+        return 0
+    fi
+    
+    # If cache doesn't exist, regenerate
+    if [ ! -f "$cache_file" ]; then
+        return 0
+    fi
+    
+    # If hash file doesn't exist, regenerate
+    if [ ! -f "$LOCAL_HASH_FILE" ]; then
+        return 0
+    fi
+    
+    # Check if local commands have changed
+    local current_local_hash=$(generate_local_hash)
+    local cached_local_hash=$(cat "$LOCAL_HASH_FILE")
+    
+    if [ "$current_local_hash" != "$cached_local_hash" ]; then
+        return 0
+    fi
+    
+    # Cache is valid
+    return 1
+}
