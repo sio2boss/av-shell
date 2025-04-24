@@ -13,12 +13,9 @@ avCheckHelpFlags "$1" "docker" "Choose a docker container to operate on" "\n \
 avAppendSystemPath
 
 #### Put system commands here
-if [ $# -eq 1 ]; then
-    
+if [ $# -ge 1 ]; then
     setpv container $1
-
 else
-
     cpath=$(getpv containerdir)
     if [ ! -e "$cpath" ]; then
         setpv containerdir containers
@@ -29,7 +26,6 @@ else
     list=$(cd "$AV_ROOT/../${cpath}" && find . \( -name Dockerfile -o -name docker-compose.yml \) -exec dirname {} \; | sed -e "s/^\.\///g" -e "s/^\///g" | sort -u)
     list="$list None"
     inquirer_menu container $list
-
 fi
 
 if [[ ! -z $(getpv container) ]]; then

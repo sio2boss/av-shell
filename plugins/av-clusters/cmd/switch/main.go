@@ -95,7 +95,20 @@ Options:
 	arguments, _ := docopt.ParseArgs(usage, osargs, "1.0")
 
 	var config context
-	arguments.Bind(&config)
+	// Check if any arguments were provided
+	hasArgs := false
+	if account, ok := arguments["--account"].(string); ok && account != "" {
+		config.Account = account
+		hasArgs = true
+	}
+	if env, ok := arguments["--env"].(string); ok && env != "" {
+		config.Env = env
+		hasArgs = true
+	}
+	if cluster, ok := arguments["--cluster"].(string); ok && cluster != "" {
+		config.Cluster = cluster
+		hasArgs = true
+	}
 
 	// Find cluster directory
 
@@ -106,7 +119,7 @@ Options:
 	var clusterdir = string(contents)
 
 	var sel_ctx context
-	if config.Account != "" && config.Env != "" && config.Cluster != "" {
+	if hasArgs && config.Account != "" && config.Env != "" && config.Cluster != "" {
 		sel_ctx = config
 	} else {
 

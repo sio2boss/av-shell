@@ -5,14 +5,22 @@ txtgrn="\033[0;32m"       # green
 bldgrn="\033[1;32m"       # bold green
 txtrst="\033[0m"          # Text reset
 
-export GUM_FORMAT_THEME="dark"
-export GUM_INPUT_CURSOR_FOREGROUND="#00FF00"
-export GUM_INPUT_PROMPT_FOREGROUND="#00FF00"
-export GUM_CHOOSE_CURSOR_FOREGROUND="#00FF00"
-export GUM_CHOOSE_HEADER_FOREGROUND="#00FF00"
-export GUM_SPIN_SPINNER_FOREGROUND="#00FF00"
-export GUM_CONFIRM_SELECTED_BACKGROUND="#00FF00"
-export GUM_CONFIRM_SELECTED_FOREGROUND="#000000"
+# Detect CI environment
+if [[ -n "${CI}" || -n "${GITHUB_ACTIONS}" ]]; then
+    export AV_CI_MODE="true"
+fi
+
+# Only set GUM settings in interactive mode
+if [[ -z "${AV_CI_MODE}" ]]; then
+    export GUM_FORMAT_THEME="dark"
+    export GUM_INPUT_CURSOR_FOREGROUND="#00FF00"
+    export GUM_INPUT_PROMPT_FOREGROUND="#00FF00"
+    export GUM_CHOOSE_CURSOR_FOREGROUND="#00FF00"
+    export GUM_CHOOSE_HEADER_FOREGROUND="#00FF00"
+    export GUM_SPIN_SPINNER_FOREGROUND="#00FF00"
+    export GUM_CONFIRM_SELECTED_BACKGROUND="#00FF00"
+    export GUM_CONFIRM_SELECTED_FOREGROUND="#000000"
+fi
 
 # Get the absolute path of the executable
 # function realpath {
@@ -183,27 +191,31 @@ fi
 # Change dir to script root
 cd $AV_ROOT/.. > /dev/null
 
+
 # If there are arguments, just run them rather than opening a shell
 if [[ $# -eq 0 ]]; then
 
 	FORCED_COMMAND=""
 
-	CURRENT_DATE=`date +%s`
-	if [[ ! -e $AV_INSTALLED_PATH/config/update_checked ]]; then
-		echo -n "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
-	else
-		LAST_CHECKED=`cat $AV_INSTALLED_PATH/config/update_checked`
-		if [[ `expr ${CURRENT_DATE} - ${LAST_CHECKED}` -gt 1728000 ]]; then
+	# Skip update check in CI mode
+	if [[ -z "${AV_CI_MODE}" ]]; then
+		CURRENT_DATE=`date +%s`
+		if [[ ! -e $AV_INSTALLED_PATH/config/update_checked ]]; then
 			echo -n "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
-			gum format -t markdown -- "# AV-SHELL"
-			gum confirm "  Would you like to check for updates?"
-			if [[ $? -eq 0 ]]; then
-				AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
-				AV_INTERACTIVE_MODE="single" \
-				AV_ROOT=$AV_ROOT \
-				PATH=$AV_ROOT/bin:$PATH \
-				ZDOTDIR=$AV_INSTALLED_PATH/config \
-				zsh -i -c upgrade
+		else
+			LAST_CHECKED=`cat $AV_INSTALLED_PATH/config/update_checked`
+			if [[ `expr ${CURRENT_DATE} - ${LAST_CHECKED}` -gt 1728000 ]]; then
+				echo -n "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
+				gum format -t markdown -- "# AV-SHELL"
+				gum confirm "  Would you like to check for updates?"
+				if [[ $? -eq 0 ]]; then
+					AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+					AV_INTERACTIVE_MODE="single" \
+					AV_ROOT=$AV_ROOT \
+					PATH=$AV_ROOT/bin:$PATH \
+					ZDOTDIR=$AV_INSTALLED_PATH/config \
+					zsh -i -c upgrade
+				fi
 			fi
 		fi
 	fi
@@ -213,7 +225,7 @@ if [[ $# -eq 0 ]]; then
 	AV_INTERACTIVE_MODE="interactive" \
 	AV_ROOT=$AV_ROOT \
 	ZDOTDIR=$AV_INSTALLED_PATH/config \
-	zsh ${FORCED_COMMAND}
+	zsh -i ${FORCED_COMMAND}
 
 elif [[ "$1" == "update" || "$1" == "upgrade" ]]; then
 
@@ -225,7 +237,9 @@ elif [[ "$1" == "update" || "$1" == "upgrade" ]]; then
 	ZDOTDIR=$AV_INSTALLED_PATH/config \
 	zsh -i -c "upgrade $@"
 
-else
+elif [[ ! -z "${AV_CI_MODE}" ]]; then
+
+	echo "CI MODE: $@"
 
 	# Run command in shell
 	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
@@ -233,7 +247,16 @@ else
 	AV_ROOT=$AV_ROOT \
 	PATH=$AV_ROOT/bin:$PATH \
 	ZDOTDIR=$AV_INSTALLED_PATH/config \
-		zsh -i -c "$@"
+	zsh -fd -c 'source $AV_INSTALLED_PATH/config/.zshrc && "$@"' - "$@"
+
+else
+
+	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+	AV_INTERACTIVE_MODE="single" \
+	AV_ROOT=$AV_ROOT \
+	PATH=$AV_ROOT/bin:$PATH \
+	ZDOTDIR=$AV_INSTALLED_PATH/config \
+	zsh -i -c "$@"
 
 fi
 

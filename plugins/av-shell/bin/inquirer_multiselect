@@ -24,6 +24,14 @@ mkdir -p $AV_PROJECT_CONFIG_DIR/vars
 
 variable=$1
 shift
+ 
+# In CI mode or non-interactive, disable the command
+if [[ -n "${AV_CI_MODE}" ]]; then
+    echo "$0 disabled in CI mode"
+    exit 1
+fi
+
+# Interactive mode
 echo -e "${txtgry}> Pick values for $variable...${txtrst}"
 selected=$(gum choose --cursor "> " --cursor-prefix "[•] " --selected-prefix "[*] " --unselected-prefix "[ ] " --no-limit "$@")
 echo -n "$selected" > $AV_PROJECT_CONFIG_DIR/vars/$variable

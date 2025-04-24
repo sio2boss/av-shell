@@ -23,6 +23,14 @@ fi
 mkdir -p $AV_PROJECT_CONFIG_DIR/vars
 variable=$1
 shift
+
+# In CI mode or non-interactive, disable the command
+if [[ -n "${AV_CI_MODE}" ]]; then
+    echo "$0 disabled in CI mode"
+    exit 1
+fi
+
+# Interactive mode
 selected=$(gum filter --placeholder "Pick a $variable..." --indicator ">" --height 10 --limit 1 "$@")
 if [[ $? -gt 0 || -z "${selected}" ]]; then
     exit 1

@@ -17,6 +17,6 @@ if [[ -z $folder ]]; then
 	setpv clusterdir infrastructure
 fi
 
-gorun ~/.av/plugins/av-clusters/cmd/switch/main.go
+gorun ~/.av/plugins/av-clusters/cmd/switch/main.go "$@"
 
 #### End commands

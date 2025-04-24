@@ -21,6 +21,20 @@ done
 # Bring in color
 source $AV_CONFIG_DIR/color
 
+
+# Make an alias so that help can run
+alias help='$AV_INSTALLED_PATH/plugins/av-shell/bin/help'
+alias team='$AV_INSTALLED_PATH/plugins/av-shell/bin/squad'
+alias update='$AV_INSTALLED_PATH/plugins/av-shell/bin/upgrade'
+alias get_tag_from_commit='$AV_INSTALLED_PATH/plugins/av-shell/bin/codehash'
+alias rm=`which rm 2> /dev/null`
+alias bash=`which bash 2> /dev/null`
+alias java=`which java 2> /dev/null`
+alias ln=`which ln 2> /dev/null`
+alias cat=`which cat 2> /dev/null`
+alias ls=`which ls 2> /dev/null`
+
+
 if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
 
     # set a fancy prompt (non-color, unless we know we "want" color)
@@ -60,27 +74,15 @@ if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
         bindkey "${terminfo[kcud1]}" down-line-or-beginning-search
     fi
 
-    
     # leave some commands out of history log
     export HISTIGNORE="&:bg:fg:ll:h:??:[ ]*:clear:exit:logout"
     export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
     export HISTTIMEFORMAT="%H:%M > "
 
-    # Make an alias so that help can run
-    alias help='$AV_INSTALLED_PATH/plugins/av-shell/bin/help'
-    alias team='$AV_INSTALLED_PATH/plugins/av-shell/bin/squad'
-    alias update='$AV_INSTALLED_PATH/plugins/av-shell/bin/upgrade'
-    alias get_tag_from_commit='$AV_INSTALLED_PATH/plugins/av-shell/bin/codehash'
-    alias ls=`which ls 2> /dev/null`
-    alias rm=`which rm 2> /dev/null`
-    alias bash=`which bash 2> /dev/null`
-    alias java=`which java 2> /dev/null`
-    alias ln=`which ln 2> /dev/null`
-    alias cat=`which cat 2> /dev/null`
-
     # Set prompt to something short and different
     export PATH=/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin
 else
+    # Minimal setup for non-interactive/CI mode
     export PATH=/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin/:~/.local/bin:~/go/bin:$PATH
 fi
 
@@ -131,7 +133,6 @@ function context_prompts() {
     fi
     echo -e -n "$container"
 
-
     if [[ ! -z $role && (! -z $cluster || ! -z $container) ]]; then
         echo -e -n "|"
     fi
@@ -141,7 +142,6 @@ function context_prompts() {
         echo -e -n "|"
     fi
     echo -e -n "$topic"
-
 
     echo -e -n "]"
 }
@@ -249,8 +249,10 @@ fi
 export AV_PRELOADED_PATH=$PATH
 export PATH=$AV_BIN_DIR:${av_path}:$PATH
 
-# Set tab title for iTerm2
-echo -ne "\033]0;$p\007"
+# Set tab title for iTerm2 only in interactive mode
+if [[ -z "${AV_CI_MODE}" ]]; then
+    echo -ne "\033]0;$p\007"
+fi
 
 # Welcome
 if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
