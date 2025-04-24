@@ -20,4 +20,11 @@ echo
 
 cd $AV_CONFIG_DIR/../ && zsh ./install "$@"
 
+# Clear global help cache after upgrade
+GLOBAL_CACHE_DIR="$AV_INSTALLED_PATH/.cache"
+if [ -d "$GLOBAL_CACHE_DIR" ]; then
+    echo -e "Clearing global help cache..."
+    rm -f "$GLOBAL_CACHE_DIR/plugins_help_cache"
+fi
+
 #### End commands

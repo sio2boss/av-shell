@@ -4,35 +4,53 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlagsPassThrough "$1" "docker" "Build an image from a Dockerfile" "docker build --help"
+avCheckHelpFlags "$1" "docker" "Build a container from a Dockerfile" "\
+Usage: 
 
-# Import system path
-avAppendSystemPath
+    build --name-override <name>
+
+        Resulting image: <repo>/<name>
+
+    build --one-repo
+
+        Resulting image: <repo>/<domain>:<container>
+
+    build
+
+        Resulting image: <repo>/<domain>/<container>
+"
+
 
 #### Put system commands here
+
+# Get container provider, default to docker if not set
+provider=$(container_provider)
+if [ -z "$provider" ]; then
+    provider="docker"
+fi
 
 domain=$(cat $AV_PROJECT_CONFIG_DIR/prompt | sed "s/\ /\_/g")
 if [ -z $domain ]; then
 	echo -e "${txtred}Unable to understand prompt text as docker domain${txtrst}"
 	exit 1
 fi
+
 container=$(getpv container)
 if [ -z $container ]; then
-	echo -e "${txtred}Unable to determine which container you are working on, use setpv container${txtrst}"
+	echo -e "${txtred}Set your container context via \'choose\'${txtrst}"
 	exit 1
 fi
 
-cpath=$(container_path)
-if [ ! -e "$cpath" ]; then
-	echo -e "${txtred}Unable to determine container_path, make sure you have set 'containerdir' and 'container' vars${txtrst}"
+container_path=$(container_path)
+if [ -z $container_path ]; then
+	echo -e "${txtred}Unable to find container path${txtrst}"
 	exit 1
 fi
 
-cachedate=$(date +%s)
-build_args="--build-arg CACHE_DATE=${cachedate}"
-artifacts_url=$(getpv artifacts-url)
-if [[ ! -z "${artifacts_url}" ]]; then
-	build_args+=" --build-arg PIP_INDEX_URL=${artifacts_url}"
+if [[ ! -z $DEPLOYMENT_ENV ]]; then
+	container_domain=$container-$DEPLOYMENT_ENV
+else
+	container_domain=$container
 fi
 artifacts_auth_token=$(getpv artifacts-token)
 if [[ ! -z "${artifacts_auth_token}" ]]; then
@@ -40,10 +58,21 @@ if [[ ! -z "${artifacts_auth_token}" ]]; then
 	build_args+=" --build-arg CODEARTIFACT_URL=${artifacts_url} --secret id=codeartifact-auth-token,env=CODEARTIFACT_AUTH_TOKEN --build-arg NPM_TOKEN=$NPM_TOKEN"
 fi
 
+container_tag=$domain/$container
+if [[ $1 == "--one-repo" ]]; then
+	container_tag=$container_domain:$container
+fi
 
-avCheckVerbose "docker build $@ ${build_args} -t $domain/$container ."
-cd $(container_path) && docker build $@ ${build_args} -t $domain/$container .
+if [[ $1 == "--name-override" ]]; then
+	shift
+	container_tag=$1
+fi
 
+# Import system path
+avAppendSystemPath
+
+avCheckVerbose "$provider build -t $container_tag $container_path"
+cd $AV_ROOT/.. && $provider build -t $container_tag $container_path
 exit $?
 
 #### End commands

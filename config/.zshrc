@@ -161,9 +161,18 @@ function av_docker_context_prompt_inputs() {
     fi
 }
 
+# Unset all variables from a .env file
+function unset_env_vars() {
+    if [[ -f .env ]]; then
+        for var in $(grep -v '^#' .env | cut -d= -f1); do
+            unset "$var"
+        done
+    fi
+}
+
 # Support .env.*
 function refresh () {
-    if [[ -f .env ]]; then
+    if [[ -f .env ]]; then        
         unamestr=$(uname)
         if [ "$unamestr" = 'Linux' ]; then
             if [[ "$AV_INTERACTIVE_MODE" == "interactive" && -z "$1" ]]; then
@@ -181,17 +190,11 @@ function refresh () {
 
 # Wrap commands that change .env files so reload always happens
 function switch() {
+    # Unset environment variables from current .env file before switching
+    unset_env_vars
+    
     $AV_INSTALLED_PLUGINS/av-clusters/bin/switch "$@"
     if [[ $? -eq 0 ]]; then
-        refresh
-    fi
-}
-
-
-function inventory_state() {
-    $AV_INSTALLED_PLUGINS/av-pagos/bin/inventory_state "$@"
-    if [[ $? -eq 0 && "$1" == "restore" ]]; then
-        sleep 1
         refresh
     fi
 }

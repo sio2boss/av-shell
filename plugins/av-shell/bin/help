@@ -10,51 +10,85 @@ each command produce a single line of help.  We section\n \
 by the folders under .av/bin/.\n \
 \n"
 
-$AV_CONFIG_DIR/welcome
-
 # Import system path
 avRestoreSystemPath
 
-#### Put system commands here
+# Import help cache functions
+source $AV_CONFIG_DIR/help_cache
 
-# Plugins / global commands
+# Ensure AV_INSTALLED_PATH is set for global plugins
+if [ -z "$AV_INSTALLED_PATH" ]; then
+    # If not set, try to determine it
+    if [ -d ~/.av ]; then
+        AV_INSTALLED_PATH=~/.av
+    else
+        echo "Error: AV_INSTALLED_PATH is not set and could not be determined" >&2
+        # Continue without caching
+        AV_INSTALLED_PATH=""
+    fi
+fi
+
+# Define global cache directory and files for plugins
+GLOBAL_CACHE_DIR="$AV_INSTALLED_PATH/.cache"
+GLOBAL_CACHE="$GLOBAL_CACHE_DIR/help_cache"
+PLUGINS_HASH_FILE="$GLOBAL_CACHE_DIR/plugins_hash"
+
+# Define project-specific cache directory and files for local commands
+PROJECT_CACHE_DIR="$AV_ROOT/.cache"
+LOCAL_CACHE="$PROJECT_CACHE_DIR/local_help_cache"
+LOCAL_HASH_FILE="$PROJECT_CACHE_DIR/local_hash"
+
+# Create cache dirs if they don't exist
+mkdir -p "$GLOBAL_CACHE_DIR"
+mkdir -p "$PROJECT_CACHE_DIR"
+
+# Main logic for displaying help
 export AV_SINGLE_LINE_HELP=true
 echo
-if [ "$1" != "--full" ]; then
-    echo "To see the complete command set, add the --full flag."
-	echo
-else
-	av_path="$AV_INSTALLED_BIN"
-	for plugin in `ls -1 $AV_INSTALLED_PLUGINS`; do
-		plugin_dir=$AV_INSTALLED_PLUGINS/${plugin}/bin
-		if [ -d ${plugin_dir} ]; then
-			echo -e "Category ${txtred}$plugin${txtrst}:\n"
 
-			for command in `ls -1 ${plugin_dir}`; do
-				printf "    %-30s - %s\n" "$command" "$(${plugin_dir}/$command -h)"
-			done
+# Set the flag variables for the imported functions
+refresh_flag=""
+full_flag=""
 
-			echo
-		fi
-	done
-fi
-
-# Local commands
-prompt="yours"
-if [ -f "$AV_ROOT/../.av/config/prompt" ]; then
-    prompt=$(cat $AV_ROOT/../.av/config/prompt)
-fi
-echo -e "Category ${txtred}${prompt}${txtrst}:\n"
-for command in ` ls -F $AV_BIN_DIR/ | grep -v '/'`; do
-		command=$(echo "${command}" | sed -e 's/\*$//')
-    	if [[ -e $AV_BIN_DIR/$command ]]; then
-			printf "    %-30s - %s\n" "$command" "`$AV_BIN_DIR/$command -h`"
-		fi
+# Parse command line arguments
+for arg in "$@"; do
+    if [ "$arg" == "--full" ]; then
+        full_flag="--full"
+    elif [ "$arg" == "--refresh" ]; then
+        refresh_flag="--refresh"
+    fi
 done
 
-echo
+# We'll handle cache regeneration in the sections below
+# No need for separate refresh handling here
+
+# Handle global plugins cache
+if [ "$full_flag" == "--full" ]; then
+    # Check if we need to regenerate the full plugins cache
+    if [ "$refresh_flag" == "--refresh" ] || ! [ -f "$GLOBAL_CACHE" ] || $(should_regenerate_plugins_cache "$refresh_flag"); then
+        echo "Regenerating global plugins cache..."
+        echo
+        generate_plugins_cache
+    fi
+    
+    # Display the global plugins help
+    cat "$GLOBAL_CACHE"
+else
+    
+    # Display the "To see the complete command set" message
+    echo "To see the complete command set, add the --full flag."
+    echo
+fi
+
+# Handle local commands cache
+# Check if we need to regenerate the regular local cache
+if [ "$refresh_flag" == "--refresh" ] || ! [ -f "$LOCAL_CACHE" ] || $(should_regenerate_local_cache "$refresh_flag"); then
+    echo "Regenerating local cache..."
+    echo
+    generate_local_cache
+fi
+
+# Display the local help
+cat "$LOCAL_CACHE"
 
 export AV_SINGLE_LINE_HELP=false
-
-#### End commands
-

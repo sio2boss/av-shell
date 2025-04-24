@@ -1,0 +1,17 @@
+#! /bin/bash
+
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+source $AV_CONFIG_DIR/findjar
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-cluster" "Display context of rhe av-shell environment" "\n \
+$(gorun ~/.av/plugins/av-shell/cmd/context/main.go --help) \
+\n"
+
+#### Put system commands here
+
+gorun ~/.av/plugins/av-shell/cmd/context/main.go "$@"
+
+#### End commands

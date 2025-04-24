@@ -8,15 +8,22 @@ avCheckHelpFlags "$1" "docker" "Shell into docker container" ""
 
 lasthash=$(getpv lasthash)
 
-# Import system path
-avRestoreSystemPath
 
 #### Put system commands here
 
+# Get container provider, default to docker if not set
+provider=$(container_provider)
+if [ -z "$provider" ]; then
+    provider="docker"
+fi
+
+# Import system path
+avRestoreSystemPath
+
 if [[ "$1" == "{}" || $# -lt 1 ]]; then
-	docker exec -i -t ${lasthash} bash
+	$provider exec -i -t ${lasthash} bash
 else
-	docker exec -i -t $1 bash
+	$provider exec -i -t $1 bash
 fi
 
 #### End commands

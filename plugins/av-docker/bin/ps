@@ -6,9 +6,16 @@ source $AV_CONFIG_DIR/default_imports
 # Check for a help flag
 avCheckHelpFlagsPassThrough "$1" "docker" "List containers" "docker ps --help"
 
-# Import system path
-avRestoreSystemPath
-
 #### Put system commands here
-cd $AV_ROOT/.. && docker ps $*
+
+# Get container provider, default to docker if not set
+provider=$(container_provider)
+if [ -z "$provider" ]; then
+    provider="docker"
+fi
+
+avAppendSystemPath
+
+$provider ps $*
+
 #### End commands

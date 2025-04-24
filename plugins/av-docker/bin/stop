@@ -6,17 +6,22 @@ source $AV_CONFIG_DIR/default_imports
 # Check for a help flag
 avCheckHelpFlagsPassThrough "$1" "docker" "Stop a running container" "docker stop --help"
 
+#### Put system commands here
+
+# Get container provider, default to docker if not set
+provider=$(container_provider)
+if [ -z "$provider" ]; then
+    provider="docker"
+fi
 lasthash=$(getpv lasthash)
 
 # Import system path
 avRestoreSystemPath
 
-#### Put system commands here
-
 if [[ "$1" == "{}" || $# -lt 1 ]]; then
-	cd $AV_ROOT/.. && docker stop ${lasthash}
+	cd $AV_ROOT/.. && $provider stop ${lasthash}
 else
-	cd $AV_ROOT/.. && docker stop $*
+	cd $AV_ROOT/.. && $provider stop $*
 fi
 
 #### End commands

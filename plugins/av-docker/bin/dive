@@ -4,25 +4,30 @@
 source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
-avCheckHelpFlagsPassThrough "$1" "docker" "Stream the contents \
-of a container as a tar archive" "docker export --help"
-
-# Import system path
-avAppendSystemPath
+avCheckHelpFlags "$1" "docker" "Explore container layers using dive tool" ""
 
 #### Put system commands here
+
+# Get container provider, default to docker if not set
+provider=$(container_provider)
+if [ -z "$provider" ]; then
+    provider="docker"
+fi
+
 domain=$(cat $AV_PROJECT_CONFIG_DIR/prompt | sed "s/\ /\_/g")
 if [ -z $domain ]; then
 	echo -e "${txtred}Unable to understand prompt text as docker domain${txtrst}"
 	exit 1
 fi
+
 container=$(getpv container)
 if [ -z $container ]; then
-	echo -e "${txtred}Unable to determine which container you are working on, use setpv container${txtrst}"
+	echo -e "${txtred}Set your container context via \'choose\'${txtrst}"
 	exit 1
 fi
 
+# Import system path
 avRestoreSystemPath
-cd $AV_ROOT/.. && dive ${domain}/${container}
 
+dive $domain/$container
 #### End commands
