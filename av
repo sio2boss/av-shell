@@ -239,8 +239,6 @@ elif [[ "$1" == "update" || "$1" == "upgrade" ]]; then
 
 elif [[ ! -z "${AV_CI_MODE}" ]]; then
 
-	echo "CI MODE: $@"
-
 	# Run command in shell
 	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
 	AV_INTERACTIVE_MODE="single" \

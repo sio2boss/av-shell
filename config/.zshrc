@@ -212,7 +212,7 @@ if [[ ! -e $AV_ROOT/../.mise.toml ]]; then
 
     # Auto load the right version of node
     if [[ -e $AV_ROOT/../.nvmrc ]]; then
-        nvm use `cat $AV_ROOT/../.nvmrc`
+        nvm use `cat $AV_ROOT/../.nvmrc` 2>&1 > /dev/null
         export PATH=$PATH:$AV_ROOT/../node_modules/.bin
     fi
 fi

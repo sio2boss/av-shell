@@ -20,7 +20,6 @@ Usage:
         Resulting image: <repo>/<domain>/<container>
 "
 
-
 #### Put system commands here
 
 # Get container provider, default to docker if not set
@@ -52,27 +51,18 @@ if [[ ! -z $DEPLOYMENT_ENV ]]; then
 else
 	container_domain=$container
 fi
+
+artifacts_url=$(getpv artifacts-url)
 artifacts_auth_token=$(getpv artifacts-token)
 if [[ ! -z "${artifacts_auth_token}" ]]; then
 	export CODEARTIFACT_AUTH_TOKEN=${artifacts_auth_token}
 	build_args+=" --build-arg CODEARTIFACT_URL=${artifacts_url} --secret id=codeartifact-auth-token,env=CODEARTIFACT_AUTH_TOKEN --build-arg NPM_TOKEN=$NPM_TOKEN"
 fi
 
-container_tag=$domain/$container
-if [[ $1 == "--one-repo" ]]; then
-	container_tag=$container_domain:$container
-fi
-
-if [[ $1 == "--name-override" ]]; then
-	shift
-	container_tag=$1
-fi
 
 # Import system path
 avAppendSystemPath
+avCheckVerbose "$provider build $@ ${build_args} -t $container_domain $container_path"
 
-avCheckVerbose "$provider build -t $container_tag $container_path"
-cd $AV_ROOT/.. && $provider build -t $container_tag $container_path
+cd $(container_path) && $provider build $@ ${build_args} -t $container_domain $container_path
 exit $?
-
-#### End commands
