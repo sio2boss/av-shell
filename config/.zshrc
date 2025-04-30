@@ -27,12 +27,6 @@ alias help='$AV_INSTALLED_PATH/plugins/av-shell/bin/help'
 alias team='$AV_INSTALLED_PATH/plugins/av-shell/bin/squad'
 alias update='$AV_INSTALLED_PATH/plugins/av-shell/bin/upgrade'
 alias get_tag_from_commit='$AV_INSTALLED_PATH/plugins/av-shell/bin/codehash'
-alias rm=`which rm 2> /dev/null`
-alias bash=`which bash 2> /dev/null`
-alias java=`which java 2> /dev/null`
-alias ln=`which ln 2> /dev/null`
-alias cat=`which cat 2> /dev/null`
-alias ls=`which ls 2> /dev/null`
 
 
 if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
