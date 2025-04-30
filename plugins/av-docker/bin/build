@@ -80,6 +80,7 @@ fi
 if [[ $1 == "--name-override" ]]; then
 	shift
 	container_tag=$1
+	shift
 fi
 
 # Import system path
