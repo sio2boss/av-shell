@@ -72,9 +72,9 @@ fi
 if [[ "$tag_style" == "sans-domain" ]]; then
 	container_tag=$container
 elif [[ "$tag_style" == "one-repo" ]]; then
-	container_tag=$container_domain
+	container_tag=$domain/$container_domain
 elif [[ "$tag_style" == "with-domain" ]]; then
-	container_tag=$container_domain
+	container_tag=$domain/$container_domain
 fi
 
 if [[ $1 == "--name-override" ]]; then
