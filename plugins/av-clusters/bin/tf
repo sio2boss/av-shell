@@ -34,7 +34,12 @@ avCheckVerbose "cd $context/terraform && terraform ${cmd}"
 # Import system path
 avAppendSystemPath
 
-eval "$(AWS_PROFILE=${ACCOUNT} aws configure export-credentials --format env)"
+if [[ -z "$AWS_PROFILE" ]]; then
+	eval "$(AWS_PROFILE=${ACCOUNT} aws configure export-credentials --format env)"
+else
+	eval "$(AWS_PROFILE=${AWS_PROFILE} aws configure export-credentials --format env)"
+fi
+
 cd $context/terraform && terraform ${cmd}
 
 #### End commands
