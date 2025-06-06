@@ -42,7 +42,7 @@ for dep in $=dependencies; do
     installed=$?
     result=$(if [[ $installed -eq 0 ]]; then echo "[${txtgrn} OK ${txtrst}]"; else echo "[${txtylw} NO ${txtrst}]"; fi)
     printf "${txtb}%-15s %-6s\n" "$dep" "$result"
-    if [[ "$dep" != "go" && "$dep" != "brew" && "$dep" != "gorun" ]]; then
+    if [[ "$dep" != "brew" && "$dep" != "gorun" ]]; then
         if [[ $installed -eq 1 ]]; then
             to_install="$to_install $dep"
         fi
@@ -119,8 +119,24 @@ else
             echo
             exit 1
         fi
-        eval "brew install ${to_install[@]} &> /dev/null"
-        error_check $? "brew dependencies install"
+        
+        if [[ "$(uname)" == "Linux" && "$(uname -m)" == "aarch64" ]]; then
+            # Split installation - go first without build-from-source if needed
+            if [[ "$to_install" == *"go"* ]]; then
+                eval "brew install go &> /dev/null"
+                error_check $? "brew go install"
+                to_install=${to_install/go/}
+                to_install=${to_install#"${to_install%%[![:space:]]*}"}
+            fi
+            # Install remaining packages with build-from-source
+            if [[ -n "$to_install" ]]; then
+                eval "brew install --build-from-source ${to_install[@]} &> /dev/null"
+                error_check $? "brew dependencies install (build from source)"
+            fi
+        else
+            eval "brew install ${to_install[@]} &> /dev/null"
+            error_check $? "brew dependencies install"
+        fi
     else
         echo "brew dependencies are already installed - ${txtgrn}success${txtrst}"
     fi

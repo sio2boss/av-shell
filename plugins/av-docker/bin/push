@@ -29,7 +29,6 @@ fi
 
 # Override container domain if DEPLOYMENT_ENV is set
 if [[ ! -z $DEPLOYMENT_ENV ]]; then
-	echo "Appending DEPLOYMENT_ENV envvar to container name"
 	container_domain=$container-$DEPLOYMENT_ENV
 else
 	container_domain=$container

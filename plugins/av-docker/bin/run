@@ -26,6 +26,13 @@ if [ -z $domain ]; then
 	exit 1
 fi
 
+# Override container domain if DEPLOYMENT_ENV is set
+if [[ ! -z $DEPLOYMENT_ENV ]]; then
+	container_domain=$container-$DEPLOYMENT_ENV
+else
+	container_domain=$container
+fi
+
 container_path=$(container_path)
 if [ -z $domain ]; then
 	echo -e "${txtred}Unable to understand prompt text as docker domain${txtrst}"
@@ -54,8 +61,8 @@ options=$(cd ${container_path} && bash -c "echo ${options}")
 avAppendSystemPath
 
 # Run
-avCheckVerbose "$provider run ${options} ${domain}/${container} $@"
-cd ${container_path} && $provider run ${options} ${domain}/${container} "$@"
+avCheckVerbose "$provider run ${options} ${domain}/${container_domain} $@"
+cd ${container_path} && $provider run ${options} ${domain}/${container_domain} "$@"
 STATUS=$?
 
 # Capture the hash

@@ -12,7 +12,7 @@ Contracts:
 
 You will need the latest golang.  Not using npm anymore. Using oh-my-zsh style of putting it in your home directory under a dot-folder.
    
-    git clone --depth=1 https://github.com/sio2boss/av-shell ~/.av && zsh ~/.av/install  --yes
+    git clone --depth=1 https://github.com/sio2boss/av-shell ~/.av && zsh ~/.av/install --yes
 
 ## Using av with your project
 

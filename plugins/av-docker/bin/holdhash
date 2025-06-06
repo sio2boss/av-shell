@@ -5,7 +5,13 @@ source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
 avCheckHelpFlags "$1" "docker" "Enables remembering last hash from docker commands" "\n \
-    Usage: holdhash [on|off].\n \
+    Usage: holdhash [on|off|get|check].\n \
+    \n \
+    Commands:\n \
+      on     Enable remembering last container hash\n \
+      off    Disable remembering last container hash\n \
+      get    Display the current container hash\n \
+      check  Show if hash remembering is enabled\n \
 \n"
 
 
@@ -17,6 +23,16 @@ if [[ "$1" == "check" ]]; then
 		echo -e "holdhash is set to: ${bldgrn}On${txtrst}"
 	else
 		echo -e "holdhash is set to: ${bldgrn}Off${txtrst}"
+	fi
+	exit 0
+fi
+
+if [[ "$1" == "get" ]]; then
+	lasthash=$(getpv lasthash)
+	if [[ ! -z "${lasthash}" ]]; then
+		echo -e "Last container hash: ${bldgrn}${lasthash}${txtrst}"
+	else
+		echo -e "No container hash stored"
 	fi
 	exit 0
 fi
