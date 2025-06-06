@@ -14,6 +14,10 @@ You will need the latest golang.  Not using npm anymore. Using oh-my-zsh style o
    
     git clone --depth=1 https://github.com/sio2boss/av-shell ~/.av && zsh ~/.av/install --yes
 
+Upgrading is as simple as running (run outside av-shell session aka regular zsh/bash):
+
+    av upgrade
+
 ## Using av with your project
 
 In your project folder run this and answer the wizard question(s):
