@@ -1,8 +1,7 @@
-#! /bin/bash
-
+#!/bin/bash
 
 # Import color
-source $AV_CONFIG_DIR/default_imports
+source "${AV_CONFIG_DIR}/default_imports"
 
 # Check for a help flag
 avCheckHelpFlags "$1" "av-shell" "Read a value from persistent storage" "\n \
@@ -10,13 +9,16 @@ avCheckHelpFlags "$1" "av-shell" "Read a value from persistent storage" "\n \
     usage: setpv <var> <value> \n \
 \n"
 
-
 #### Put system commands here
 
 # Get variable stored on disks
-if [ -e $AV_PROJECT_CONFIG_DIR/vars/$1 ]; then
-        value=$(/bin/cat $AV_PROJECT_CONFIG_DIR/vars/$1)
-        echo "$value"
+if [[ ! -e "${AV_PROJECT_CONFIG_DIR}/vars" ]]; then
+    mkdir -p "${AV_PROJECT_CONFIG_DIR}/vars"
+fi
+
+if [[ -e "${AV_PROJECT_CONFIG_DIR}/vars/$1" ]]; then
+        value="$(/bin/cat "${AV_PROJECT_CONFIG_DIR}/vars/$1")"
+        printf "%s" "$value"
 fi
 
 #### End commands

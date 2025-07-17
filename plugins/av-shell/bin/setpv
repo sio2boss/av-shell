@@ -2,7 +2,7 @@
 
 
 # Import color
-source $AV_CONFIG_DIR/default_imports
+source "${AV_CONFIG_DIR}/default_imports"
 
 # Check for a help flag
 avCheckHelpFlags "$1" "av-shell" "Write a value to persistent storage" "\n \
@@ -15,8 +15,8 @@ avRestoreSystemPath
 
 #### Put system commands here
 if [[ $# -gt 1 ]]; then
-   	mkdir -p $AV_PROJECT_CONFIG_DIR/vars
-	echo -n "$2" > $AV_PROJECT_CONFIG_DIR/vars/$1
+   	mkdir -p "${AV_PROJECT_CONFIG_DIR}/vars"
+	echo -n "$2" > "${AV_PROJECT_CONFIG_DIR}/vars/$1"
 else
 	echo "usage: setpv <var> <value>"
 fi

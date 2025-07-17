@@ -40,11 +40,11 @@ upsearch () {
   topdir="`cd ~/;pwd`"
   for (( n=${#slashes}; n>0; --n ))
   do
-	if [[ $directory == $topdir ]]; then
+	if [[ "$directory" == "$topdir" ]]; then
 		return
 	fi
-    test -e "$directory/$1" && export AV_ROOT="$directory/$1" && return
-	directory="`cd "$directory/..";pwd`"
+    test -e "${directory}/$1" && export AV_ROOT="${directory}/$1" && return
+	directory="`cd \"${directory}/..\" && pwd`"
   done
 }
 
@@ -52,8 +52,8 @@ upsearch () {
 
 # Built-in commands
 if [[ "$1" == "--help" || "$1" == "-h" ]]; then
-	export AV_CONFIG_DIR=$AV_INSTALLED_PATH/config
-	cd $AV_INSTALLED_PATH/config && ./welcome
+	export AV_CONFIG_DIR="${AV_INSTALLED_PATH}/config"
+	cd "${AV_INSTALLED_PATH}/config" && ./welcome
 	echo
 	echo "Flags: "
 	echo "  --help      - this helpful display"
@@ -64,7 +64,6 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
 	echo "  get         - install plugin from repository"
 	echo "  invigorate  - checks your domain specific shell's version and imposes the changes necessary"
 	echo "  upgrade     - pull updates for av-shell and plugins, system wide"
-	echo "  update      - same as upgrade"
 	echo "  activate    - produce content that can be sourced to activate like python virtualenvs"
 	echo "  deactivate  - undo the activate sub-command"
 	echo
@@ -116,11 +115,11 @@ if [[ "$1" == "get" && -z "$AV_ROOT" ]]; then
 	fi
 
   reponame="$(basename "${2%.*}")"
-  if [[ -e ~/.av/plugins/${reponame} ]]; then
+  if [[ -e "${AV_INSTALLED_PATH}/plugins/${reponame}" ]]; then
 		echo -e "${txtgrn}[AV-SHELL]${txtrst} Plugin already installed, pulling latest..."
-		cd ~/.av/plugins/${reponame} && git pull
+		cd "${AV_INSTALLED_PATH}/plugins/${reponame}" && git pull
 	else
-		cd ~/.av/plugins && git clone $2
+		cd "${AV_INSTALLED_PATH}/plugins" && git clone "$2"
 	fi
 
 	exit
@@ -131,7 +130,7 @@ unset AV_ROOT
 upsearch ".av"
 
 if [[ "$1" == "status" ]]; then
-	if [[ ! -z $AV_ROOT ]]; then
+	if [[ ! -z "$AV_ROOT" ]]; then
 		echo -n "$AV_ROOT"
 	fi
 	exit
@@ -147,12 +146,12 @@ fi
 # Mount like pyenv mode
 if [[ "$1" == "activate" ]]; then
 
-	echo -e "export AV_ROOT=$AV_ROOT"
+	echo -e "export AV_ROOT=\"${AV_ROOT}\""
 	echo -e "export AV_INTERACTIVE_MODE=\"mounted\""
-	echo -e "export AV_INSTALLED_PATH=$AV_INSTALLED_PATH"
-	echo -e "source $AV_INSTALLED_PATH/config/.zshrc"
-	echo -e "export AV_OLD_SYSTEM_PATH=\"$PATH\""
-	echo -e 'export PATH=$AV_BIN_DIR:${av_path}:$PATH'
+	echo -e "export AV_INSTALLED_PATH=\"${AV_INSTALLED_PATH}\""
+	echo -e "source \"${AV_INSTALLED_PATH}/config/.zshrc\""
+	echo -e "export AV_OLD_SYSTEM_PATH=\"${PATH}\""
+	echo -e 'export PATH="${AV_BIN_DIR}:${av_path}:${PATH}"'
 	echo -e "if [ -n \"${BASH:-}\" -o -n \"${ZSH_VERSION:-}\" ] ; then"
 	echo -e "	hash -r 2> /dev/null"
 	echo -e "fi"
@@ -168,11 +167,11 @@ if [[ "$1" == "deactivate" ]]; then
     echo -e "unset AV_INSTALLED_PATH"
 	echo -e "unset AV_PROJ_TOP"
 	echo -e "unset ZDOTDIR"
-    echo -e "if [ ! -z \"$AV_OLD_SYSTEM_PATH\" ]; then"
-	echo -e "   export PATH=\"$AV_OLD_SYSTEM_PATH\""
+    echo -e "if [ ! -z \"${AV_OLD_SYSTEM_PATH}\" ]; then"
+	echo -e "   export PATH=\"${AV_OLD_SYSTEM_PATH}\""
 	echo -e "   unset AV_OLD_SYSTEM_PATH"
 	echo -e "fi"
-    echo -e "RPROMPT=$AV_OLD_RPROMPT"
+    echo -e "RPROMPT=${AV_OLD_RPROMPT}"
 	echo -e "if [ -n \"${BASH:-}\" -o -n \"${ZSH_VERSION:-}\" ] ; then"
 	echo -e "	hash -r 2> /dev/null"
 	echo -e "fi"
@@ -189,7 +188,7 @@ if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
 fi
 
 # Change dir to script root
-cd $AV_ROOT/.. > /dev/null
+cd "${AV_ROOT}/.." > /dev/null
 
 
 # If there are arguments, just run them rather than opening a shell
@@ -200,20 +199,20 @@ if [[ $# -eq 0 ]]; then
 	# Skip update check in CI mode
 	if [[ -z "${AV_CI_MODE}" ]]; then
 		CURRENT_DATE=`date +%s`
-		if [[ ! -e $AV_INSTALLED_PATH/config/update_checked ]]; then
-			echo -n "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
+		if [[ ! -e "${AV_INSTALLED_PATH}/config/update_checked" ]]; then
+			echo -n "${CURRENT_DATE}" > "${AV_INSTALLED_PATH}/config/update_checked"
 		else
-			LAST_CHECKED=`cat $AV_INSTALLED_PATH/config/update_checked`
+			LAST_CHECKED=`cat "${AV_INSTALLED_PATH}/config/update_checked"`
 			if [[ `expr ${CURRENT_DATE} - ${LAST_CHECKED}` -gt 1728000 ]]; then
-				echo -n "${CURRENT_DATE}" > $AV_INSTALLED_PATH/config/update_checked
+				echo -n "${CURRENT_DATE}" > "${AV_INSTALLED_PATH}/config/update_checked"
 				gum format -t markdown -- "# AV-SHELL"
 				gum confirm "  Would you like to check for updates?"
 				if [[ $? -eq 0 ]]; then
-					AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+					AV_INSTALLED_PATH="${AV_INSTALLED_PATH}" \
 					AV_INTERACTIVE_MODE="single" \
-					AV_ROOT=$AV_ROOT \
-					PATH=$AV_ROOT/bin:$PATH \
-					ZDOTDIR=$AV_INSTALLED_PATH/config \
+					AV_ROOT="${AV_ROOT}" \
+					PATH="${AV_ROOT}/bin:${PATH}" \
+					ZDOTDIR="${AV_INSTALLED_PATH}/config" \
 					zsh -i -c upgrade
 				fi
 			fi
@@ -221,39 +220,39 @@ if [[ $# -eq 0 ]]; then
 	fi
 
 	# Open shell
-	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+	AV_INSTALLED_PATH="${AV_INSTALLED_PATH}" \
 	AV_INTERACTIVE_MODE="interactive" \
-	AV_ROOT=$AV_ROOT \
-	ZDOTDIR=$AV_INSTALLED_PATH/config \
+	AV_ROOT="${AV_ROOT}" \
+	ZDOTDIR="${AV_INSTALLED_PATH}/config" \
 	zsh -i ${FORCED_COMMAND}
 
-elif [[ "$1" == "update" || "$1" == "upgrade" ]]; then
+elif [[ "$1" == "upgrade" ]]; then
 
 	shift
-	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+	AV_INSTALLED_PATH="${AV_INSTALLED_PATH}" \
 	AV_INTERACTIVE_MODE="single" \
-	AV_ROOT=$AV_ROOT \
-	PATH=$AV_ROOT/bin:$PATH \
-	ZDOTDIR=$AV_INSTALLED_PATH/config \
+	AV_ROOT="${AV_ROOT}" \
+	PATH="${AV_ROOT}/bin:${PATH}" \
+	ZDOTDIR="${AV_INSTALLED_PATH}/config" \
 	zsh -i -c "upgrade $@"
 
 elif [[ ! -z "${AV_CI_MODE}" ]]; then
 
 	# Run command in shell
-	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+	AV_INSTALLED_PATH="${AV_INSTALLED_PATH}" \
 	AV_INTERACTIVE_MODE="single" \
-	AV_ROOT=$AV_ROOT \
-	PATH=$AV_ROOT/bin:$PATH \
-	ZDOTDIR=$AV_INSTALLED_PATH/config \
-	zsh -fd -c 'source $AV_INSTALLED_PATH/config/.zshrc && "$@"' - "$@"
+	AV_ROOT="${AV_ROOT}" \
+	PATH="${AV_ROOT}/bin:${PATH}" \
+	ZDOTDIR="${AV_INSTALLED_PATH}/config" \
+	zsh -fd -c 'source "${AV_INSTALLED_PATH}/config/.zshrc" && "$@"' - "$@"
 
 else
 
-	AV_INSTALLED_PATH=$AV_INSTALLED_PATH \
+	AV_INSTALLED_PATH="${AV_INSTALLED_PATH}" \
 	AV_INTERACTIVE_MODE="single" \
-	AV_ROOT=$AV_ROOT \
-	PATH=$AV_ROOT/bin:$PATH \
-	ZDOTDIR=$AV_INSTALLED_PATH/config \
+	AV_ROOT="${AV_ROOT}" \
+	PATH="${AV_ROOT}/bin:${PATH}" \
+	ZDOTDIR="${AV_INSTALLED_PATH}/config" \
 	zsh -i -c "$@"
 
 fi

@@ -1,32 +1,31 @@
 #! /bin/zsh
 
-export AV_OLD_SYSTEM_PATH=/usr/local/bin:$PATH
-export AV_PROJECT_CONFIG_DIR=$AV_ROOT/config
-export AV_INSTALLED_BIN=$AV_INSTALLED_PATH/bin
-export AV_INSTALLED_PLUGINS=$AV_INSTALLED_PATH/plugins
-export AV_CONFIG_DIR=$AV_INSTALLED_PATH/config
-export AV_BIN_DIR=$AV_ROOT/bin
-export AV_PROJ_TOP=$AV_ROOT/..
-export PROJECT_ROOT=$AV_ROOT/..
+export AV_OLD_SYSTEM_PATH="/usr/local/bin:$PATH"
+export AV_PROJECT_CONFIG_DIR="${AV_ROOT}/config"
+export AV_INSTALLED_BIN="${AV_INSTALLED_PATH}/bin"
+export AV_INSTALLED_PLUGINS="${AV_INSTALLED_PATH}/plugins"
+export AV_CONFIG_DIR="${AV_INSTALLED_PATH}/config"
+export AV_BIN_DIR="${AV_ROOT}/bin"
+export AV_PROJ_TOP="${AV_ROOT}/.."
+export PROJECT_ROOT="${AV_ROOT}/.."
 
 # Figure out OS
 THIS_OS=`uname`
 
 # Setup path
-av_path="$AV_INSTALLED_BIN"
-for plugin in `ls -1 $AV_INSTALLED_PLUGINS`; do
-  av_path=${av_path}:$AV_INSTALLED_PLUGINS/${plugin}/bin
+av_path="${AV_INSTALLED_BIN}"
+for plugin in `ls -1 "${AV_INSTALLED_PLUGINS}"`; do
+  av_path="${av_path}:${AV_INSTALLED_PLUGINS}/${plugin}/bin"
 done
 
 # Bring in color
-source $AV_CONFIG_DIR/color
+source "${AV_CONFIG_DIR}/color"
 
 
 # Make an alias so that help can run
-alias help='$AV_INSTALLED_PATH/plugins/av-shell/bin/help'
-alias team='$AV_INSTALLED_PATH/plugins/av-shell/bin/squad'
-alias update='$AV_INSTALLED_PATH/plugins/av-shell/bin/upgrade'
-alias get_tag_from_commit='$AV_INSTALLED_PATH/plugins/av-shell/bin/codehash'
+alias help='"${AV_INSTALLED_PATH}/plugins/av-shell/bin/help"'
+alias team='"${AV_INSTALLED_PATH}/plugins/av-shell/bin/squad"'
+alias get_tag_from_commit='"${AV_INSTALLED_PATH}/plugins/av-shell/bin/codehash"'
 
 
 if [[ "$AV_INTERACTIVE_MODE" == "interactive" ]]; then
