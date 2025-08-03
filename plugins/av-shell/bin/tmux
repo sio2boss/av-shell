@@ -1,0 +1,44 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-shell" "Manage tmux sessions" "\n \
+    Automatically create or attach to a tmux session named after the current project.\n \
+    Usage: tmux [new|attach|list]\n \
+\n"
+
+#### Put system commands here
+
+# Get the project name from prompt
+PROJECT_NAME=$(getprompt)
+
+# Import system path
+avRestoreSystemPath
+
+if [[ "$1" == "list" || "$1" == "ls" ]]; then
+    command tmux list-sessions
+    exit 0
+fi
+
+if [[ "$1" == "new" || "$1" == "n" ]]; then
+    command tmux new-session -s "$PROJECT_NAME"
+    exit 0
+fi
+
+if [[ "$1" == "attach" || "$1" == "a" ]]; then
+    command tmux attach-session -t "$PROJECT_NAME"
+    exit 0
+fi
+
+# Check if session exists
+if command tmux has-session -t "$PROJECT_NAME" 2>/dev/null; then
+    # Session exists, attach to it
+    command tmux attach-session -t "$PROJECT_NAME"
+else
+    # Session doesn't exist, create and attach to it
+    command tmux new-session -s "$PROJECT_NAME"
+fi
+
+#### End commands
