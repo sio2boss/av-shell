@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-shell" "Run code-server for the current project" "\n \
+    Will read the port from \$AV_ROOT/../.av/config/code-server-port\n \
+    and run code-server --bind-addr <port> \$AV_ROOT\n \
+\n"
+
+project=`getprompt`
+
+# Import system path
+avRestoreSystemPath
+
+#### Put system commands here
+
+# Define the config file path
+CONFIG_FILE="$AV_ROOT/../.av/config/vars/code-server-port"
+
+# Check if the config file exists
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo -e "${txtred}Error: Config file not found at $CONFIG_FILE${txtrst}" >&2
+    exit 1
+fi
+
+# Read the port from the config file
+PORT=$(cat "$CONFIG_FILE" | tr -d ' \t\r\n')
+
+# Check if port is a valid number
+if ! [[ "$PORT" =~ ^[0-9]+$ ]]; then
+    echo -e "${txtred}Error: Invalid port number in config file${txtrst}" >&2
+    exit 1
+fi
+
+# Check if code-server command exists
+if ! command -v code-server &> /dev/null; then
+    echo -e "${txtred}Error: code-server command not found${txtrst}" >&2
+    exit 1
+fi
+
+# Run code-server with the specified port and AV_ROOT
+echo -e "${txtblu}Starting code-server on port $PORT${txtrst}"
+echo -e "${txtblu}Serving directory: $AV_ROOT/../${txtrst}"
+cd $AV_ROOT/../ && code-server --bind-addr localhost:$PORT --disable-telemetry --user-data-dir ~/.local/share/$project `pwd`
+
+#### End commands

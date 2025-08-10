@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-shell" "Check for required commands in the help output" "\n \
+    Will check the help command output for the following commands:\n \
+    clean, format, lint, make, prep, start, update, test\n \
+    And verify their descriptions have been updated from 'template script'\n \
+\n"
+
+# Import system path
+avRestoreSystemPath
+
+#### Put system commands here
+
+# Call the help command and capture its output
+HELP_OUTPUT=$(av help --full 2>/dev/null)
+
+# Check if the help command succeeded
+if [ $? -ne 0 ]; then
+    echo -e "${txtred}Error: Failed to execute 'av help --full'${txtrst}" >&2
+    exit 1
+fi
+
+# List of required commands
+REQUIRED_COMMANDS=("clean" "format" "lint" "make" "prep" "start" "update" "test" "audit" "deploy")
+
+# Initialize counters
+found_count=0
+missing_count=0
+template_count=0
+
+echo -e "${txtblu}Checking for required commands in help output${txtrst}"
+echo
+
+# Check each command
+for cmd in "${REQUIRED_COMMANDS[@]}"; do
+    # Check if command exists in help output
+    if echo "$HELP_OUTPUT" | grep -q "^    $cmd *-"; then
+        echo -e "  ${txtgrn}✓${txtrst} $cmd - Found in help"
+        ((found_count++))
+        
+        # Check if description is still "template script"
+        if echo "$HELP_OUTPUT" | grep -q "^    $cmd *- template script"; then
+            echo -e "    ${txtylw}⚠${txtrst} Description still 'template script'"
+            ((template_count++))
+        else
+            # Extract and show the actual description
+            description=$(echo "$HELP_OUTPUT" | grep "^    $cmd *-" | sed "s/^    $cmd *- //")
+            echo -e "    ${txtgrn}✓${txtrst} Description: $description"
+        fi
+    else
+        echo -e "  ${txtred}✗${txtrst} $cmd - Missing from help"
+        ((missing_count++))
+    fi
+done
+
+echo
+echo -e "${txtblu}Summary:${txtrst}"
+echo -e "  Found: ${txtgrn}$found_count${txtrst}"
+echo -e "  Missing: ${txtred}$missing_count${txtrst}"
+echo -e "  Template descriptions: ${txtylw}$template_count${txtrst}"
+
+if [ $missing_count -gt 0 ] || [ $template_count -gt 0 ]; then
+    echo
+    if [ $missing_count -gt 0 ]; then
+        echo -e "${txtred}Error: Some required commands are missing${txtrst}"
+    fi
+    if [ $template_count -gt 0 ]; then
+        echo -e "${txtylw}Warning: Some commands still have 'template script' descriptions${txtrst}"
+    fi
+    exit 1
+else
+    echo
+    echo -e "${txtgrn}All required commands are present with updated descriptions${txtrst}"
+fi
+
+#### End commands
