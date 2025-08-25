@@ -33,11 +33,28 @@ else
 	container_domain=$container
 fi
 
-container_path=$(container_path)
-if [ -z $domain ]; then
-	echo -e "${txtred}Unable to understand prompt text as docker domain${txtrst}"
+# Check for tagstyle setting
+tag_style=$(getpv tagstyle)
+
+# Apply tag style based on tagstyle setting
+if [[ -z "$tag_style" ]]; then
+	echo -e "${txtred}No tag style set. Run 'tagstyle' to choose a format:${txtrst}"
 	exit 1
 fi
+
+container_path=$(container_path)
+
+if [[ "$tag_style" == "sans-domain" ]]; then
+	container_tag=$container
+elif [[ "$tag_style" == "one-repo" ]]; then
+	container_tag=$domain/$container_domain
+elif [[ "$tag_style" == "with-domain" ]]; then
+	container_tag=$domain/$container_domain
+else
+	echo -e "${txtred}Invalid tag style '$tag_style'. Run 'tagstyle' to choose a valid format.${txtrst}"
+	exit 1
+fi
+
 
 if [ ! -e "$container_path/Runfile" ]; then
 	echo -e "${txtred}Unable to find Runfile in $container_path${txtrst}"
@@ -49,7 +66,7 @@ options="-it --rm"
 if [[ -e "$container_path/Runfile" ]]; then
 	options=$(cat $container_path/Runfile)
 fi
-if [[ "$1" == "interactive" ]]; then
+if [[ "$1" == "interactive" || "$1" == "i" || "$1" == "int" ]]; then
 	shift
 	options=$(echo "${options}" | sed -e 's/\-d[[:space:]]*/\-it\ /1')
 fi
@@ -61,8 +78,8 @@ options=$(cd ${container_path} && bash -c "echo ${options}")
 avAppendSystemPath
 
 # Run
-avCheckVerbose "$provider run ${options} ${domain}/${container_domain} $@"
-cd ${container_path} && $provider run ${options} ${domain}/${container_domain} "$@"
+avCheckVerbose "$provider run ${options} ${container_tag} $@"
+cd ${container_path} && $provider run ${options} ${container_tag} "$@"
 STATUS=$?
 
 # Capture the hash

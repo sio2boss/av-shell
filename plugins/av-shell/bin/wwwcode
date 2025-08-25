@@ -43,6 +43,10 @@ fi
 # Run code-server with the specified port and AV_ROOT
 echo -e "${txtblu}Starting code-server on port $PORT${txtrst}"
 echo -e "${txtblu}Serving directory: $AV_ROOT/../${txtrst}"
-cd $AV_ROOT/../ && code-server --bind-addr localhost:$PORT --disable-telemetry --user-data-dir ~/.local/share/$project `pwd`
+cd $AV_ROOT/../ && code-server \
+    --bind-addr localhost:$PORT \
+    --disable-telemetry \
+    --extensions-dir ~/.local/share/code-server/extensions/ \
+    --user-data-dir ~/.local/share/$project `pwd`
 
 #### End commands
