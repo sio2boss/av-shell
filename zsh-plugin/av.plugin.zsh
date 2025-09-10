@@ -11,19 +11,20 @@ fi
 # Allow for functions in the prompt.
 setopt PROMPT_SUBST
 
-## Enable auto-execution of functions.
-typeset -ga chpwd_functions
+# Load the add-zsh-hook function
+autoload -Uz add-zsh-hook
 
-# Append functions needed for mounting and unmounting av projects.
-chpwd_functions+='chpwd_update_av_vars'
-
-# Add a precmd hook to ensure update_current_av_vars is called after shell initialization
-typeset -ga precmd_functions
-precmd_functions+='precmd_update_av_vars'
+# Add hooks for mounting and unmounting av projects
+add-zsh-hook chpwd chpwd_update_av_vars
+add-zsh-hook precmd precmd_update_av_vars
+add-zsh-hook preexec preexec_update_av_vars
 
 function precmd_update_av_vars() {
-    # Only run once during shell initialization
-    if [[ -z "${__AV_INITIALIZED}" ]]; then
+    # Always run in tmux panes to handle environment inheritance
+    if [[ -n "${TMUX}" ]]; then
+        update_current_av_vars
+        export __AV_INITIALIZED=1
+    elif [[ -z "${__AV_INITIALIZED}" ]]; then
         update_current_av_vars
         export __AV_INITIALIZED=1
     fi
@@ -32,6 +33,15 @@ function precmd_update_av_vars() {
 # when we change working directory mount or unmount av
 function chpwd_update_av_vars() {
     update_current_av_vars
+}
+
+# when a command is about to be executed, check if we need to initialize av
+function preexec_update_av_vars() {
+    # Only run if not initialized yet (first command in new shell)
+    if [[ -z "${__AV_INITIALIZED}" ]]; then
+        update_current_av_vars
+        export __AV_INITIALIZED=1
+    fi
 }
 
 # Check if current directory is in or below an av project that we have mounted
@@ -65,7 +75,7 @@ function update_current_av_vars() {
 
 # Wrap prompt mods for zsh
 function av_prompt_info() {
-    if [ ! -z "${__CURRENT_AV_STATUS}" ]; then
+    if [ ! -z "${__CURRENT_AV_STATUS}" ] && command -v av_project_prompt_inputs >/dev/null 2>&1; then
         echo -e -n "%{$fg_bold[blue]%}av:(%{$fg_bold[green]%}$(av_project_prompt_inputs)%{$fg_bold[blue]%})%{$reset_color%} "
     fi
 }
