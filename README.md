@@ -123,7 +123,7 @@ Lets shut it down
 
     stop
 
-And perminantly remove it
+And permanently remove it
 
     rmc
 
