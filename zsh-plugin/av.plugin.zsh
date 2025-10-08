@@ -90,6 +90,11 @@ function av() {
         if [[ ! -z "$(which refresh | grep -v "not found")" ]]; then
             refresh
         fi
+        # After exiting the interactive shell, reactivate if we're in an av project
+        # This ensures automount functionality continues to work
+        if [[ ! -z "$("${AV_COMMAND}" status 2>/dev/null)" ]]; then
+            source <("${AV_COMMAND}" activate 2>/dev/null)
+        fi
         return $?
     fi
 
