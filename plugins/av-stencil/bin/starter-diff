@@ -1,0 +1,1642 @@
+#!/usr/bin/env gorun
+
+// go.mod >>>
+// module starter-diff
+// 
+// go 1.24.0
+// 
+// require (
+// 	github.com/gdamore/encoding v1.0.1 // indirect
+// 	github.com/gdamore/tcell/v2 v2.13.7 // indirect
+// 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
+// 	github.com/rivo/tview v0.42.0 // indirect
+// 	github.com/rivo/uniseg v0.4.7 // indirect
+// 	golang.org/x/sys v0.38.0 // indirect
+// 	golang.org/x/term v0.37.0 // indirect
+// 	golang.org/x/text v0.31.0 // indirect
+// )
+// <<< go.mod
+
+// go.sum >>>
+// github.com/gdamore/encoding v1.0.1 h1:YzKZckdBL6jVt2Gc+5p82qhrGiqMdG/eNs6Wy0u3Uhw=
+// github.com/gdamore/encoding v1.0.1/go.mod h1:0Z0cMFinngz9kS1QfMjCP8TY7em3bZYeeklsSDPivEo=
+// github.com/gdamore/tcell/v2 v2.13.7 h1:yfHdeC7ODIYCc6dgRos8L1VujQtXHmUpU6UZotzD6os=
+// github.com/gdamore/tcell/v2 v2.13.7/go.mod h1:+Wfe208WDdB7INEtCsNrAN6O2m+wsTPk1RAovjaILlo=
+// github.com/lucasb-eyer/go-colorful v1.3.0 h1:2/yBRLdWBZKrf7gB40FoiKfAWYQ0lqNcbuQwVHXptag=
+// github.com/lucasb-eyer/go-colorful v1.3.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
+// github.com/rivo/tview v0.42.0 h1:b/ftp+RxtDsHSaynXTbJb+/n/BxDEi+W3UfF5jILK6c=
+// github.com/rivo/tview v0.42.0/go.mod h1:cSfIYfhpSGCjp3r/ECJb+GKS7cGJnqV8vfjQPwoXyfY=
+// github.com/rivo/uniseg v0.4.7 h1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ=
+// github.com/rivo/uniseg v0.4.7/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
+// github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
+// golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
+// golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
+// golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4/go.mod h1:jJ57K6gSWd91VN4djpZkiMVwK6gcyfeH4XE8wZrZaV4=
+// golang.org/x/mod v0.8.0/go.mod h1:iBbtSCu2XBx23ZKBPSOrRkjjQPZFPuis4dIYUhu/chs=
+// golang.org/x/net v0.0.0-20190620200207-3b0461eec859/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
+// golang.org/x/net v0.0.0-20210226172049-e18ecbb05110/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
+// golang.org/x/net v0.0.0-20220722155237-a158d28d115b/go.mod h1:XRhObCWvk6IyKnWLug+ECip1KBveYUHfp+8e9klMJ9c=
+// golang.org/x/net v0.6.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
+// golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
+// golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
+// golang.org/x/sync v0.1.0/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
+// golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
+// golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+// golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+// golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+// golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+// golang.org/x/sys v0.5.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+// golang.org/x/sys v0.38.0 h1:3yZWxaJjBmCWXqhN1qh02AkOnCQ1poK6oF+a7xWL6Gc=
+// golang.org/x/sys v0.38.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=
+// golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
+// golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
+// golang.org/x/term v0.5.0/go.mod h1:jMB1sMXY+tzblOD4FWmEbocvup2/aLOaQEp7JmGp78k=
+// golang.org/x/term v0.37.0 h1:8EGAD0qCmHYZg6J17DvsMy9/wJ7/D/4pV/wfnld5lTU=
+// golang.org/x/term v0.37.0/go.mod h1:5pB4lxRNYYVZuTLmy8oR2BH8dflOR+IbTYFD8fi3254=
+// golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
+// golang.org/x/text v0.3.3/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
+// golang.org/x/text v0.3.7/go.mod h1:u+2+/6zg+i71rQMx5EYifcz6MCKuco9NR6JIITiCfzQ=
+// golang.org/x/text v0.7.0/go.mod h1:mrYo+phRRbMaCq/xk9113O4dZlRixOauAjOtrjsXDZ8=
+// golang.org/x/text v0.14.0/go.mod h1:18ZOQIKpY8NJVqYksKHtTdi31H5itFRjB5/qKTNYzSU=
+// golang.org/x/text v0.31.0 h1:aC8ghyu4JhP8VojJ2lEHBnochRno1sgL6nEi9WGFGMM=
+// golang.org/x/text v0.31.0/go.mod h1:tKRAlv61yKIjGGHX/4tP1LTbc13YSec1pxVEWXzfoeM=
+// golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
+// golang.org/x/tools v0.0.0-20191119224855-298f0cb1881e/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
+// golang.org/x/tools v0.1.12/go.mod h1:hNGJHUnrk76NpqgfD5Aqm5Crs+Hm0VOH/i9J2+nxYbc=
+// golang.org/x/tools v0.6.0/go.mod h1:Xwgl3UAJ/d3gWutnCtw505GrjyAbvKui8lOU390QaIU=
+// golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
+// <<< go.sum
+
+package main
+
+import (
+	"context"
+	"crypto/md5"
+	"flag"
+	"fmt"
+	"io"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"sort"
+	"strings"
+	"time"
+
+	"github.com/gdamore/tcell/v2"
+	"github.com/rivo/tview"
+)
+
+// FileStatus represents the status of a file in the comparison
+type FileStatus int
+
+const (
+	StatusUnchanged FileStatus = iota
+	StatusModified
+	StatusAdded
+	StatusDeleted
+	StatusConflict
+	StatusRejected
+)
+
+// FileNode represents a file or directory in the tree
+type FileNode struct {
+	Name     string
+	Path     string
+	IsDir    bool
+	Status   FileStatus
+	Children []*FileNode
+	Parent   *FileNode
+}
+
+// AppState holds the application state
+type AppState struct {
+	sourceDir       string
+	targetDir       string
+	outputFile      string
+	excludePatterns []string
+	sourceTree      *FileNode
+	targetTree      *FileNode
+	rejectedFiles   map[string]bool
+	showAll         bool
+	filterPattern   string
+}
+
+// Default exclusion patterns
+var defaultExclusions = []string{".git", "node_modules", ".venv", ".av", ".idea", "__pycache__", ".DS_Store"}
+
+// isExcluded checks if a file/directory should be excluded
+func isExcluded(name string, excludePatterns []string) bool {
+	// Check default exclusions
+	for _, pattern := range defaultExclusions {
+		if name == pattern {
+			return true
+		}
+	}
+	// Check custom exclusions
+	for _, pattern := range excludePatterns {
+		if name == pattern {
+			return true
+		}
+	}
+	return false
+}
+
+// buildTree recursively builds a file tree from a directory
+func buildTree(rootPath string, excludePatterns []string) (*FileNode, error) {
+	root := &FileNode{
+		Name:     filepath.Base(rootPath),
+		Path:     rootPath,
+		IsDir:    true,
+		Children: []*FileNode{},
+	}
+
+	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Skip root itself
+		if path == rootPath {
+			return nil
+		}
+
+		// Check if this path should be excluded
+		if isExcluded(info.Name(), excludePatterns) {
+			if info.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		// Calculate relative path from root
+		relPath, err := filepath.Rel(rootPath, path)
+		if err != nil {
+			return err
+		}
+
+		// Build the node path
+		parts := strings.Split(relPath, string(filepath.Separator))
+		current := root
+
+		// Navigate/create the path
+		for i := 0; i < len(parts)-1; i++ {
+			found := false
+			for _, child := range current.Children {
+				if child.Name == parts[i] && child.IsDir {
+					current = child
+					found = true
+					break
+				}
+			}
+			if !found {
+				newNode := &FileNode{
+					Name:     parts[i],
+					Path:     filepath.Join(rootPath, strings.Join(parts[:i+1], string(filepath.Separator))),
+					IsDir:    true,
+					Children: []*FileNode{},
+					Parent:   current,
+				}
+				current.Children = append(current.Children, newNode)
+				current = newNode
+			}
+		}
+
+		// Check if node already exists (for directories that were created as parents)
+		var node *FileNode
+		for _, child := range current.Children {
+			if child.Name == parts[len(parts)-1] {
+				node = child
+				break
+			}
+		}
+
+		if node == nil {
+			// Add the file or directory
+			node = &FileNode{
+				Name:     parts[len(parts)-1],
+				Path:     path,
+				IsDir:    info.IsDir(),
+				Children: []*FileNode{},
+				Parent:   current,
+			}
+			current.Children = append(current.Children, node)
+		} else {
+			// Update path if needed (for directories created as parents)
+			node.Path = path
+		}
+
+		if info.IsDir() {
+			// Don't skip - let Walk process children
+			return nil
+		}
+		return nil
+	})
+
+	// Sort children alphabetically
+	sortTree(root)
+
+	return root, err
+}
+
+// sortTree recursively sorts children alphabetically
+func sortTree(node *FileNode) {
+	sort.Slice(node.Children, func(i, j int) bool {
+		// Directories come before files
+		if node.Children[i].IsDir != node.Children[j].IsDir {
+			return node.Children[i].IsDir
+		}
+		return node.Children[i].Name < node.Children[j].Name
+	})
+	for _, child := range node.Children {
+		if child.IsDir {
+			sortTree(child)
+		}
+	}
+}
+
+// computeMD5 computes MD5 hash of a file
+func computeMD5(path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	hash := md5.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+}
+
+// compareTrees compares two file trees and sets statuses
+func compareTrees(sourceTree, targetTree *FileNode, sourceRoot, targetRoot string, rejectedFiles map[string]bool) {
+	compareNodes(sourceTree, targetTree, sourceRoot, targetRoot, rejectedFiles)
+}
+
+// compareNodes recursively compares two nodes
+func compareNodes(sourceNode, targetNode *FileNode, sourceRoot, targetRoot string, rejectedFiles map[string]bool) {
+	if sourceNode == nil && targetNode == nil {
+		return
+	}
+
+	// Build maps of children by name
+	sourceChildren := make(map[string]*FileNode)
+	targetChildren := make(map[string]*FileNode)
+
+	if sourceNode != nil {
+		for _, child := range sourceNode.Children {
+			sourceChildren[child.Name] = child
+		}
+	}
+	if targetNode != nil {
+		for _, child := range targetNode.Children {
+			targetChildren[child.Name] = child
+		}
+	}
+
+	// Check all source children
+	for name, sourceChild := range sourceChildren {
+		targetChild, exists := targetChildren[name]
+		relPath, _ := filepath.Rel(sourceRoot, sourceChild.Path)
+
+		if rejectedFiles[relPath] {
+			sourceChild.Status = StatusRejected
+			if targetChild != nil {
+				targetChild.Status = StatusRejected
+			}
+		} else if !exists {
+			// File exists only in source (Added)
+			sourceChild.Status = StatusAdded
+		} else {
+			// File exists in both
+			if sourceChild.IsDir != targetChild.IsDir {
+				// Type mismatch (Conflict)
+				sourceChild.Status = StatusConflict
+				targetChild.Status = StatusConflict
+			} else if sourceChild.IsDir {
+				// Both are directories, recurse
+				compareNodes(sourceChild, targetChild, sourceRoot, targetRoot, rejectedFiles)
+			} else {
+				// Both are files, compare content
+				sourceHash, _ := computeMD5(sourceChild.Path)
+				targetHash, _ := computeMD5(targetChild.Path)
+				if sourceHash == targetHash {
+					sourceChild.Status = StatusUnchanged
+					targetChild.Status = StatusUnchanged
+				} else {
+					sourceChild.Status = StatusModified
+					targetChild.Status = StatusModified
+				}
+			}
+		}
+	}
+
+	// Check target children that don't exist in source (Deleted)
+	for name, targetChild := range targetChildren {
+		if _, exists := sourceChildren[name]; !exists {
+			relPath, _ := filepath.Rel(targetRoot, targetChild.Path)
+			if rejectedFiles[relPath] {
+				targetChild.Status = StatusRejected
+			} else {
+				targetChild.Status = StatusDeleted
+			}
+		}
+	}
+}
+
+// rejectDirectory recursively rejects or un-rejects all files within a directory
+func rejectDirectory(node *FileNode, rootPath string, rejectedFiles map[string]bool, reject bool) {
+	if node == nil {
+		return
+	}
+
+	relPath, err := filepath.Rel(rootPath, node.Path)
+	if err != nil {
+		return
+	}
+
+	// For files, add/remove from rejectedFiles map and update status
+	if !node.IsDir {
+		if reject {
+			rejectedFiles[relPath] = true
+			node.Status = StatusRejected
+		} else {
+			delete(rejectedFiles, relPath)
+		}
+	} else {
+		// For directories, recursively process all children
+		for _, child := range node.Children {
+			rejectDirectory(child, rootPath, rejectedFiles, reject)
+		}
+	}
+}
+
+// recalculateDirectoryStatus recalculates status for all files within a directory
+func recalculateDirectoryStatus(node *FileNode, sourceTree, targetTree *FileNode, sourceRoot, targetRoot string) {
+	if node == nil {
+		return
+	}
+
+	// Recursively process all children
+	for _, child := range node.Children {
+		if child.IsDir {
+			recalculateDirectoryStatus(child, sourceTree, targetTree, sourceRoot, targetRoot)
+		} else {
+			recalculateNodeStatus(child, sourceTree, targetTree, sourceRoot, targetRoot)
+		}
+	}
+}
+
+// recalculateNodeStatus recalculates the status for a file node by comparing with its corresponding node
+func recalculateNodeStatus(node *FileNode, sourceTree, targetTree *FileNode, sourceRoot, targetRoot string) {
+	if node == nil {
+		return
+	}
+
+	// Calculate relative path
+	var relPath string
+	var sourceNode, targetNode *FileNode
+
+	if strings.HasPrefix(node.Path, sourceRoot) {
+		relPath, _ = filepath.Rel(sourceRoot, node.Path)
+		sourceNode = node
+		targetNode = findFileNodeByRelPath(targetTree, targetRoot, relPath)
+	} else {
+		relPath, _ = filepath.Rel(targetRoot, node.Path)
+		targetNode = node
+		sourceNode = findFileNodeByRelPath(sourceTree, sourceRoot, relPath)
+	}
+
+	if targetNode == nil {
+		// File exists only in source (Added)
+		if sourceNode != nil {
+			sourceNode.Status = StatusAdded
+		}
+	} else if sourceNode == nil {
+		// File exists only in target (Deleted)
+		if targetNode != nil {
+			targetNode.Status = StatusDeleted
+		}
+	} else {
+		// File exists in both trees
+		if sourceNode.IsDir != targetNode.IsDir {
+			sourceNode.Status = StatusConflict
+			targetNode.Status = StatusConflict
+		} else if sourceNode.IsDir {
+			// Both are directories - status doesn't change for directories
+			return
+		} else {
+			// Both are files, compare content
+			sourceHash, _ := computeMD5(sourceNode.Path)
+			targetHash, _ := computeMD5(targetNode.Path)
+			if sourceHash == targetHash {
+				sourceNode.Status = StatusUnchanged
+				targetNode.Status = StatusUnchanged
+			} else {
+				sourceNode.Status = StatusModified
+				targetNode.Status = StatusModified
+			}
+		}
+	}
+}
+
+// findFileNodeByRelPath finds a FileNode by relative path in a tree
+func findFileNodeByRelPath(root *FileNode, rootPath, relPath string) *FileNode {
+	if root == nil {
+		return nil
+	}
+
+	// Handle root node
+	if relPath == "." || relPath == "" {
+		return root
+	}
+
+	parts := strings.Split(relPath, string(filepath.Separator))
+	current := root
+
+	for _, part := range parts {
+		found := false
+		for _, child := range current.Children {
+			if child.Name == part {
+				current = child
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil
+		}
+	}
+
+	return current
+}
+
+func main() {
+	var helpFlag bool
+	var outputFile string
+	var excludePatterns []string
+
+	flag.BoolVar(&helpFlag, "help", false, "Display usage information and exit")
+	flag.BoolVar(&helpFlag, "h", false, "Display usage information and exit")
+	flag.StringVar(&outputFile, "output", "", "Path to file where rejected files list will be written on exit")
+
+	// Custom flag parsing for --exclude (can be specified multiple times)
+	args := os.Args[1:]
+	var positionalArgs []string
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		if arg == "--help" || arg == "-h" {
+			helpFlag = true
+		} else if arg == "--output" && i+1 < len(args) {
+			outputFile = args[i+1]
+			i++
+		} else if arg == "--exclude" && i+1 < len(args) {
+			excludePatterns = append(excludePatterns, args[i+1])
+			i++
+		} else if arg[0] != '-' {
+			positionalArgs = append(positionalArgs, arg)
+		}
+	}
+
+	if helpFlag {
+		if os.Getenv("AV_SINGLE_LINE_HELP") != "" {
+			fmt.Println("Compare starter/template directory with target project directory")
+			os.Exit(0)
+		}
+		fmt.Println("Usage: starter-diff <source_dir> <target_dir> [--output <output_file>] [--exclude <pattern>]...")
+		fmt.Println()
+		fmt.Println("Arguments:")
+		fmt.Println("  source_dir              Path to starter/template directory (required)")
+		fmt.Println("  target_dir              Path to target project directory (required)")
+		fmt.Println("  --output <output_file>  Path to file where rejected files list will be written on exit (optional)")
+		fmt.Println("  --exclude <pattern>     Additional exclusion pattern to exclude from comparison (optional, can be specified multiple times)")
+		fmt.Println()
+		fmt.Println("Options:")
+		fmt.Println("  -h, --help              Display usage information and exit")
+		fmt.Println()
+		fmt.Println("Examples:")
+		fmt.Println("  starter-diff /path/to/starter /path/to/project")
+		fmt.Println("  starter-diff starter project --exclude build --exclude .env")
+		fmt.Println("  starter-diff starter project --output rejected.txt")
+		os.Exit(0)
+	}
+
+	if len(positionalArgs) < 2 {
+		fmt.Fprintf(os.Stderr, "Error: source_dir and target_dir are required\n")
+		fmt.Fprintf(os.Stderr, "Use --help for usage information\n")
+		os.Exit(2)
+	}
+
+	sourceDir := positionalArgs[0]
+	targetDir := positionalArgs[1]
+
+	// Validate directories exist
+	if _, err := os.Stat(sourceDir); os.IsNotExist(err) {
+		fmt.Fprintf(os.Stderr, "Error: source directory does not exist: %s\n", sourceDir)
+		os.Exit(2)
+	}
+	if _, err := os.Stat(targetDir); os.IsNotExist(err) {
+		fmt.Fprintf(os.Stderr, "Error: target directory does not exist: %s\n", targetDir)
+		os.Exit(2)
+	}
+
+	// Convert to absolute paths
+	sourceAbs, err := filepath.Abs(sourceDir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: failed to resolve source directory: %v\n", err)
+		os.Exit(2)
+	}
+	targetAbs, err := filepath.Abs(targetDir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: failed to resolve target directory: %v\n", err)
+		os.Exit(2)
+	}
+
+	// Validate they are directories
+	sourceInfo, err := os.Stat(sourceAbs)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: failed to stat source directory: %v\n", err)
+		os.Exit(2)
+	}
+	if !sourceInfo.IsDir() {
+		fmt.Fprintf(os.Stderr, "Error: source path is not a directory: %s\n", sourceAbs)
+		os.Exit(2)
+	}
+
+	targetInfo, err := os.Stat(targetAbs)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: failed to stat target directory: %v\n", err)
+		os.Exit(2)
+	}
+	if !targetInfo.IsDir() {
+		fmt.Fprintf(os.Stderr, "Error: target path is not a directory: %s\n", targetAbs)
+		os.Exit(2)
+	}
+
+	// Build file trees
+	fmt.Fprintf(os.Stderr, "Scanning directories...\n")
+	sourceTree, err := buildTree(sourceAbs, excludePatterns)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: failed to scan source directory: %v\n", err)
+		os.Exit(2)
+	}
+
+	targetTree, err := buildTree(targetAbs, excludePatterns)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: failed to scan target directory: %v\n", err)
+		os.Exit(2)
+	}
+
+	// Compare trees
+	fmt.Fprintf(os.Stderr, "Comparing files...\n")
+	rejectedFiles := make(map[string]bool)
+	compareTrees(sourceTree, targetTree, sourceAbs, targetAbs, rejectedFiles)
+
+	// Initialize app state
+	appState := &AppState{
+		sourceDir:       sourceAbs,
+		targetDir:       targetAbs,
+		outputFile:      outputFile,
+		excludePatterns: excludePatterns,
+		sourceTree:      sourceTree,
+		targetTree:      targetTree,
+		rejectedFiles:   rejectedFiles,
+		showAll:         false,
+		filterPattern:   "",
+	}
+
+	// Run TUI
+	runTUI(appState)
+}
+
+// runTUI starts the TUI application
+func runTUI(appState *AppState) {
+	app := tview.NewApplication()
+
+	// Create source tree view
+	sourceTreeView := tview.NewTreeView()
+	sourceTreeView.SetBorder(true)
+	sourceTreeView.SetTitle("Source (Starter)")
+
+	// Create target tree view
+	targetTreeView := tview.NewTreeView()
+	targetTreeView.SetBorder(true)
+	targetTreeView.SetTitle("Target (Project)")
+
+	// Create filter input (initially hidden)
+	filterInput := tview.NewInputField()
+	filterInput.SetLabel("Filter: ")
+	filterInput.SetFieldBackgroundColor(tcell.ColorBlack)
+
+	// Convert FileNode to tview TreeNode
+	var convertToTreeNode func(*FileNode, string, string) *tview.TreeNode
+	convertToTreeNode = func(node *FileNode, rootPath, filterPattern string) *tview.TreeNode {
+		if node == nil {
+			return nil
+		}
+
+		// Apply filtering
+		relPath, _ := filepath.Rel(rootPath, node.Path)
+		if filterPattern != "" && !strings.Contains(strings.ToLower(relPath), strings.ToLower(filterPattern)) {
+			return nil
+		}
+
+		// Apply status filtering
+		if !appState.showAll {
+			if node.Status == StatusUnchanged && !appState.rejectedFiles[relPath] {
+				// Skip unchanged files unless they're rejected
+				if !node.IsDir {
+					// Check if any children should be shown
+					hasVisibleChildren := false
+					for _, child := range node.Children {
+						childRelPath, _ := filepath.Rel(rootPath, child.Path)
+						if appState.rejectedFiles[childRelPath] || child.Status != StatusUnchanged {
+							hasVisibleChildren = true
+							break
+						}
+					}
+					if !hasVisibleChildren {
+						return nil
+					}
+				}
+			}
+		}
+
+		// Build display text
+		displayText := node.Name
+		if node.IsDir {
+			displayText = node.Name + "/"
+		}
+		if appState.rejectedFiles[relPath] {
+			displayText += " [rejected]"
+		}
+
+		// Set color based on status
+		color := tcell.ColorWhite
+		if appState.rejectedFiles[relPath] {
+			color = tcell.ColorGray
+		} else {
+			switch node.Status {
+			case StatusModified:
+				color = tcell.ColorYellow
+			case StatusAdded:
+				color = tcell.ColorGreen
+			case StatusDeleted:
+				color = tcell.ColorRed
+			case StatusConflict:
+				color = tcell.NewRGBColor(255, 0, 255) // Magenta
+			case StatusUnchanged:
+				color = tcell.ColorWhite
+			}
+		}
+
+		tn := tview.NewTreeNode(displayText).SetColor(color).SetReference(node)
+		tn.SetSelectable(true)
+
+		// Add children
+		for _, child := range node.Children {
+			childTn := convertToTreeNode(child, rootPath, filterPattern)
+			if childTn != nil {
+				tn.AddChild(childTn)
+			}
+		}
+
+		// Set expandable if directory
+		if node.IsDir && len(tn.GetChildren()) > 0 {
+			tn.SetSelectable(true)
+		}
+
+		return tn
+	}
+
+	// Flag to prevent infinite recursion when syncing selections (declared early for refreshTrees access)
+	syncingSelection := false
+
+	// Helper function to find TreeNode by relative path in a tree (declared early for refreshTrees access)
+	findTreeNodeByRelPath := func(root *tview.TreeNode, rootPath, relPath string) *tview.TreeNode {
+		if root == nil {
+			return nil
+		}
+		var walk func(*tview.TreeNode) *tview.TreeNode
+		walk = func(tn *tview.TreeNode) *tview.TreeNode {
+			if tn == nil {
+				return nil
+			}
+			if ref := tn.GetReference(); ref != nil {
+				if fn := ref.(*FileNode); fn != nil {
+					nodeRelPath, err := filepath.Rel(rootPath, fn.Path)
+					if err == nil && nodeRelPath == relPath {
+						return tn
+					}
+				}
+			}
+			for _, child := range tn.GetChildren() {
+				if found := walk(child); found != nil {
+					return found
+				}
+			}
+			return nil
+		}
+		return walk(root)
+	}
+
+	// Refresh tree views
+	// If preserveSelection is true, tries to preserve the current selection by relative path
+	refreshTrees := func(preserveSelection ...bool) {
+		preserve := len(preserveSelection) > 0 && preserveSelection[0]
+
+		// Store current selection paths if preserving
+		var sourceRelPath, targetRelPath string
+		if preserve {
+			if current := sourceTreeView.GetCurrentNode(); current != nil {
+				if ref := current.GetReference(); ref != nil {
+					if fn := ref.(*FileNode); fn != nil {
+						sourceRelPath, _ = filepath.Rel(appState.sourceDir, fn.Path)
+					}
+				}
+			}
+			if current := targetTreeView.GetCurrentNode(); current != nil {
+				if ref := current.GetReference(); ref != nil {
+					if fn := ref.(*FileNode); fn != nil {
+						targetRelPath, _ = filepath.Rel(appState.targetDir, fn.Path)
+					}
+				}
+			}
+		}
+
+		sourceRoot := convertToTreeNode(appState.sourceTree, appState.sourceDir, appState.filterPattern)
+		targetRoot := convertToTreeNode(appState.targetTree, appState.targetDir, appState.filterPattern)
+		sourceTreeView.SetRoot(sourceRoot)
+		targetTreeView.SetRoot(targetRoot)
+
+		// Use syncingSelection flag to prevent triggering sync during refresh
+		syncingSelection = true
+
+		if preserve && (sourceRelPath != "" || targetRelPath != "") {
+			// Try to restore previous selection
+			if sourceRelPath != "" && sourceRoot != nil {
+				if restoredNode := findTreeNodeByRelPath(sourceRoot, appState.sourceDir, sourceRelPath); restoredNode != nil {
+					sourceTreeView.SetCurrentNode(restoredNode)
+				} else if sourceRoot != nil {
+					// Fallback to root if node not found
+					sourceTreeView.SetCurrentNode(sourceRoot)
+				}
+			} else if sourceRoot != nil {
+				sourceTreeView.SetCurrentNode(sourceRoot)
+			}
+
+			if targetRelPath != "" && targetRoot != nil {
+				if restoredNode := findTreeNodeByRelPath(targetRoot, appState.targetDir, targetRelPath); restoredNode != nil {
+					targetTreeView.SetCurrentNode(restoredNode)
+				} else if targetRoot != nil {
+					// Fallback to root if node not found
+					targetTreeView.SetCurrentNode(targetRoot)
+				}
+			} else if targetRoot != nil {
+				targetTreeView.SetCurrentNode(targetRoot)
+			}
+		} else {
+			// Always set current node to root to ensure selection is visible
+			if sourceRoot != nil {
+				sourceTreeView.SetCurrentNode(sourceRoot)
+			}
+			if targetRoot != nil {
+				targetTreeView.SetCurrentNode(targetRoot)
+			}
+		}
+
+		syncingSelection = false
+	}
+
+	refreshTrees()
+
+	// Create layout
+	flex := tview.NewFlex().
+		AddItem(sourceTreeView, 0, 1, true).
+		AddItem(targetTreeView, 0, 1, false)
+
+	// Footer - will be updated dynamically to show filter status
+	footer := tview.NewTextView().
+		SetDynamicColors(true)
+
+	// Function to update footer text
+	updateFooter := func() {
+		filterText := "filter"
+		if appState.filterPattern != "" {
+			filterText = "[::b]filter[::-]"
+		}
+		footer.SetText(fmt.Sprintf("Colors: [yellow]Modified[yellow] [green]Added[green] [red]Deleted[red] [magenta]Conflict[magenta] [gray]Rejected[gray] | Enter: diff | 'r': reject | → expand | ← collapse | '/' %s | 'h': help | 'q' or Esc: exit", filterText))
+	}
+	updateFooter()
+
+	mainLayout := tview.NewFlex().
+		SetDirection(tview.FlexRow).
+		AddItem(flex, 0, 1, true).
+		AddItem(footer, 1, 0, false)
+
+	// Current focus (0 = source, 1 = target)
+	focusIndex := 0
+	filterActive := false
+
+	// Set up key handlers on main layout (not app level)
+	setupKeyHandlers := func() {
+		mainLayout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+			if filterActive {
+				// Filter mode is handled by filterInput itself
+				return event
+			}
+
+			// Check for character keys first
+			rune := event.Rune()
+			switch rune {
+			case 'q', 'Q':
+				showExitDialog(app, appState, mainLayout)
+				return nil
+			case 'h', 'H':
+				showHelpDialog(app, mainLayout)
+				return nil
+			case 'a', 'A':
+				appState.showAll = !appState.showAll
+				refreshTrees(true) // Preserve selection when toggling view
+				return nil
+			case 'r', 'R':
+				// Toggle rejection status (works for both files and directories)
+				currentView := sourceTreeView
+				if focusIndex == 1 {
+					currentView = targetTreeView
+				}
+				current := currentView.GetCurrentNode()
+				if current != nil {
+					if ref := current.GetReference(); ref != nil {
+						if fn := ref.(*FileNode); fn != nil {
+							// Calculate relative path
+							var relPath string
+							var rootPath string
+							if strings.HasPrefix(fn.Path, appState.sourceDir) {
+								relPath, _ = filepath.Rel(appState.sourceDir, fn.Path)
+								rootPath = appState.sourceDir
+							} else {
+								relPath, _ = filepath.Rel(appState.targetDir, fn.Path)
+								rootPath = appState.targetDir
+							}
+
+							// Check if this path (or any file within it) is already rejected
+							isRejected := false
+							if fn.IsDir {
+								// For directories, check if any file within is rejected
+								for rejectedPath := range appState.rejectedFiles {
+									if rejectedPath == relPath || strings.HasPrefix(rejectedPath, relPath+"/") {
+										isRejected = true
+										break
+									}
+								}
+							} else {
+								// For files, check directly
+								isRejected = appState.rejectedFiles[relPath]
+							}
+
+							// Toggle rejection
+							if isRejected {
+								// Un-reject: recursively un-reject all files in directory or single file
+								if fn.IsDir {
+									// Recursively un-reject all files in this directory
+									rejectDirectory(fn, rootPath, appState.rejectedFiles, false)
+									// Also handle corresponding node in other tree
+									var correspondingNode *FileNode
+									if strings.HasPrefix(fn.Path, appState.sourceDir) {
+										correspondingNode = findFileNodeByRelPath(appState.targetTree, appState.targetDir, relPath)
+									} else {
+										correspondingNode = findFileNodeByRelPath(appState.sourceTree, appState.sourceDir, relPath)
+									}
+									if correspondingNode != nil {
+										var otherRootPath string
+										if strings.HasPrefix(fn.Path, appState.sourceDir) {
+											otherRootPath = appState.targetDir
+										} else {
+											otherRootPath = appState.sourceDir
+										}
+										rejectDirectory(correspondingNode, otherRootPath, appState.rejectedFiles, false)
+									}
+									// Recalculate status for all files in the directory
+									recalculateDirectoryStatus(fn, appState.sourceTree, appState.targetTree, appState.sourceDir, appState.targetDir)
+								} else {
+									// Un-reject single file
+									delete(appState.rejectedFiles, relPath)
+									// Find both source and target nodes
+									sourceNode := findFileNodeByRelPath(appState.sourceTree, appState.sourceDir, relPath)
+									targetNode := findFileNodeByRelPath(appState.targetTree, appState.targetDir, relPath)
+									// Recalculate status - this will update both nodes
+									if sourceNode != nil {
+										recalculateNodeStatus(sourceNode, appState.sourceTree, appState.targetTree, appState.sourceDir, appState.targetDir)
+									} else if targetNode != nil {
+										recalculateNodeStatus(targetNode, appState.sourceTree, appState.targetTree, appState.sourceDir, appState.targetDir)
+									}
+								}
+							} else {
+								// Reject: recursively reject all files in directory or single file
+								if fn.IsDir {
+									// Recursively reject all files in this directory
+									rejectDirectory(fn, rootPath, appState.rejectedFiles, true)
+									// Also handle corresponding node in other tree
+									var correspondingNode *FileNode
+									if strings.HasPrefix(fn.Path, appState.sourceDir) {
+										correspondingNode = findFileNodeByRelPath(appState.targetTree, appState.targetDir, relPath)
+									} else {
+										correspondingNode = findFileNodeByRelPath(appState.sourceTree, appState.sourceDir, relPath)
+									}
+									if correspondingNode != nil {
+										var otherRootPath string
+										if strings.HasPrefix(fn.Path, appState.sourceDir) {
+											otherRootPath = appState.targetDir
+										} else {
+											otherRootPath = appState.sourceDir
+										}
+										rejectDirectory(correspondingNode, otherRootPath, appState.rejectedFiles, true)
+									}
+								} else {
+									// Reject single file
+									appState.rejectedFiles[relPath] = true
+									fn.Status = StatusRejected
+									// Find and update corresponding node in the other tree
+									if strings.HasPrefix(fn.Path, appState.sourceDir) {
+										findAndUpdateNode(appState.targetTree, relPath, StatusRejected)
+									} else {
+										findAndUpdateNode(appState.sourceTree, relPath, StatusRejected)
+									}
+								}
+							}
+							refreshTrees(true) // Refresh trees to show updated status, preserving selection
+						}
+					}
+				}
+				return nil
+			case '/':
+				showFilterDialog(app, appState, mainLayout, sourceTreeView, targetTreeView, focusIndex, refreshTrees, updateFooter)
+				return nil
+			case ' ':
+				// Toggle directory expand/collapse
+				currentView := sourceTreeView
+				if focusIndex == 1 {
+					currentView = targetTreeView
+				}
+				current := currentView.GetCurrentNode()
+				if current != nil {
+					node := current.GetReference().(*FileNode)
+					if node.IsDir {
+						current.SetExpanded(!current.IsExpanded())
+					}
+				}
+				return nil
+			}
+
+			// Check for special keys
+			switch event.Key() {
+			case tcell.KeyEscape, tcell.KeyCtrlC:
+				// Exit confirmation
+				showExitDialog(app, appState, mainLayout)
+				return nil
+			case tcell.KeyTab:
+				focusIndex = 1 - focusIndex
+				if focusIndex == 0 {
+					app.SetFocus(sourceTreeView)
+				} else {
+					app.SetFocus(targetTreeView)
+				}
+				return nil
+			case tcell.KeyRight:
+				// Expand directory
+				currentView := sourceTreeView
+				if focusIndex == 1 {
+					currentView = targetTreeView
+				}
+				current := currentView.GetCurrentNode()
+				if current != nil {
+					node := current.GetReference().(*FileNode)
+					if node.IsDir && !current.IsExpanded() {
+						current.SetExpanded(true)
+					}
+				}
+				return nil
+			case tcell.KeyLeft:
+				// Collapse directory
+				currentView := sourceTreeView
+				if focusIndex == 1 {
+					currentView = targetTreeView
+				}
+				current := currentView.GetCurrentNode()
+				if current != nil {
+					node := current.GetReference().(*FileNode)
+					if node.IsDir {
+						current.SetExpanded(false)
+					} else if node.Parent != nil {
+						// Find parent node and collapse it
+						parentPath := node.Parent.Path
+						findAndCollapse := func(tn *tview.TreeNode) bool {
+							if ref := tn.GetReference(); ref != nil {
+								if fn := ref.(*FileNode); fn.Path == parentPath {
+									tn.SetExpanded(false)
+									return true
+								}
+							}
+							return false
+						}
+						walkTree(currentView.GetRoot(), findAndCollapse)
+					}
+				}
+				return nil
+			case tcell.KeyEnter:
+				// Show diff or toggle directory
+				currentView := sourceTreeView
+				if focusIndex == 1 {
+					currentView = targetTreeView
+				}
+				current := currentView.GetCurrentNode()
+				if current != nil {
+					node := current.GetReference().(*FileNode)
+					if node.IsDir {
+						current.SetExpanded(!current.IsExpanded())
+					} else {
+						showDiff(app, appState, node, mainLayout, refreshTrees, currentView)
+					}
+				}
+				return nil
+			}
+
+			// Let other keys (like Up/Down arrows) pass through to tree views
+			return event
+		})
+	}
+
+	// Set up selection synchronization
+	sourceTreeView.SetChangedFunc(func(node *tview.TreeNode) {
+		if syncingSelection || node == nil {
+			return
+		}
+		if ref := node.GetReference(); ref != nil {
+			if fn := ref.(*FileNode); fn != nil {
+				// Calculate relative path from source directory
+				relPath, err := filepath.Rel(appState.sourceDir, fn.Path)
+				if err != nil {
+					return
+				}
+				// Find corresponding node in target tree
+				targetRoot := targetTreeView.GetRoot()
+				if targetRoot != nil {
+					correspondingNode := findTreeNodeByRelPath(targetRoot, appState.targetDir, relPath)
+					if correspondingNode != nil {
+						syncingSelection = true
+						targetTreeView.SetCurrentNode(correspondingNode)
+						syncingSelection = false
+					}
+				}
+			}
+		}
+	})
+
+	targetTreeView.SetChangedFunc(func(node *tview.TreeNode) {
+		if syncingSelection || node == nil {
+			return
+		}
+		if ref := node.GetReference(); ref != nil {
+			if fn := ref.(*FileNode); fn != nil {
+				// Calculate relative path from target directory
+				relPath, err := filepath.Rel(appState.targetDir, fn.Path)
+				if err != nil {
+					return
+				}
+				// Find corresponding node in source tree
+				sourceRoot := sourceTreeView.GetRoot()
+				if sourceRoot != nil {
+					correspondingNode := findTreeNodeByRelPath(sourceRoot, appState.sourceDir, relPath)
+					if correspondingNode != nil {
+						syncingSelection = true
+						sourceTreeView.SetCurrentNode(correspondingNode)
+						syncingSelection = false
+					}
+				}
+			}
+		}
+	})
+
+	// Set up tree view handlers
+	sourceTreeView.SetSelectedFunc(func(node *tview.TreeNode) {
+		if ref := node.GetReference(); ref != nil {
+			if fn := ref.(*FileNode); !fn.IsDir {
+				showDiff(app, appState, fn, mainLayout, refreshTrees, sourceTreeView)
+			}
+		}
+	})
+
+	targetTreeView.SetSelectedFunc(func(node *tview.TreeNode) {
+		if ref := node.GetReference(); ref != nil {
+			if fn := ref.(*FileNode); !fn.IsDir {
+				showDiff(app, appState, fn, mainLayout, refreshTrees, targetTreeView)
+			}
+		}
+	})
+
+	// Set input capture on tree views to intercept ONLY app-level keys
+	// For navigation keys, we need to let the tree view handle them.
+	// In tview, input capture runs BEFORE normal widget processing.
+	// Returning nil bubbles the event up (widget doesn't process it).
+	// Returning event consumes it (widget processes it normally).
+	// So for navigation keys, we want the widget to process them, which means
+	// we should return event. But that consumes it. However, the widget should
+	// have already processed it in its normal flow before input capture.
+	// Actually wait - input capture is called FIRST, so if we return event,
+	// the widget processes it. If we return nil, it bubbles.
+	// So for navigation: return event to let tree view process.
+	// For app keys: return nil to bubble to main layout.
+	sourceTreeView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		rune := event.Rune()
+		// Intercept app-level character keys - bubble them up
+		if rune == 'q' || rune == 'Q' || rune == 'h' || rune == 'H' || rune == 'a' || rune == 'A' || rune == '/' || rune == ' ' || rune == 'r' || rune == 'R' {
+			return nil // Bubble up to main layout
+		}
+		key := event.Key()
+		// Intercept app-level special keys - bubble them up
+		if key == tcell.KeyEscape || key == tcell.KeyCtrlC || key == tcell.KeyEnter ||
+			key == tcell.KeyRight || key == tcell.KeyLeft || key == tcell.KeyTab {
+			return nil // Bubble up to main layout
+		}
+		// For navigation keys, return event to let tree view handle them
+		// This allows the tree view to process Up/Down/PageUp/PageDown/Home/End
+		return event
+	})
+
+	targetTreeView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		rune := event.Rune()
+		// Intercept app-level character keys - bubble them up
+		if rune == 'q' || rune == 'Q' || rune == 'h' || rune == 'H' || rune == 'a' || rune == 'A' || rune == '/' || rune == ' ' || rune == 'r' || rune == 'R' {
+			return nil // Bubble up to main layout
+		}
+		key := event.Key()
+		// Intercept app-level special keys - bubble them up
+		if key == tcell.KeyEscape || key == tcell.KeyCtrlC || key == tcell.KeyEnter ||
+			key == tcell.KeyRight || key == tcell.KeyLeft || key == tcell.KeyTab {
+			return nil // Bubble up to main layout
+		}
+		// For navigation keys, return event to let tree view handle them
+		return event
+	})
+
+	setupKeyHandlers()
+
+	app.SetRoot(mainLayout, true)
+	app.SetFocus(sourceTreeView)
+
+	if err := app.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error running application: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+// walkTree walks a tree node recursively
+func walkTree(node *tview.TreeNode, fn func(*tview.TreeNode) bool) bool {
+	if fn(node) {
+		return true
+	}
+	for _, child := range node.GetChildren() {
+		if walkTree(child, fn) {
+			return true
+		}
+	}
+	return false
+}
+
+// showDiff displays a diff dialog
+func showDiff(app *tview.Application, appState *AppState, node *FileNode, mainLayout tview.Primitive, refreshTrees func(preserveSelection ...bool), focusedTreeView *tview.TreeView) {
+	modal := tview.NewModal()
+	modal.SetText("Computing diff...")
+	modal.AddButtons([]string{"Close"})
+	app.SetRoot(modal, true)
+
+	// Compute diff asynchronously
+	go func() {
+		var diffOutput string
+
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		// Determine if node is from source or target tree
+		var sourcePath, targetPath string
+		var relPath string
+
+		// Check if path is in source or target directory
+		if strings.HasPrefix(node.Path, appState.sourceDir) {
+			// Node is from source tree
+			sourcePath = node.Path
+			relPath, _ = filepath.Rel(appState.sourceDir, node.Path)
+			targetPath = filepath.Join(appState.targetDir, relPath)
+		} else {
+			// Node is from target tree
+			targetPath = node.Path
+			relPath, _ = filepath.Rel(appState.targetDir, node.Path)
+			sourcePath = filepath.Join(appState.sourceDir, relPath)
+		}
+
+		switch node.Status {
+		case StatusAdded:
+			// Compare source against /dev/null
+			cmd := exec.CommandContext(ctx, "diff", "-u", "/dev/null", sourcePath)
+			output, _ := cmd.CombinedOutput()
+			diffOutput = string(output)
+		case StatusDeleted:
+			// Compare /dev/null against target
+			cmd := exec.CommandContext(ctx, "diff", "-u", targetPath, "/dev/null")
+			output, _ := cmd.CombinedOutput()
+			diffOutput = string(output)
+		case StatusModified, StatusUnchanged:
+			cmd := exec.CommandContext(ctx, "diff", "-u", sourcePath, targetPath)
+			output, _ := cmd.CombinedOutput()
+			diffOutput = string(output)
+			if len(diffOutput) == 0 {
+				diffOutput = "No differences found"
+			}
+		default:
+			diffOutput = "Cannot diff this file type"
+		}
+
+		app.QueueUpdateDraw(func() {
+			// Create diff view
+			diffTextView := tview.NewTextView()
+			diffTextView.SetDynamicColors(true)
+			diffTextView.SetScrollable(true)
+			diffTextView.SetWrap(true)
+
+			// Syntax highlight diff
+			lines := strings.Split(diffOutput, "\n")
+			for _, line := range lines {
+				if strings.HasPrefix(line, "+++") || strings.HasPrefix(line, "---") {
+					diffTextView.Write([]byte("[yellow]" + tview.Escape(line) + "[white]\n"))
+				} else if strings.HasPrefix(line, "@@") {
+					diffTextView.Write([]byte("[cyan]" + tview.Escape(line) + "[white]\n"))
+				} else if strings.HasPrefix(line, "+") {
+					diffTextView.Write([]byte("[green]" + tview.Escape(line) + "[white]\n"))
+				} else if strings.HasPrefix(line, "-") {
+					diffTextView.Write([]byte("[red]" + tview.Escape(line) + "[white]\n"))
+				} else {
+					diffTextView.Write([]byte(tview.Escape(line) + "\n"))
+				}
+			}
+
+			diffTextView.SetBorder(true)
+			diffTextView.SetTitle("Diff: " + filepath.Base(node.Path))
+
+			footer := tview.NewTextView().
+				SetDynamicColors(true).
+				SetText("↑↓: scroll | Page Up/Down: page | Home/End: top/bottom | [red]r[white]: reject | Backspace/Esc/q: close")
+
+			diffLayout := tview.NewFlex().
+				SetDirection(tview.FlexRow).
+				AddItem(diffTextView, 0, 1, true).
+				AddItem(footer, 1, 0, false)
+
+			// Capture relPath for use in rejection
+			rejectRelPath := relPath
+			diffLayout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+				// Check for character keys first
+				rune := event.Rune()
+				switch rune {
+				case 'q', 'Q':
+					app.SetRoot(mainLayout, true)
+					app.SetFocus(focusedTreeView) // Restore focus to the tree view that opened the diff
+					return nil
+				case 'r', 'R':
+					// Reject file
+					appState.rejectedFiles[rejectRelPath] = true
+					node.Status = StatusRejected
+					// Find and update corresponding node in the other tree
+					if strings.HasPrefix(node.Path, appState.sourceDir) {
+						findAndUpdateNode(appState.targetTree, rejectRelPath, StatusRejected)
+					} else {
+						findAndUpdateNode(appState.sourceTree, rejectRelPath, StatusRejected)
+					}
+					refreshTrees(true) // Refresh trees to show rejected status, preserving selection
+					app.SetRoot(mainLayout, true)
+					app.SetFocus(focusedTreeView) // Restore focus to the tree view that opened the diff
+					return nil
+				}
+				// Check for special keys
+				switch event.Key() {
+				case tcell.KeyBackspace, tcell.KeyEscape:
+					refreshTrees(true) // Refresh trees in case anything changed, preserving selection
+					app.SetRoot(mainLayout, true)
+					app.SetFocus(focusedTreeView) // Restore focus to the tree view that opened the diff
+					return nil
+				}
+				// Let text view handle scrolling keys
+				return event
+			})
+
+			app.SetRoot(diffLayout, true)
+			app.SetFocus(diffTextView)
+		})
+	}()
+}
+
+// findAndUpdateNode finds a node by relative path and updates its status
+func findAndUpdateNode(root *FileNode, relPath string, status FileStatus) bool {
+	return findAndUpdateNodeHelper(root, root.Path, relPath, status)
+}
+
+func findAndUpdateNodeHelper(node *FileNode, rootPath, relPath string, status FileStatus) bool {
+	if node == nil {
+		return false
+	}
+	// Compute relative path from root
+	nodeRelPath, err := filepath.Rel(rootPath, node.Path)
+	if err != nil {
+		return false
+	}
+	if nodeRelPath == relPath {
+		node.Status = status
+		return true
+	}
+	for _, child := range node.Children {
+		if findAndUpdateNodeHelper(child, rootPath, relPath, status) {
+			return true
+		}
+	}
+	return false
+}
+
+// showFilterDialog displays the filter dialog overlay
+func showFilterDialog(app *tview.Application, appState *AppState, mainLayout tview.Primitive, sourceTreeView *tview.TreeView, targetTreeView *tview.TreeView, focusIndex int, refreshTrees func(preserveSelection ...bool), updateFooter func()) {
+	// Store the original filter pattern to restore if cancelled
+	originalFilter := appState.filterPattern
+
+	// Create input field for filter
+	filterInput := tview.NewInputField()
+	filterInput.SetLabel("Filter: ")
+	filterInput.SetFieldBackgroundColor(tcell.ColorBlack)
+	filterInput.SetText(appState.filterPattern)
+
+	// Create footer for dialog with instructions
+	dialogFooter := tview.NewTextView().
+		SetDynamicColors(true).
+		SetText("Enter: apply filter | Esc: cancel")
+
+	// Create a container for the input field with border and footer
+	// Height: 1 for input + 2 for border + 1 for footer = 4 total
+	inputContainer := tview.NewFlex().
+		SetDirection(tview.FlexRow).
+		AddItem(filterInput, 1, 0, true).
+		AddItem(dialogFooter, 1, 0, false)
+
+	inputContainer.SetBorder(true)
+	inputContainer.SetTitle("Filter")
+
+	// Create a centered flex that will hold the dialog
+	// This will be 70% width - use fixed sizes: 15% left margin, 70% dialog, 15% right margin
+	centeredFlex := tview.NewFlex().
+		AddItem(nil, 0, 15, false).
+		AddItem(inputContainer, 0, 70, false).
+		AddItem(nil, 0, 15, false)
+
+	// Create a custom Box that draws the main layout and overlays the dialog
+	type filterDialogBox struct {
+		*tview.Box
+		mainLayout  tview.Primitive
+		dialog      tview.Primitive
+		filterInput *tview.InputField
+	}
+
+	dialogBox := &filterDialogBox{
+		Box:         tview.NewBox(),
+		mainLayout:  mainLayout,
+		dialog:      centeredFlex,
+		filterInput: filterInput,
+	}
+
+	dialogBox.SetDrawFunc(func(screen tcell.Screen, x, y, width, height int) (int, int, int, int) {
+		// Draw the main layout first (full screen)
+		mainLayout.SetRect(x, y, width, height)
+		mainLayout.Draw(screen)
+
+		// Calculate dialog position: 70% width, centered horizontally, near top
+		dialogWidth := width * 70 / 100
+		dialogX := x + (width-dialogWidth)/2
+		dialogY := y + 2  // Position near top
+		dialogHeight := 4 // 1 for input + 2 for border + 1 for footer
+
+		// Set rectangles for the dialog components so they can receive focus properly
+		centeredFlex.SetRect(dialogX, dialogY, dialogWidth, dialogHeight)
+		inputContainer.SetRect(dialogX+1, dialogY+1, dialogWidth-2, dialogHeight-2)
+		// Input field rectangle: account for border (1 char on each side) and label
+		inputX := dialogX + 1
+		inputY := dialogY + 1
+		inputWidth := dialogWidth - 2
+		inputHeight := 1
+		filterInput.SetRect(inputX, inputY, inputWidth, inputHeight)
+
+		// Draw the dialog on top
+		centeredFlex.Draw(screen)
+
+		return x, y, width, height
+	})
+
+	// Wrap in a Flex to make it focusable (following the pattern of other dialogs)
+	dialogLayout := tview.NewFlex().
+		SetDirection(tview.FlexRow).
+		AddItem(dialogBox, 0, 1, true)
+
+	// Set up input handlers
+	filterInput.SetChangedFunc(func(text string) {
+		// Update filter pattern as user types
+		appState.filterPattern = text
+		refreshTrees(true) // Preserve selection when filtering
+		updateFooter()     // Update footer to show filter status
+		app.Draw()         // Force redraw to show updated trees
+	})
+
+	closeDialog := func(applyFilter bool) {
+		if !applyFilter {
+			// Cancel: restore original filter
+			appState.filterPattern = originalFilter
+			refreshTrees(true)
+		}
+		updateFooter()
+		app.SetRoot(mainLayout, true)
+		// Restore focus to the appropriate tree view
+		if focusIndex == 0 {
+			app.SetFocus(sourceTreeView)
+		} else {
+			app.SetFocus(targetTreeView)
+		}
+	}
+
+	// Set input capture on the input field itself to handle Enter/Escape
+	filterInput.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		// Handle Enter and Escape to close dialog
+		switch event.Key() {
+		case tcell.KeyEnter:
+			closeDialog(true)
+			return nil
+		case tcell.KeyEscape:
+			closeDialog(false)
+			return nil
+		}
+		// Let the input field handle all other input (typing, backspace, etc.)
+		return event
+	})
+
+	// Set input capture on dialogLayout to handle events that bubble up
+	dialogLayout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		// Only handle Enter/Escape if they weren't handled by input field
+		switch event.Key() {
+		case tcell.KeyEnter:
+			closeDialog(true)
+			return nil
+		case tcell.KeyEscape:
+			closeDialog(false)
+			return nil
+		}
+		// Let other events pass through to input field
+		return event
+	})
+
+	// Set the root to dialogLayout and focus the input field
+	app.SetRoot(dialogLayout, true)
+	app.SetFocus(filterInput)
+}
+
+// showHelpDialog displays the help dialog
+func showHelpDialog(app *tview.Application, mainLayout tview.Primitive) {
+	helpText := `Keyboard Shortcuts:
+
+Navigation:
+  ↑ / ↓              Move selection up/down
+  Page Up / Page Down Scroll by page
+  Home / End         Jump to top/bottom
+  Tab                Switch focus between source and target
+  →                  Expand selected directory
+  ←                  Collapse directory (or parent if on child)
+  Space / Enter      Toggle expand/collapse directory
+
+Actions:
+  Enter (on file)    Show diff
+  /                  Activate pattern filter
+  a                  Toggle show all / changed only
+  h                  Show this help
+  q / Esc            Exit application
+
+Diff View:
+  ↑ / ↓              Scroll diff content
+  Page Up / Page Down Scroll by page
+  Home / End         Jump to top/bottom
+  r                  Reject file
+  Backspace / Esc / q Close diff view
+
+Filter Mode:
+  Type pattern       Filter files by path (case-insensitive)
+  Escape             Clear filter and exit filter mode
+  Tab                Switch focus between lists`
+
+	helpView := tview.NewTextView()
+	helpView.SetDynamicColors(true)
+	helpView.SetText(helpText)
+	helpView.SetBorder(true)
+	helpView.SetTitle("Help")
+	helpView.SetScrollable(true)
+
+	helpView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		rune := event.Rune()
+		if rune == 'q' || rune == 'Q' || rune == 'h' || rune == 'H' {
+			app.SetRoot(mainLayout, true)
+			return nil
+		}
+		if event.Key() == tcell.KeyEscape {
+			app.SetRoot(mainLayout, true)
+			return nil
+		}
+		return event
+	})
+
+	app.SetRoot(helpView, true)
+	app.SetFocus(helpView)
+}
+
+// showExitDialog shows exit confirmation
+func showExitDialog(app *tview.Application, appState *AppState, mainLayout tview.Primitive) {
+	modal := tview.NewModal()
+	modal.SetText("Apply changes? (y/n):")
+	modal.AddButtons([]string{"Yes", "No"})
+
+	modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+		if buttonLabel == "Yes" {
+			writeRejectedFiles(appState)
+			app.Stop()
+			os.Exit(0)
+		} else {
+			writeRejectedFiles(appState)
+			app.Stop()
+			os.Exit(1)
+		}
+	})
+
+	// Handle y/n keys and Escape
+	modal.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		rune := event.Rune()
+		switch rune {
+		case 'y', 'Y':
+			writeRejectedFiles(appState)
+			app.Stop()
+			os.Exit(0)
+			return nil
+		case 'n', 'N':
+			writeRejectedFiles(appState)
+			app.Stop()
+			os.Exit(1)
+			return nil
+		}
+		// Escape cancels and returns to main view
+		if event.Key() == tcell.KeyEscape {
+			app.SetRoot(mainLayout, true)
+			return nil
+		}
+		// Let modal handle button navigation
+		return event
+	})
+
+	app.SetRoot(modal, true)
+	app.SetFocus(modal)
+}
+
+// writeRejectedFiles writes rejected files to output file if specified
+func writeRejectedFiles(appState *AppState) {
+	if appState.outputFile == "" {
+		return
+	}
+
+	// Create parent directories if needed
+	dir := filepath.Dir(appState.outputFile)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: failed to create output directory: %v\n", err)
+		return
+	}
+
+	file, err := os.Create(appState.outputFile)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: failed to create output file: %v\n", err)
+		return
+	}
+	defer file.Close()
+
+	// Collect rejected file paths (relative to target directory)
+	rejectedPaths := []string{}
+	for relPath := range appState.rejectedFiles {
+		// Check if path exists in target directory
+		targetPath := filepath.Join(appState.targetDir, relPath)
+		if _, err := os.Stat(targetPath); err == nil {
+			rejectedPaths = append(rejectedPaths, relPath)
+		}
+	}
+
+	sort.Strings(rejectedPaths)
+	for _, path := range rejectedPaths {
+		fmt.Fprintln(file, path)
+	}
+}

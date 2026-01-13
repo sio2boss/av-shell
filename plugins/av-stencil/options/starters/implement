@@ -1,0 +1,604 @@
+#! /bin/bash
+
+# Import color
+source $AV_CONFIG_DIR/default_imports
+
+# Check for a help flag
+avCheckHelpFlags "$1" "av-stencil-starters" "Apply a starter template to your project" "\n \
+    Apply a starter template from either a GitHub repository or a local directory.\n \
+    \n \
+    Examples:\n \
+      GitHub HTTPS: https://github.com/user/repo\n \
+      GitHub SSH: git@github.com:user/repo.git\n \
+      Local directory: /path/to/starter or ./relative/path/to/starter (relative paths supported)\n \
+\n"
+
+# Import system path
+avAppendSystemPath
+
+#### Put system commands here
+
+# Function to convert absolute path to relative path
+relpath() {
+    local target="$1"
+    local base="$2"
+    
+    # Use realpath if available (Linux)
+    if command -v realpath &> /dev/null && realpath --version 2>&1 | grep -q "GNU"; then
+        realpath --relative-to="${base}" "${target}" 2>/dev/null && return
+    fi
+    
+    # Use python if available (works on both Linux and macOS)
+    if command -v python3 &> /dev/null; then
+        python3 -c "import os.path; print(os.path.relpath('${target}', '${base}'))" 2>/dev/null && return
+    fi
+    
+    # Fallback: return the original path if we can't calculate relative path
+    echo "${target}"
+}
+
+# Initialize variables
+applied_starters_file="${AV_PROJECT_CONFIG_DIR}/vars/applied-starters"
+project_root="$AV_ROOT/../"
+pull_mode=false
+starter_source=""
+rejected_files=()  # Array to store rejected files from starter-diff
+
+# Check if pull was explicitly requested via command line argument
+if [[ "$1" == "pull" ]]; then
+    pull_mode=true
+fi
+
+# If pull mode, show menu to select from previously applied starters
+if [[ ${pull_mode} == true ]]; then
+    if [[ ! -f ${applied_starters_file} ]]; then
+        echo -e "${txtred}Error: No previously applied starters found.${txtrst}"
+        echo -e "Please apply a starter first using: ${txtcyn}av stencil starters${txtrst}"
+        exit 1
+    fi
+    
+    # Build menu options from previously applied starters
+    # Use a temporary file to track unique starters (by canonical_path)
+    # We'll keep the most recent application of each starter
+    temp_unique=$(mktemp)
+    
+    # Display format: timestamp|type|canonical_path|target_directory
+    while IFS='|' read -r timestamp type canonical_path target_directory; do
+        # Skip comment lines (starting with #) and empty lines
+        [[ "${timestamp}" =~ ^# ]] && continue
+        [[ -z "${timestamp}" ]] && continue
+        
+        # Check if we've seen this canonical_path before
+        existing_line=$(grep "^[^|]*|[^|]*|${canonical_path}|" "${temp_unique}" 2>/dev/null || true)
+        
+        if [[ -z "${existing_line}" ]]; then
+            # First time seeing this starter - add it
+            echo "${timestamp}|${type}|${canonical_path}|${target_directory}" >> "${temp_unique}"
+        else
+            # We've seen this starter before - check if this is more recent
+            existing_timestamp=$(echo "${existing_line}" | cut -d'|' -f1)
+            # Compare timestamps (lexicographic comparison works for ISO format)
+            if [[ "${timestamp}" > "${existing_timestamp}" ]]; then
+                # Replace with more recent entry
+                grep -v "^[^|]*|[^|]*|${canonical_path}|" "${temp_unique}" > "${temp_unique}.tmp" 2>/dev/null || true
+                mv "${temp_unique}.tmp" "${temp_unique}" 2>/dev/null || true
+                echo "${timestamp}|${type}|${canonical_path}|${target_directory}" >> "${temp_unique}"
+            fi
+        fi
+    done < ${applied_starters_file}
+    
+    # Build menu arrays from unique starters
+    menu_options=()
+    menu_paths=()
+    menu_targets=()
+    menu_display_names=()
+    
+    while IFS='|' read -r timestamp type canonical_path target_directory; do
+        # Extract display name (last directory/repo name)
+        if [[ ${type} == "github" ]]; then
+            display_name=$(basename ${canonical_path} .git)
+            type_display="GitHub"
+        else
+            display_name=$(basename ${canonical_path})
+            type_display="Local"
+        fi
+        
+        # Format menu item with starter name -> targeting path on first line
+        # and last applied timestamp on second line (indented with dash prefix)
+        if [[ -n "${target_directory}" ]]; then
+            menu_label="${display_name} -> targeting: ${target_directory}"$'\n'"    - last applied: ${timestamp}"
+        else
+            menu_label="${display_name}"$'\n'"    - last applied: ${timestamp}"
+        fi
+        menu_options+=("${menu_label}")
+        menu_paths+=("${canonical_path}")
+        menu_targets+=("${target_directory}")
+        menu_display_names+=("${display_name}")
+    done < "${temp_unique}"
+    
+    # Clean up temporary file
+    rm -f "${temp_unique}"
+    
+    # Check if we have any unique starters
+    if [[ ${#menu_options[@]} -eq 0 ]]; then
+        echo -e "${txtred}Error: No previously applied starters found.${txtrst}"
+        echo -e "Please apply a starter first using: ${txtcyn}av stencil starters${txtrst}"
+        exit 1
+    fi
+    
+    # Show menu to select from previously applied starters
+    if [[ ${#menu_options[@]} -gt 0 ]]; then
+        selected_option=$(gum filter --placeholder "Pick a previously applied starter..." --indicator ">" --height 10 --limit 1 "${menu_options[@]}")
+        if [[ $? -eq 0 && -n "${selected_option}" ]]; then
+            # Extract the display name from the first line of the selected option
+            # Format is: "<display_name> -> targeting: <path>" or just "<display_name>"
+            selected_display_name=$(echo "${selected_option}" | head -n1 | sed 's/ -> targeting:.*$//')
+            
+            # Find the canonical path and target directory for the selected option
+            for i in "${!menu_display_names[@]}"; do
+                if [[ "${menu_display_names[$i]}" == "${selected_display_name}" ]]; then
+                    starter_source="${menu_paths[$i]}"
+                    stored_target_directory="${menu_targets[$i]}"
+                    break
+                fi
+            done
+        fi
+        # If user cancelled or no selection, exit
+        if [[ -z "${starter_source}" ]]; then
+            echo "Cancelled."
+            exit 0
+        fi
+    else
+        echo -e "${txtred}Error: No previously applied starters found.${txtrst}"
+        echo -e "Please apply a starter first using: ${txtcyn}av stencil starters${txtrst}"
+        exit 1
+    fi
+fi
+
+# Prompt for starter source if not already selected from pull menu
+if [[ -z "${starter_source}" ]]; then
+    starter_source=$(gum input --prompt="Enter starter source (GitHub URL or local directory): " --placeholder="https://github.com/user/repo or ./relative/path/to/starter")
+    if [[ -z ${starter_source} ]]; then
+        echo "No starter source provided. Exiting."
+        exit 1
+    fi
+fi
+
+# Determine if it's a GitHub URL or local directory
+is_github=false
+temp_clone_dir=""
+starter_type=""
+canonical_path=""
+
+# Check for GitHub HTTPS URL
+if [[ ${starter_source} =~ ^https://github.com/ ]]; then
+    is_github=true
+    starter_type="github"
+    github_url=${starter_source}
+    # Ensure URL ends with .git or add it
+    if [[ ! ${github_url} =~ \.git$ ]]; then
+        github_url="${github_url}.git"
+    fi
+    canonical_path=${github_url}
+fi
+
+# Check for GitHub SSH URL
+if [[ ${starter_source} =~ ^git@github.com: ]]; then
+    is_github=true
+    starter_type="github"
+    github_url=${starter_source}
+    # Ensure URL ends with .git or add it
+    if [[ ! ${github_url} =~ \.git$ ]]; then
+        github_url="${github_url}.git"
+    fi
+    canonical_path=${github_url}
+fi
+
+# Check for git+ssh:// format
+if [[ ${starter_source} =~ ^git\+ssh:// ]]; then
+    is_github=true
+    starter_type="github"
+    github_url=${starter_source}
+    canonical_path=${github_url}
+fi
+
+if [[ ${is_github} == true ]]; then
+    # Clone GitHub repository to temporary directory
+    temp_clone_dir=$(mktemp -d)
+    repo_name=$(basename ${github_url} .git)
+    
+    if [[ ${pull_mode} == true ]]; then
+        echo -e "Pulling latest changes from ${txtpur}${github_url}${txtrst}..."
+    else
+        echo -e "Cloning ${txtpur}${github_url}${txtrst}..."
+    fi
+    
+    if ! git clone ${github_url} ${temp_clone_dir} 2>/dev/null; then
+        echo -e "${txtred}Error: Failed to clone repository${txtrst}"
+        rm -rf ${temp_clone_dir}
+        exit 1
+    fi
+    
+    starter_dir=${temp_clone_dir}
+else
+    # Use local directory
+    starter_type="local"
+    starter_dir=${starter_source}
+    
+    # Expand relative paths - resolve to absolute path
+    if [[ ! ${starter_dir} =~ ^/ ]]; then
+        # If relative path, resolve from current directory
+        if [[ -d ${starter_dir} ]]; then
+            starter_dir="$(cd "${starter_dir}" && pwd)"
+        else
+            echo -e "${txtred}Error: Directory ${starter_dir} does not exist${txtrst}"
+            exit 1
+        fi
+    fi
+    
+    # Check if directory exists
+    if [[ ! -d ${starter_dir} ]]; then
+        echo -e "${txtred}Error: Directory ${starter_dir} does not exist${txtrst}"
+        exit 1
+    fi
+    
+    # Store the canonical absolute path
+    canonical_path=${starter_dir}
+fi
+
+# Check if this starter has been applied before
+# Read applied starters file from project root (need to cd there first)
+original_cwd="$(pwd)"
+cd "${project_root}"
+is_reapply=false
+stored_target_directory=""
+
+# Check if starter was previously applied
+if [[ -f ${applied_starters_file} ]]; then
+    while IFS='|' read -r timestamp type stored_canonical_path stored_target_dir; do
+        # Skip comment lines and empty lines
+        [[ "${timestamp}" =~ ^# ]] && continue
+        [[ -z "${timestamp}" ]] && continue
+        
+        # Check if this canonical path matches
+        if [[ "${stored_canonical_path}" == "${canonical_path}" ]]; then
+            is_reapply=true
+            stored_target_directory="${stored_target_dir}"
+            # Enable pull mode if not already explicitly set
+            if [[ "${pull_mode}" == "false" ]]; then
+                pull_mode=true
+            fi
+            break
+        fi
+    done < ${applied_starters_file}
+fi
+
+# Return to original directory for user input
+cd "${original_cwd}"
+
+# If re-applying, inform user and use pull mode
+if [[ ${is_reapply} == true ]]; then
+    echo -e "${txtylw}This starter has been applied before. Using pull mode to update.${txtrst}"
+    if [[ -n "${stored_target_directory}" ]]; then
+        echo -e "Previously applied to: ${txtcyn}${stored_target_directory}${txtrst}"
+    fi
+    echo
+fi
+
+# Prompt for target directory (default to stored target or current directory)
+# If we're in pull mode and selected from menu, we already have the target directory
+if [[ ${pull_mode} == true ]] && [[ -n "${stored_target_directory}" ]]; then
+    # Use the stored target directory from the menu selection (already relative)
+    # Convert to absolute path for later use
+    if [[ ! ${stored_target_directory} =~ ^/ ]]; then
+        # Relative path - resolve from project root
+        target_directory="${project_root}/${stored_target_directory}"
+    else
+        target_directory="${stored_target_directory}"
+    fi
+    # Display relative path for user
+    target_rel="${stored_target_directory}"
+    echo -e "${txtgrn}Using previously applied target directory: ${txtpur}${target_rel}${txtrst}"
+    echo
+else
+    # Not in pull mode or no stored target - prompt for it
+    if [[ -n "${stored_target_directory}" ]]; then
+        default_target="${stored_target_directory}"
+    else
+        default_target="."
+    fi
+
+    target_directory=$(gum input --prompt="Target directory to apply starter: " --placeholder="${default_target}" --value="${default_target}")
+    if [[ -z ${target_directory} ]]; then
+        target_directory="${default_target}"
+    fi
+fi
+
+# Resolve target directory to absolute path and create if needed
+# Note: If we're in pull mode and got target from menu, it's already resolved above
+if [[ ! ${target_directory} =~ ^/ ]]; then
+    # Relative path - resolve from project root
+    # Special case: "." means project root
+    if [[ "${target_directory}" == "." ]]; then
+        target_directory="$(cd "${project_root}" && pwd)"
+    else
+        # Other relative paths - resolve from project root
+        if [[ ! -d "${project_root}/${target_directory}" ]]; then
+            echo -e "${txtylw}Target directory ${target_directory} does not exist.${txtrst}"
+            if gum confirm "Create this directory?"; then
+                mkdir -p "${project_root}/${target_directory}"
+                if [[ $? -ne 0 ]]; then
+                    echo -e "${txtred}Error: Failed to create directory ${target_directory}${txtrst}"
+                    if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
+                        rm -rf ${temp_clone_dir}
+                    fi
+                    exit 1
+                fi
+                echo -e "${txtgrn}Created directory: ${target_directory}${txtrst}"
+            else
+                echo "Cancelled."
+                if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
+                    rm -rf ${temp_clone_dir}
+                fi
+                exit 0
+            fi
+        fi
+        target_directory="$(cd "${project_root}/${target_directory}" && pwd)"
+    fi
+else
+    # Absolute path - verify it exists or create it
+    if [[ ! -d ${target_directory} ]]; then
+        echo -e "${txtylw}Target directory ${target_directory} does not exist.${txtrst}"
+        if gum confirm "Create this directory?"; then
+            mkdir -p "${target_directory}"
+            if [[ $? -ne 0 ]]; then
+                echo -e "${txtred}Error: Failed to create directory ${target_directory}${txtrst}"
+                if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
+                    rm -rf ${temp_clone_dir}
+                fi
+                exit 1
+            fi
+            echo -e "${txtgrn}Created directory: ${target_directory}${txtrst}"
+        else
+            echo "Cancelled."
+            if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
+                rm -rf ${temp_clone_dir}
+            fi
+            exit 0
+        fi
+    fi
+fi
+
+# Change to target directory
+cd ${target_directory}
+
+# Determine display name (last directory name)
+if [[ ${is_github} == true ]]; then
+    # Extract repo name from GitHub URL
+    display_name=$(basename ${github_url} .git)
+else
+    # Use basename of the directory
+    display_name=$(basename ${canonical_path})
+fi
+
+# Show what will be copied
+# Convert absolute path to relative path from project root for display
+target_rel=$(relpath "${target_directory}" "${project_root}")
+echo -e "${txtgrn}Ready to apply${txtrst}"
+echo -e "  starter: ${txtpur}${display_name}${txtrst}"
+echo -e "  target: ${txtpur}${target_rel}${txtrst}"
+echo
+
+# Check git status - ensure repository is clean
+cd ${target_directory}
+if git rev-parse --git-dir > /dev/null 2>&1; then
+    # We're in a git repository
+    if [[ -n $(git status --porcelain) ]]; then
+        echo -e "${txtred}Warning: Git repository has uncommitted changes${txtrst}"
+        echo
+        echo "Current git status:"
+        git status --short
+        echo
+        if ! gum confirm "Continue anyway? (Not recommended - changes may be overwritten)"; then
+            echo "Cancelled."
+            if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
+                rm -rf ${temp_clone_dir}
+            fi
+            exit 0
+        fi
+        echo
+    else
+        echo -e "${txtgrn}Git repository is clean${txtrst}"
+        echo
+    fi
+else
+    # Not a git repository - that's okay, just inform
+    echo -e "${txtgry}Not a git repository (this is okay)${txtrst}"
+    echo
+fi
+
+# Define exclusion patterns (used for both starter-diff and rsync)
+exclusion_patterns=(
+    '.git'
+    'node_modules'
+    '.venv'
+    '.av'
+    '.idea'
+    '__pycache__'
+    '.DS_Store'
+)
+
+# If in pull mode, show diff view and get confirmation from starter-diff
+if [[ ${pull_mode} == true ]]; then
+    echo
+    echo -e "${txtgrn}Showing differences between starter source and target...${txtrst}"
+    echo
+    
+    # Show diff view and get confirmation
+    if command -v starter-diff &> /dev/null; then
+        # Create temporary file for rejected files output
+        rejected_files_output=$(mktemp)
+        
+        # Build starter-diff command with exclusions
+        starter_diff_cmd=("starter-diff" "${starter_dir}" "${target_directory}" "--output" "${rejected_files_output}")
+        for pattern in "${exclusion_patterns[@]}"; do
+            starter_diff_cmd+=("--exclude" "${pattern}")
+        done
+        
+        # Run starter-diff with output file for rejected files and exclusions
+        "${starter_diff_cmd[@]}"
+        diff_exit_code=$?
+        echo
+        
+        # Handle exit codes:
+        # 0 = user confirmed to apply changes
+        # 1 = user cancelled (chose not to apply changes)
+        # >1 = error condition
+        if [[ ${diff_exit_code} -eq 1 ]]; then
+            echo "Cancelled."
+            rm -f "${rejected_files_output}"
+            if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
+                rm -rf ${temp_clone_dir}
+            fi
+            exit 0
+        elif [[ ${diff_exit_code} -gt 1 ]]; then
+            echo -e "${txtred}Error: starter-diff encountered an error (exit code: ${diff_exit_code})${txtrst}"
+            rm -f "${rejected_files_output}"
+            if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
+                rm -rf ${temp_clone_dir}
+            fi
+            exit 1
+        fi
+        
+        # Exit code 0 - user confirmed, proceed with applying changes
+        # Read rejected files if any were specified
+        rejected_files=()
+        if [[ -f "${rejected_files_output}" ]] && [[ -s "${rejected_files_output}" ]]; then
+            echo -e "${txtylw}Note: Some files were marked as rejected and will be excluded from the update.${txtrst}"
+            while IFS= read -r rejected_file; do
+                # Skip empty lines
+                [[ -z "${rejected_file}" ]] && continue
+                rejected_files+=("${rejected_file}")
+            done < "${rejected_files_output}"
+            echo -e "${txtgry}Rejected files (${#rejected_files[@]}):${txtrst}"
+            for rejected_file in "${rejected_files[@]}"; do
+                echo -e "  - ${rejected_file}"
+            done
+            echo
+        fi
+        
+        # Clean up rejected files output
+        rm -f "${rejected_files_output}"
+    else
+        echo -e "${txtylw}Warning: starter-diff tool not found. Proceeding without diff view.${txtrst}"
+        echo
+        # Fall back to gum confirm if starter-diff is not available
+        if ! gum confirm "Continue with pulling/updating the starter?"; then
+            echo "Cancelled."
+            if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
+                rm -rf ${temp_clone_dir}
+            fi
+            exit 0
+        fi
+    fi
+else
+    # Not in pull mode - use regular confirmation
+    if ! gum confirm "Continue with applying the starter?"; then
+        echo "Cancelled."
+        if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
+            rm -rf ${temp_clone_dir}
+        fi
+        exit 0
+    fi
+fi
+
+echo
+
+# Build rsync exclude list from exclusion patterns
+rsync_excludes=()
+for pattern in "${exclusion_patterns[@]}"; do
+    rsync_excludes+=("--exclude=${pattern}")
+done
+
+# Add rejected files to exclude list if in pull mode
+if [[ ${pull_mode} == true ]] && [[ ${#rejected_files[@]} -gt 0 ]]; then
+    for rejected_file in "${rejected_files[@]}"; do
+        # Add exclude pattern for rejected file
+        # Note: rsync exclude patterns are relative to the source directory
+        rsync_excludes+=("--exclude=${rejected_file}")
+    done
+fi
+
+# Use rsync if available, otherwise use find and cp
+if command -v rsync &> /dev/null; then
+    # Build rsync command with excludes
+    rsync_base_args=(-a)
+    
+    # Try to use progress2 if available (newer rsync)
+    if rsync --help 2>&1 | grep -q "info=progress2"; then
+        rsync_base_args+=(--info=progress2)
+    else
+        # Older rsync - use --progress, redirect file names (stdout) but keep progress (stderr)
+        rsync_base_args+=(--progress)
+    fi
+    
+    # Add all excludes
+    rsync_args=("${rsync_base_args[@]}" "${rsync_excludes[@]}")
+    
+    # Build command string for display
+    rsync_cmd="rsync ${rsync_args[*]} ${starter_dir}/ ${target_directory}/"
+    echo -e "${txtgry}Executing: ${rsync_cmd}${txtrst}"
+    
+    # Execute rsync
+    if rsync --help 2>&1 | grep -q "info=progress2"; then
+        rsync "${rsync_base_args[@]}" "${rsync_excludes[@]}" "${starter_dir}/" "${target_directory}/"
+    else
+        # Older rsync - redirect stdout but keep stderr (progress)
+        rsync "${rsync_base_args[@]}" "${rsync_excludes[@]}" "${starter_dir}/" "${target_directory}/" > /dev/null
+    fi
+else
+    echo -e "${txtred}Error: rsync not found. Please install rsync to use this feature.${txtrst}"
+    exit 1
+fi
+
+if [[ $? -eq 0 ]]; then
+    # Record the applied starter with full details for future updates
+    # Format: timestamp|type|canonical_path|target_directory
+    mkdir -p "${AV_PROJECT_CONFIG_DIR}/vars"
+    
+    # Add header if file doesn't exist, is empty, or doesn't have a header
+    if [[ ! -f ${applied_starters_file} ]] || [[ ! -s ${applied_starters_file} ]]; then
+        echo "# timestamp|type|canonical_path|target_directory" > ${applied_starters_file}
+        echo "# type: 'github' or 'local'" >> ${applied_starters_file}
+        echo "# canonical_path: GitHub URL (with .git) or absolute local directory path" >> ${applied_starters_file}
+        echo "# target_directory: Relative path from project root where starter was applied" >> ${applied_starters_file}
+    elif [[ -f ${applied_starters_file} ]] && ! head -n 1 ${applied_starters_file} | grep -q "^# timestamp"; then
+        # File exists but doesn't have header - prepend header to existing content
+        header_file=$(mktemp)
+        echo "# timestamp|type|canonical_path|target_directory" > ${header_file}
+        echo "# type: 'github' or 'local'" >> ${header_file}
+        echo "# canonical_path: GitHub URL (with .git) or absolute local directory path" >> ${header_file}
+        echo "# target_directory: Relative path from project root where starter was applied" >> ${header_file}
+        cat ${applied_starters_file} >> ${header_file}
+        mv ${header_file} ${applied_starters_file}
+    fi
+    
+    # Convert absolute path to relative path from project root before saving
+    target_rel=$(relpath "${target_directory}" "${project_root}")
+    timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+    echo "${timestamp}|${starter_type}|${canonical_path}|${target_rel}" >> ${applied_starters_file}
+else
+    echo
+    echo -e "${txtred}Error: Failed to apply starter${txtrst}"
+    if [[ ${is_github} == true ]]; then
+        rm -rf ${temp_clone_dir}
+    fi
+    exit 1
+fi
+
+# Clean up temporary clone directory if we cloned from GitHub
+if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
+    rm -rf ${temp_clone_dir}
+fi
+
+#### End commands

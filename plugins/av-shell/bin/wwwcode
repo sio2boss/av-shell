@@ -7,9 +7,13 @@ source $AV_CONFIG_DIR/default_imports
 avCheckHelpFlags "$1" "av-shell" "Run code-server for the current project" "\n \
     Will read the port from \$AV_ROOT/../.av/config/code-server-port\n \
     and run code-server --bind-addr <port> \$AV_ROOT\n \
+    Optional second argument: extensions directory name (default: code-server)\n \
 \n"
 
 project=`getprompt`
+
+# Set extensions directory name (default to code-server, override with first argument)
+EXTENSIONS_DIR_NAME="${1:-code-server}"
 
 # Import system path
 avRestoreSystemPath
@@ -46,7 +50,8 @@ echo -e "${txtblu}Serving directory: $AV_ROOT/../${txtrst}"
 cd $AV_ROOT/../ && code-server \
     --bind-addr localhost:$PORT \
     --disable-telemetry \
-    --extensions-dir ~/.local/share/code-server/extensions/ \
+    --extensions-dir ~/.local/share/$EXTENSIONS_DIR_NAME/extensions/ \
     --user-data-dir ~/.local/share/$project `pwd`
+
 
 #### End commands

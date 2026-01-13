@@ -5,6 +5,26 @@ source $AV_CONFIG_DIR/default_imports
 
 # Check for a help flag
 avCheckHelpFlags "$1" "av-stencil" "Apply additional features to your project" "\n \
+    Usage: stencil [option] [pull]\n \
+    \n \
+    If no option is provided, a menu will be shown to select from available options.\n \
+    \n \
+    Options:\n \
+      option      - Stencil option to apply (starters, containers, kubernetes, etc.)\n \
+      pull        - Optional. Pass 'pull' to the selected stencil option\n \
+    \n \
+    Examples:\n \
+      stencil                    - Show menu to select option\n \
+      stencil pull               - Show menu, then pass 'pull' to selected option\n \
+      stencil starters           - Apply starters stencil\n \
+      stencil starters pull      - Apply starters stencil with 'pull' argument\n \
+    \n \
+    Available stencil options:\n \
+      starters    - Apply a starter template from GitHub or local directory\n \
+      containers   - Set up container templates\n \
+      kubernetes   - Set up Kubernetes configurations\n \
+      clusters     - Set up cluster configurations\n \
+      kafka        - Set up Kafka support\n \
 \n"
 
 # Import system path
@@ -14,6 +34,45 @@ avAppendSystemPath
 
 config_dir=$AV_INSTALLED_PLUGINS/av-stencil/options
 folders=$(/bin/ls -1 ${config_dir})
+
+# Check if first argument is a valid stencil option
+if [[ -n "$1" ]] && [[ -d "${config_dir}/$1" ]] && [[ -f "${config_dir}/$1/implement" ]]; then
+    # Valid stencil option provided
+    # Check if second argument is "pull"
+    if [[ "$2" == "pull" ]]; then
+        # Pass pull to the implement script
+        exec ${config_dir}/$1/implement pull
+        exit $?
+    else
+        # Directly execute the specified stencil option (no pull)
+        exec ${config_dir}/$1/implement
+        exit $?
+    fi
+fi
+
+# Check if first argument is "pull" (no stencil specified)
+if [[ "$1" == "pull" ]]; then
+    # Show menu to select stencil, then pass pull to it
+    inquirer_menu stencil ${folders}
+    sleep 1
+    stencil=`getpv stencil`
+    if [[ ! -z ${stencil} ]]; then
+        exec ${config_dir}/${stencil}/implement pull
+        exit $?
+    fi
+    exit 0
+fi
+
+# If first argument is provided but not valid, show error
+if [[ -n "$1" ]]; then
+    echo -e "${txtred}Error: Unknown stencil option '$1'${txtrst}"
+    echo
+    echo "Available options:"
+    echo "$folders" | sed 's/^/  - /'
+    exit 1
+fi
+
+# No argument provided - show menu
 inquirer_menu stencil ${folders}
 sleep 1
 stencil=`getpv stencil`
