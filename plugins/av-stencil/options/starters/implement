@@ -37,6 +37,192 @@ relpath() {
     echo "${target}"
 }
 
+# Function to update or add starter entry in applied-starters file
+# Format: timestamp|type|canonical_path|target_directory|starter_keyword|replacement_keyword
+# If starter already exists (by canonical_path), updates the line; otherwise appends
+update_applied_starter() {
+    local timestamp="$1"
+    local starter_type="$2"
+    local canonical_path="$3"
+    local target_directory="$4"
+    local starter_keyword="$5"
+    local replacement_keyword="$6"
+    
+    mkdir -p "${AV_PROJECT_CONFIG_DIR}/vars"
+    
+    # Create or update header if needed
+    if [[ ! -f ${applied_starters_file} ]] || [[ ! -s ${applied_starters_file} ]]; then
+        echo "# timestamp|type|canonical_path|target_directory|starter_keyword|replacement_keyword" > ${applied_starters_file}
+        echo "# type: 'github' or 'local'" >> ${applied_starters_file}
+        echo "# canonical_path: GitHub URL (with .git) or absolute local directory path" >> ${applied_starters_file}
+        echo "# target_directory: Relative path from project root where starter was applied" >> ${applied_starters_file}
+        echo "# starter_keyword: The keyword to search for in the starter (e.g., 'starter-keyword')" >> ${applied_starters_file}
+        echo "# replacement_keyword: The keyword to replace it with" >> ${applied_starters_file}
+    elif [[ -f ${applied_starters_file} ]] && ! head -n 1 ${applied_starters_file} | grep -q "^# timestamp"; then
+        # File exists but doesn't have header - prepend header to existing content
+        header_file=$(mktemp)
+        echo "# timestamp|type|canonical_path|target_directory|starter_keyword|replacement_keyword" > ${header_file}
+        echo "# type: 'github' or 'local'" >> ${header_file}
+        echo "# canonical_path: GitHub URL (with .git) or absolute local directory path" >> ${header_file}
+        echo "# target_directory: Relative path from project root where starter was applied" >> ${header_file}
+        echo "# starter_keyword: The keyword to search for in the starter (e.g., 'starter-keyword')" >> ${header_file}
+        echo "# replacement_keyword: The keyword to replace it with" >> ${header_file}
+        cat ${applied_starters_file} >> ${header_file}
+        mv ${header_file} ${applied_starters_file}
+    fi
+    
+    # Check if starter already exists (by canonical_path)
+    local temp_file=$(mktemp)
+    local found=false
+    
+    while IFS='|' read -r line; do
+        # Skip comment lines and empty lines
+        [[ "${line}" =~ ^# ]] && echo "${line}" >> "${temp_file}" && continue
+        [[ -z "${line}" ]] && continue
+        
+        # Parse the line
+        IFS='|' read -r line_timestamp line_type line_canonical_path line_target_dir line_starter_kw line_replacement_kw <<< "${line}"
+        
+        # Check if this is the starter we're updating
+        if [[ "${line_canonical_path}" == "${canonical_path}" ]]; then
+            # Update this line with new values
+            echo "${timestamp}|${starter_type}|${canonical_path}|${target_directory}|${starter_keyword}|${replacement_keyword}" >> "${temp_file}"
+            found=true
+        else
+            # Keep existing line
+            echo "${line}" >> "${temp_file}"
+        fi
+    done < ${applied_starters_file}
+    
+    # If not found, append new entry
+    if [[ "${found}" == "false" ]]; then
+        echo "${timestamp}|${starter_type}|${canonical_path}|${target_directory}|${starter_keyword}|${replacement_keyword}" >> "${temp_file}"
+    fi
+    
+    # Replace original file with updated content
+    mv "${temp_file}" ${applied_starters_file}
+}
+
+# Function to perform find & replace in temp directory
+# Replaces "starter-keyword" with user keyword in:
+# - File contents
+# - Filenames
+# - Directory names
+perform_keyword_replacement() {
+    local source_dir="$1"
+    local target_dir="$2"
+    local old_keyword="$3"
+    local new_keyword="$4"
+    shift 4
+    local exclusion_patterns=("$@")
+    
+    # Build rsync exclude list from exclusion patterns
+    local rsync_excludes=()
+    for pattern in "${exclusion_patterns[@]}"; do
+        rsync_excludes+=("--exclude=${pattern}")
+    done
+    
+    # Copy source to target directory with exclusions
+    if command -v rsync &> /dev/null; then
+        rsync -a "${rsync_excludes[@]}" "${source_dir}/" "${target_dir}/" > /dev/null 2>&1
+    else
+        # Fallback: use find with exclusions (less efficient but works)
+        # Build find exclusion conditions
+        local find_excludes=()
+        for pattern in "${exclusion_patterns[@]}"; do
+            find_excludes+=(-not -name "${pattern}")
+        done
+        
+        # Copy files and directories excluding the patterns
+        find "${source_dir}" -mindepth 1 -maxdepth 1 "${find_excludes[@]}" -exec cp -r {} "${target_dir}/" \; 2>/dev/null || true
+    fi
+    
+    # Function to escape special regex characters for sed
+    escape_for_sed() {
+        echo "$1" | sed 's/[[\.*^$()+?{|]/\\&/g'
+    }
+    
+    # Escape keywords for sed
+    local escaped_old_keyword=$(escape_for_sed "${old_keyword}")
+    local escaped_new_keyword=$(escape_for_sed "${new_keyword}")
+    
+    # Function to rename files and directories recursively
+    # We need to process directories from deepest to shallowest to avoid path issues
+    rename_files_and_dirs() {
+        local dir="$1"
+        
+        # First, replace in file contents (before renaming)
+        find "${dir}" -type f -print0 | while IFS= read -r -d '' item; do
+            # Replace in file contents (skip binary files)
+            if [[ -f "${item}" ]]; then
+                # Try to detect text files - use file command if available, otherwise try sed
+                if command -v file &> /dev/null; then
+                    if file "${item}" 2>/dev/null | grep -q "text"; then
+                        # Use sed for in-place replacement with escaped patterns
+                        if [[ "$(uname)" == "Darwin" ]]; then
+                            # macOS requires empty string after -i
+                            sed -i '' "s/${escaped_old_keyword}/${escaped_new_keyword}/g" "${item}" 2>/dev/null || true
+                        else
+                            # Linux
+                            sed -i "s/${escaped_old_keyword}/${escaped_new_keyword}/g" "${item}" 2>/dev/null || true
+                        fi
+                    fi
+                else
+                    # Fallback: try sed anyway (will fail gracefully on binary files)
+                    if [[ "$(uname)" == "Darwin" ]]; then
+                        sed -i '' "s/${escaped_old_keyword}/${escaped_new_keyword}/g" "${item}" 2>/dev/null || true
+                    else
+                        sed -i "s/${escaped_old_keyword}/${escaped_new_keyword}/g" "${item}" 2>/dev/null || true
+                    fi
+                fi
+            fi
+        done
+        
+        # Then rename directories from deepest to shallowest
+        # Get all directories, count path separators to determine depth, sort by depth descending
+        find "${dir}" -type d | while IFS= read -r item; do
+            echo "$(echo "${item}" | tr -cd '/' | wc -c | tr -d ' ') ${item}"
+        done | sort -rn | cut -d' ' -f2- | while IFS= read -r item; do
+            local dirname=$(dirname "${item}")
+            local basename=$(basename "${item}")
+            
+            # Skip root directory
+            [[ "${item}" == "${dir}" ]] && continue
+            
+            # Skip if basename doesn't contain old_keyword
+            if [[ "${basename}" == *"${old_keyword}"* ]]; then
+                local new_basename="${basename//${old_keyword}/${new_keyword}}"
+                if [[ "${basename}" != "${new_basename}" ]]; then
+                    local new_path="${dirname}/${new_basename}"
+                    if [[ -d "${item}" ]] && [[ ! -e "${new_path}" ]]; then
+                        mv "${item}" "${new_path}" 2>/dev/null || true
+                    fi
+                fi
+            fi
+        done
+        
+        # Finally, rename files
+        find "${dir}" -type f | while IFS= read -r item; do
+            local dirname=$(dirname "${item}")
+            local basename=$(basename "${item}")
+            
+            # Rename file if basename contains old_keyword
+            if [[ "${basename}" == *"${old_keyword}"* ]]; then
+                local new_basename="${basename//${old_keyword}/${new_keyword}}"
+                if [[ "${basename}" != "${new_basename}" ]]; then
+                    local new_path="${dirname}/${new_basename}"
+                    if [[ -f "${item}" ]] && [[ ! -e "${new_path}" ]]; then
+                        mv "${item}" "${new_path}" 2>/dev/null || true
+                    fi
+                fi
+            fi
+        done
+    }
+    
+    # Perform the replacement
+    rename_files_and_dirs "${target_dir}"
+}
+
 # Initialize variables
 applied_starters_file="${AV_PROJECT_CONFIG_DIR}/vars/applied-starters"
 project_root="$AV_ROOT/../"
@@ -58,33 +244,28 @@ if [[ ${pull_mode} == true ]]; then
     fi
     
     # Build menu options from previously applied starters
-    # Use a temporary file to track unique starters (by canonical_path)
-    # We'll keep the most recent application of each starter
+    # Since we now only keep one row per starter, we can read directly
+    # Format: timestamp|type|canonical_path|target_directory|starter_keyword|replacement_keyword
     temp_unique=$(mktemp)
     
-    # Display format: timestamp|type|canonical_path|target_directory
-    while IFS='|' read -r timestamp type canonical_path target_directory; do
+    while IFS='|' read -r line; do
         # Skip comment lines (starting with #) and empty lines
-        [[ "${timestamp}" =~ ^# ]] && continue
-        [[ -z "${timestamp}" ]] && continue
+        [[ "${line}" =~ ^# ]] && continue
+        [[ -z "${line}" ]] && continue
         
-        # Check if we've seen this canonical_path before
-        existing_line=$(grep "^[^|]*|[^|]*|${canonical_path}|" "${temp_unique}" 2>/dev/null || true)
+        # Parse line - handle both old (4 fields) and new (6 fields) formats
+        IFS='|' read -r timestamp type canonical_path target_directory starter_keyword replacement_keyword <<< "${line}"
         
-        if [[ -z "${existing_line}" ]]; then
-            # First time seeing this starter - add it
-            echo "${timestamp}|${type}|${canonical_path}|${target_directory}" >> "${temp_unique}"
-        else
-            # We've seen this starter before - check if this is more recent
-            existing_timestamp=$(echo "${existing_line}" | cut -d'|' -f1)
-            # Compare timestamps (lexicographic comparison works for ISO format)
-            if [[ "${timestamp}" > "${existing_timestamp}" ]]; then
-                # Replace with more recent entry
-                grep -v "^[^|]*|[^|]*|${canonical_path}|" "${temp_unique}" > "${temp_unique}.tmp" 2>/dev/null || true
-                mv "${temp_unique}.tmp" "${temp_unique}" 2>/dev/null || true
-                echo "${timestamp}|${type}|${canonical_path}|${target_directory}" >> "${temp_unique}"
-            fi
+        # If old format (no keywords), set them to empty
+        if [[ -z "${starter_keyword}" ]]; then
+            starter_keyword=""
         fi
+        if [[ -z "${replacement_keyword}" ]]; then
+            replacement_keyword=""
+        fi
+        
+        # Since we now only keep one row per starter, just add it
+        echo "${timestamp}|${type}|${canonical_path}|${target_directory}|${starter_keyword}|${replacement_keyword}" >> "${temp_unique}"
     done < ${applied_starters_file}
     
     # Build menu arrays from unique starters
@@ -92,8 +273,10 @@ if [[ ${pull_mode} == true ]]; then
     menu_paths=()
     menu_targets=()
     menu_display_names=()
+    menu_starter_keywords=()
+    menu_replacement_keywords=()
     
-    while IFS='|' read -r timestamp type canonical_path target_directory; do
+    while IFS='|' read -r timestamp type canonical_path target_directory starter_keyword replacement_keyword; do
         # Extract display name (last directory/repo name)
         if [[ ${type} == "github" ]]; then
             display_name=$(basename ${canonical_path} .git)
@@ -114,6 +297,8 @@ if [[ ${pull_mode} == true ]]; then
         menu_paths+=("${canonical_path}")
         menu_targets+=("${target_directory}")
         menu_display_names+=("${display_name}")
+        menu_starter_keywords+=("${starter_keyword}")
+        menu_replacement_keywords+=("${replacement_keyword}")
     done < "${temp_unique}"
     
     # Clean up temporary file
@@ -134,11 +319,13 @@ if [[ ${pull_mode} == true ]]; then
             # Format is: "<display_name> -> targeting: <path>" or just "<display_name>"
             selected_display_name=$(echo "${selected_option}" | head -n1 | sed 's/ -> targeting:.*$//')
             
-            # Find the canonical path and target directory for the selected option
+            # Find the canonical path, target directory, and keywords for the selected option
             for i in "${!menu_display_names[@]}"; do
                 if [[ "${menu_display_names[$i]}" == "${selected_display_name}" ]]; then
                     starter_source="${menu_paths[$i]}"
                     stored_target_directory="${menu_targets[$i]}"
+                    stored_starter_keyword="${menu_starter_keywords[$i]}"
+                    stored_replacement_keyword="${menu_replacement_keywords[$i]}"
                     break
                 fi
             done
@@ -252,18 +439,26 @@ original_cwd="$(pwd)"
 cd "${project_root}"
 is_reapply=false
 stored_target_directory=""
+stored_starter_keyword=""
+stored_replacement_keyword=""
 
 # Check if starter was previously applied
 if [[ -f ${applied_starters_file} ]]; then
-    while IFS='|' read -r timestamp type stored_canonical_path stored_target_dir; do
+    while IFS='|' read -r line; do
         # Skip comment lines and empty lines
-        [[ "${timestamp}" =~ ^# ]] && continue
-        [[ -z "${timestamp}" ]] && continue
+        [[ "${line}" =~ ^# ]] && continue
+        [[ -z "${line}" ]] && continue
+        
+        # Parse line - handle both old (4 fields) and new (6 fields) formats
+        IFS='|' read -r line_timestamp line_type line_canonical_path line_target_dir line_starter_kw line_replacement_kw <<< "${line}"
         
         # Check if this canonical path matches
-        if [[ "${stored_canonical_path}" == "${canonical_path}" ]]; then
+        if [[ "${line_canonical_path}" == "${canonical_path}" ]]; then
             is_reapply=true
-            stored_target_directory="${stored_target_dir}"
+            stored_target_directory="${line_target_dir}"
+            # Get stored keywords from the line (empty if old format)
+            stored_starter_keyword="${line_starter_kw:-}"
+            stored_replacement_keyword="${line_replacement_kw:-}"
             # Enable pull mode if not already explicitly set
             if [[ "${pull_mode}" == "false" ]]; then
                 pull_mode=true
@@ -426,6 +621,9 @@ exclusion_patterns=(
     '.idea'
     '__pycache__'
     '.DS_Store'
+    'containers/**/support/**'
+    '.env'
+    '.env.*'
 )
 
 # If in pull mode, show diff view and get confirmation from starter-diff
@@ -434,13 +632,34 @@ if [[ ${pull_mode} == true ]]; then
     echo -e "${txtgrn}Showing differences between starter source and target...${txtrst}"
     echo
     
+    # For pull mode, we need to apply keyword replacement to starter before diffing
+    # This ensures the diff compares apples-to-apples (both sides have keywords replaced)
+    diff_starter_dir="${starter_dir}"
+    temp_diff_starter_dir=""
+    
+    if [[ -n "${stored_starter_keyword}" ]] && [[ -n "${stored_replacement_keyword}" ]]; then
+        # Create temp directory for processed starter for diff
+        temp_diff_starter_dir=$(mktemp -d)
+        
+        echo -e "${txtgry}Processing starter with keyword replacement for diff comparison...${txtrst}"
+        
+        # Apply keyword replacement to starter for diff
+        perform_keyword_replacement "${starter_dir}" "${temp_diff_starter_dir}" "${stored_starter_keyword}" "${stored_replacement_keyword}" "${exclusion_patterns[@]}"
+        
+        # Use processed directory for starter-diff
+        diff_starter_dir="${temp_diff_starter_dir}"
+        
+        echo -e "${txtgrn}Starter processed for diff${txtrst}"
+        echo
+    fi
+    
     # Show diff view and get confirmation
     if command -v starter-diff &> /dev/null; then
         # Create temporary file for rejected files output
         rejected_files_output=$(mktemp)
         
         # Build starter-diff command with exclusions
-        starter_diff_cmd=("starter-diff" "${starter_dir}" "${target_directory}" "--output" "${rejected_files_output}")
+        starter_diff_cmd=("starter-diff" "${diff_starter_dir}" "${target_directory}" "--output" "${rejected_files_output}")
         for pattern in "${exclusion_patterns[@]}"; do
             starter_diff_cmd+=("--exclude" "${pattern}")
         done
@@ -457,6 +676,9 @@ if [[ ${pull_mode} == true ]]; then
         if [[ ${diff_exit_code} -eq 1 ]]; then
             echo "Cancelled."
             rm -f "${rejected_files_output}"
+            if [[ -n "${temp_diff_starter_dir}" ]]; then
+                rm -rf "${temp_diff_starter_dir}"
+            fi
             if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
                 rm -rf ${temp_clone_dir}
             fi
@@ -464,10 +686,18 @@ if [[ ${pull_mode} == true ]]; then
         elif [[ ${diff_exit_code} -gt 1 ]]; then
             echo -e "${txtred}Error: starter-diff encountered an error (exit code: ${diff_exit_code})${txtrst}"
             rm -f "${rejected_files_output}"
+            if [[ -n "${temp_diff_starter_dir}" ]]; then
+                rm -rf "${temp_diff_starter_dir}"
+            fi
             if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
                 rm -rf ${temp_clone_dir}
             fi
             exit 1
+        fi
+        
+        # Clean up temp diff starter directory if we created one (after diff is done)
+        if [[ -n "${temp_diff_starter_dir}" ]]; then
+            rm -rf "${temp_diff_starter_dir}"
         fi
         
         # Exit code 0 - user confirmed, proceed with applying changes
@@ -514,6 +744,76 @@ fi
 
 echo
 
+# Handle keyword replacement
+# Get or prompt for both starter-keyword and replacement keyword
+starter_keyword=""
+replacement_keyword=""
+
+if [[ -n "${stored_starter_keyword}" ]] && [[ -n "${stored_replacement_keyword}" ]]; then
+    # Reuse stored keywords on pull
+    starter_keyword="${stored_starter_keyword}"
+    replacement_keyword="${stored_replacement_keyword}"
+    echo -e "${txtgrn}Using stored keywords:${txtrst}"
+    echo -e "  Starter keyword: ${txtpur}${starter_keyword}${txtrst}"
+    echo -e "  Replacement keyword: ${txtpur}${replacement_keyword}${txtrst}"
+    echo
+else
+    # First time applying - prompt for both keywords
+    echo -e "${txtcyn}Keyword Replacement Configuration${txtrst}"
+    echo
+    
+    # Prompt for starter-keyword (what to search for)
+    starter_keyword=$(gum input --prompt="Enter the starter keyword to search for: " --placeholder="starter-keyword" --value="starter-keyword")
+    
+    if [[ -z "${starter_keyword}" ]]; then
+        echo -e "${txtylw}No starter keyword provided. Skipping keyword replacement.${txtrst}"
+        echo
+    else
+        # Prompt for replacement keyword
+        default_replacement=""
+        if command -v getprompt &> /dev/null; then
+            default_replacement=$(getprompt 2>/dev/null || echo "")
+        fi
+        
+        if [[ -n "${default_replacement}" ]]; then
+            replacement_keyword=$(gum input --prompt="Enter keyword to replace '${starter_keyword}' with: " --placeholder="${default_replacement}" --value="${default_replacement}")
+        else
+            replacement_keyword=$(gum input --prompt="Enter keyword to replace '${starter_keyword}' with: " --placeholder="my-keyword")
+        fi
+        
+        if [[ -z "${replacement_keyword}" ]]; then
+            echo -e "${txtylw}No replacement keyword provided. Skipping keyword replacement.${txtrst}"
+            echo
+            starter_keyword=""  # Clear starter_keyword too if no replacement
+        else
+            echo -e "${txtgrn}Keyword replacement: ${txtpur}${starter_keyword}${txtrst} → ${txtpur}${replacement_keyword}${txtrst}"
+            echo
+        fi
+    fi
+fi
+
+# If both keywords are provided, copy starter to temp directory and perform replacement
+processed_starter_dir="${starter_dir}"
+temp_processed_dir=""
+
+if [[ -n "${starter_keyword}" ]] && [[ -n "${replacement_keyword}" ]]; then
+    # Create temp directory for processed starter
+    temp_processed_dir=$(mktemp -d)
+    
+    echo -e "${txtgry}Processing starter with keyword replacement...${txtrst}"
+    
+    # Perform keyword replacement (pass exclusion patterns to skip during copy)
+    perform_keyword_replacement "${starter_dir}" "${temp_processed_dir}" "${starter_keyword}" "${replacement_keyword}" "${exclusion_patterns[@]}"
+    
+    # Use processed directory for rsync
+    processed_starter_dir="${temp_processed_dir}"
+    
+    echo -e "${txtgrn}Keyword replacement completed${txtrst}"
+    echo
+fi
+
+echo
+
 # Build rsync exclude list from exclusion patterns
 rsync_excludes=()
 for pattern in "${exclusion_patterns[@]}"; do
@@ -546,15 +846,15 @@ if command -v rsync &> /dev/null; then
     rsync_args=("${rsync_base_args[@]}" "${rsync_excludes[@]}")
     
     # Build command string for display
-    rsync_cmd="rsync ${rsync_args[*]} ${starter_dir}/ ${target_directory}/"
+    rsync_cmd="rsync ${rsync_args[*]} ${processed_starter_dir}/ ${target_directory}/"
     echo -e "${txtgry}Executing: ${rsync_cmd}${txtrst}"
     
     # Execute rsync
     if rsync --help 2>&1 | grep -q "info=progress2"; then
-        rsync "${rsync_base_args[@]}" "${rsync_excludes[@]}" "${starter_dir}/" "${target_directory}/"
+        rsync "${rsync_base_args[@]}" "${rsync_excludes[@]}" "${processed_starter_dir}/" "${target_directory}/"
     else
         # Older rsync - redirect stdout but keep stderr (progress)
-        rsync "${rsync_base_args[@]}" "${rsync_excludes[@]}" "${starter_dir}/" "${target_directory}/" > /dev/null
+        rsync "${rsync_base_args[@]}" "${rsync_excludes[@]}" "${processed_starter_dir}/" "${target_directory}/" > /dev/null
     fi
 else
     echo -e "${txtred}Error: rsync not found. Please install rsync to use this feature.${txtrst}"
@@ -562,43 +862,34 @@ else
 fi
 
 if [[ $? -eq 0 ]]; then
-    # Record the applied starter with full details for future updates
-    # Format: timestamp|type|canonical_path|target_directory
-    mkdir -p "${AV_PROJECT_CONFIG_DIR}/vars"
-    
-    # Add header if file doesn't exist, is empty, or doesn't have a header
-    if [[ ! -f ${applied_starters_file} ]] || [[ ! -s ${applied_starters_file} ]]; then
-        echo "# timestamp|type|canonical_path|target_directory" > ${applied_starters_file}
-        echo "# type: 'github' or 'local'" >> ${applied_starters_file}
-        echo "# canonical_path: GitHub URL (with .git) or absolute local directory path" >> ${applied_starters_file}
-        echo "# target_directory: Relative path from project root where starter was applied" >> ${applied_starters_file}
-    elif [[ -f ${applied_starters_file} ]] && ! head -n 1 ${applied_starters_file} | grep -q "^# timestamp"; then
-        # File exists but doesn't have header - prepend header to existing content
-        header_file=$(mktemp)
-        echo "# timestamp|type|canonical_path|target_directory" > ${header_file}
-        echo "# type: 'github' or 'local'" >> ${header_file}
-        echo "# canonical_path: GitHub URL (with .git) or absolute local directory path" >> ${header_file}
-        echo "# target_directory: Relative path from project root where starter was applied" >> ${header_file}
-        cat ${applied_starters_file} >> ${header_file}
-        mv ${header_file} ${applied_starters_file}
-    fi
-    
     # Convert absolute path to relative path from project root before saving
     target_rel=$(relpath "${target_directory}" "${project_root}")
     timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "${timestamp}|${starter_type}|${canonical_path}|${target_rel}" >> ${applied_starters_file}
+    
+    # Use empty strings for keywords if not provided
+    final_starter_keyword="${starter_keyword:-}"
+    final_replacement_keyword="${replacement_keyword:-}"
+    
+    # Update or add starter entry (this handles one row per starter and includes keywords)
+    update_applied_starter "${timestamp}" "${starter_type}" "${canonical_path}" "${target_rel}" "${final_starter_keyword}" "${final_replacement_keyword}"
 else
     echo
     echo -e "${txtred}Error: Failed to apply starter${txtrst}"
     if [[ ${is_github} == true ]]; then
         rm -rf ${temp_clone_dir}
     fi
+    if [[ -n "${temp_processed_dir}" ]]; then
+        rm -rf ${temp_processed_dir}
+    fi
     exit 1
 fi
 
-# Clean up temporary clone directory if we cloned from GitHub
+# Clean up temporary directories
 if [[ ${is_github} == true && -n ${temp_clone_dir} ]]; then
     rm -rf ${temp_clone_dir}
+fi
+if [[ -n "${temp_processed_dir}" ]]; then
+    rm -rf ${temp_processed_dir}
 fi
 
 #### End commands
