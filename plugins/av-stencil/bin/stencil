@@ -23,7 +23,6 @@ avCheckHelpFlags "$1" "av-stencil" "Apply additional features to your project" "
       starters    - Apply a starter template from GitHub or local directory\n \
       containers   - Set up container templates\n \
       kubernetes   - Set up Kubernetes configurations\n \
-      clusters     - Set up cluster configurations\n \
       kafka        - Set up Kafka support\n \
 \n"
 

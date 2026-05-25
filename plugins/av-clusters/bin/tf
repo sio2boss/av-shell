@@ -34,10 +34,16 @@ avCheckVerbose "cd $context/terraform && terraform ${cmd}"
 # Import system path
 avAppendSystemPath
 
-if [[ -z "$AWS_PROFILE" ]]; then
-	eval "$(AWS_PROFILE=${ACCOUNT} aws configure export-credentials --format env)"
-else
-	eval "$(AWS_PROFILE=${AWS_PROFILE} aws configure export-credentials --format env)"
+if grep -q 'provider\s*"aws"' $context/terraform/main.tf 2>/dev/null; then
+	if [[ -z "$AWS_PROFILE" ]]; then
+		eval "$(AWS_PROFILE=${ACCOUNT} aws configure export-credentials --format env)"
+	else
+		eval "$(AWS_PROFILE=${AWS_PROFILE} aws configure export-credentials --format env)"
+	fi
+fi
+
+if grep -q 'provider\s*"google"' $context/terraform/main.tf 2>/dev/null; then
+  export GOOGLE_OAUTH_ACCESS_TOKEN="$(gcloud auth print-access-token)"
 fi
 
 cd $context/terraform && terraform ${cmd}

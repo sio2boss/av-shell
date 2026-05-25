@@ -613,18 +613,35 @@ else
 fi
 
 # Define exclusion patterns (used for both starter-diff and rsync)
-exclusion_patterns=(
-    '.git'
-    'node_modules'
-    '.venv'
-    '.av'
-    '.idea'
-    '__pycache__'
-    '.DS_Store'
-    'containers/**/support/**'
-    '.env'
-    '.env.*'
-)
+# Different patterns for initial vs pull mode
+if [[ ${pull_mode} == true ]]; then
+    # Pull mode: exclude .av/config/vars but allow .av otherwise
+    exclusion_patterns=(
+        '.git'
+        'node_modules'
+        '.venv'
+        '.av/config/vars'
+        '.idea'
+        '__pycache__'
+        '.DS_Store'
+        'containers/**/support/**'
+        '.env'
+        '.env.*'
+    )
+else
+    # Initial mode: don't exclude .av at all
+    exclusion_patterns=(
+        '.git'
+        'node_modules'
+        '.venv'
+        '.idea'
+        '__pycache__'
+        '.DS_Store'
+        'containers/**/support/**'
+        '.env'
+        '.env.*'
+    )
+fi
 
 # If in pull mode, show diff view and get confirmation from starter-diff
 if [[ ${pull_mode} == true ]]; then
